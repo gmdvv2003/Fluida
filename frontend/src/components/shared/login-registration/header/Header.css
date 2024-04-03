@@ -1,0 +1,13 @@
+.header-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: var(--header-height);
+	box-shadow: black 0px 0px 1px;
+	background-color: white;
+}
+
+.header-logo {
+	height: var(--header-logo-height);
+}

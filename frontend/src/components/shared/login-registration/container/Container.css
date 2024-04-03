@@ -1,0 +1,17 @@
+.forms-container-holder {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100vw;
+	height: calc(100vh - var(--header-height));
+}
+
+.forms-container {
+	display: flex;
+	justify-content: center;
+	width: max(20%, 400px);
+	height: max(60%, 600px);
+	box-shadow: var(--border-shadow-color) 0px 0px var(--border-shadow-radius);
+	border-radius: var(--border-radius);
+	background-color: white;
+}

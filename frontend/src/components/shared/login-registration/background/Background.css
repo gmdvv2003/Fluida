@@ -1,0 +1,10 @@
+.fluida-background-waves-container {
+	background: url("./../../../../assets/icons/fluida-background-wave.png") center top no-repeat;
+	background-size: 100% 100%;
+}
+
+.fluida-identity-fish-container {
+	background: url("./../../../../assets/icons/fluida-identity-fish.svg") right center no-repeat;
+	background-position: 100% 25%;
+	background-size: 50% 50%;
+}
