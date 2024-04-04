@@ -93,6 +93,18 @@ class UserService {
     };
   }
 
+  logout(accessToken) {
+    const userIndex = users.findIndex(user => user.access_token === accessToken);
+    if (userIndex === -1) {
+      throw new Error('Token de acesso inválido');
+    }
+
+    // Limpar o access_token do objeto do usuário
+    users[userIndex].access_token = '';
+
+    return true; // Indicando que o logout foi realizado com sucesso
+  }
+
 }
 
 module.exports = UserService;

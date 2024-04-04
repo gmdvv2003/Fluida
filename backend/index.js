@@ -23,6 +23,7 @@ const userController = new UserController();
 app.get('/users', (req, res) => userController.findAll(req, res))
 app.post('/users/register', (req, res) => userController.createUser(req, res));
 app.post('/users/login', (req, res) => userController.login(req, res));
+app.post('/users/logout', (req, res) => userController.logout(req, res));
 
 // ====================================================================================
 

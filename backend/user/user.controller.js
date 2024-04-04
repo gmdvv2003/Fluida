@@ -26,6 +26,16 @@ class UserController {
     }
   }
 
+  logout(req, res) {
+    const accessToken = req.headers['access_token'];
+    try {
+      userService.logout(accessToken);
+      res.status(200).json({ message: 'Logout realizado com sucesso' });
+    } catch (error) {
+      res.status(401).json({ error: error.message });
+    }
+  }
+
 }
 
 module.exports = UserController;
