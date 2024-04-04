@@ -9,8 +9,8 @@ class UserController {
   }
 
   createUser(req, res) {
-    const { user_id, username, name, lastname, email, phone_number, hashedpassword } = req.body;
-    const user = userService.createUser(user_id, username, name, lastname, email, phone_number, hashedpassword);
+    const { user_id, username, name, lastname, email, phone_number, password } = req.body;
+    const user = userService.createUser(user_id, username, name, lastname, email, phone_number, password);
     res.json(user);
   }
 
