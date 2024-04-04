@@ -1,4 +1,4 @@
-.HM-header-home-container {
+.HH-header-home-container {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -8,7 +8,7 @@
 	background-color: white;
 }
 
-.HM-container-logo {
+.HH-container-logo {
 	display: flex;
 	width: 25%;
 	height: 100%;
@@ -16,13 +16,13 @@
 	align-items: center;
 }
 
-.HM-header-home-logo {
+.HH-header-home-logo {
 	height: var(--header-logo-height);
 	margin-left: 10px;
 	cursor: pointer;
 }
 
-.HM-input-container {
+.HH-input-container {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -31,7 +31,7 @@
 	position: relative;
 }
 
-.HM-input-search {
+.HH-input-search {
 	display: flex;
 	width: calc(100% - 20px);
 	height: 20px;
@@ -41,11 +41,11 @@
 	padding-right: 20px;
 }
 
-.HM-input-search:focus {
+.HH-input-search:focus {
 	outline: none;
 }
 
-.HM-icon-search {
+.HH-icon-search {
 	position: absolute;
 	top: 50%;
 	right: 5px;
@@ -54,7 +54,7 @@
 	content: url("./../../../../assets/action-icons/lens.svg");
 }
 
-.HM-buttons-container {
+.HH-buttons-container {
 	display: flex;
 	width: 25%;
 	height: 100%;
@@ -62,7 +62,7 @@
 	justify-content: right;
 }
 
-.HM-bell-icon {
+.HH-bell-icon {
 	display: flex;
 	margin-right: 10px;
 	height: 25px;
@@ -71,7 +71,7 @@
 	cursor: pointer;
 }
 
-.HM-settins-icon {
+.HH-settings-icon {
 	margin-right: 10px;
 	height: 27px;
 	content: url("./../../../../assets/action-icons/settings.svg");
@@ -79,7 +79,7 @@
 	cursor: pointer;
 }
 
-.HM-photo-icon {
+.HH-photo-icon {
 	margin-right: 15px;
 	height: 35px;
 	content: url("./../../../../assets/action-icons/add-circle-full.svg");

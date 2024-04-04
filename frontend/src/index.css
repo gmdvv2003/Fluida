@@ -8,6 +8,7 @@
 	--header-logo-height: 45%;
 
 	--action-button-background-color: #fe8e04;
+	--action-button-selected-background-color: rgb(218, 120, 0);
 }
 
 body {

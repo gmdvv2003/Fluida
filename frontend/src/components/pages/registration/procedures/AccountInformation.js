@@ -1,4 +1,8 @@
-import React, { useState, useImperativeHandle } from "react";
+import React, { useRef, useState, useEffect, useImperativeHandle } from "react";
+
+import EmailInputTypeValidator from "utilities/inputs-validators/models/EmailInputTypeValidator";
+import NameInputTypeValidator from "utilities/inputs-validators/models/NameInputTypeValidator";
+import PhoneNumberInputTypeValidator from "utilities/inputs-validators/models/PhoneNumberInputTypeValidator";
 
 import InputFieldError from "components/shared/login-registration/error/InputFieldError";
 
@@ -13,13 +17,44 @@ import "./../Registration.css";
 import "./AccountInformation.css";
 
 const AccountInformation = React.forwardRef(({ nextProcedure, previousProcedure }, ref) => {
-	const [invalidEmail, setInvalidEmail] = useState(false);
-	const [invalidName, setInvalidName] = useState(false);
-	const [invalidPhoneNumber, setInvalidPhoneNumber] = useState(false);
+	const emailFieldReference = useRef(null);
+	const firstNameFieldReference = useRef(null);
+	const lastNameFieldReference = useRef(null);
+	const phoneNumberReference = useRef(null);
+
+	const [invalidEmail, setInvalidEmail] = useState(true);
+	const [invalidFirstName, setInvalidFirstName] = useState(true);
+	const [invalidLastName, setInvalidLastName] = useState(true);
+	const [invalidPhoneNumber, setInvalidPhoneNumber] = useState(true);
+
+	function handleOnEmailChange(event) {
+		setInvalidEmail(!EmailInputTypeValidator.validate(event.target.value));
+	}
+
+	function handleOnNameChange(event) {
+		setInvalidFirstName(!NameInputTypeValidator.validate(event.target.value));
+	}
+
+	function handleOnLastNameChange(event) {
+		setInvalidLastName(!NameInputTypeValidator.validate(event.target.value));
+	}
+
+	function handleOnPhoneNumberChange(event) {
+		setInvalidPhoneNumber(!PhoneNumberInputTypeValidator.validate(event.target.value));
+	}
 
 	function handleOnContinueButton() {
-		nextProcedure();
+		if (!invalidEmail && !invalidFirstName && !invalidLastName && !invalidPhoneNumber) {
+			nextProcedure();
+		}
 	}
+
+	useEffect(() => {
+		emailFieldReference.current.onTextChange(handleOnEmailChange);
+		firstNameFieldReference.current.onTextChange(handleOnNameChange);
+		lastNameFieldReference.current.onTextChange(handleOnLastNameChange);
+		phoneNumberReference.current.onTextChange(handleOnPhoneNumberChange);
+	}, []);
 
 	return (
 		<div>
@@ -37,6 +72,7 @@ const AccountInformation = React.forwardRef(({ nextProcedure, previousProcedure 
 									grid_template_areas="email_field"
 								>
 									<TextInputField
+										ref={emailFieldReference}
 										name="email"
 										placeholder="Insira um email válido"
 										grid_area="email_field"
@@ -52,11 +88,13 @@ const AccountInformation = React.forwardRef(({ nextProcedure, previousProcedure 
 									grid_template_areas="first_name last_name"
 								>
 									<TextInputField
+										ref={firstNameFieldReference}
 										name="name"
 										placeholder="Primeiro nome"
 										grid_area="first_name"
 									/>
 									<TextInputField
+										ref={lastNameFieldReference}
 										name="name"
 										placeholder="Ultimo nome"
 										grid_area="last_name"
@@ -64,11 +102,13 @@ const AccountInformation = React.forwardRef(({ nextProcedure, previousProcedure 
 								</InputFieldContainer>
 							</div>
 
-							{invalidName && <InputFieldError error="Nome inválido." />}
+							{(invalidFirstName || invalidLastName) && (
+								<InputFieldError error="Nome inválido." />
+							)}
 
 							<div>
 								<InputFieldContainer description="Insira o seu número de telefone.">
-									<PhoneNumberField />
+									<PhoneNumberField ref={phoneNumberReference} />
 								</InputFieldContainer>
 							</div>
 
@@ -77,7 +117,9 @@ const AccountInformation = React.forwardRef(({ nextProcedure, previousProcedure 
 							)}
 
 							<div className="R-registration-button">
-								<button onClick={handleOnContinueButton}>Continuar</button>
+								<button type="button" onClick={handleOnContinueButton}>
+									Continuar
+								</button>
 							</div>
 
 							<div className="R-registration-footer">
