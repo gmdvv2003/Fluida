@@ -1,14 +1,14 @@
 class UserEntity {
   
-  constructor(user_id, username, name, lastname, email, phone_number, password, access_token){
-    this.user_id = user_id;
-    this.username = username;
-    this.name = name;
-    this.lastname = lastname;
-    this.email = email;
-    this.phone_number = phone_number;
-    this.password = password;
-    this.access_token = access_token;
+  constructor(userData){
+    this.user_id = userData.user_id;
+    this.username = userData.username;
+    this.name = userData.name;
+    this.lastname = userData.lastname;
+    this.email = userData.email;
+    this.phone_number = userData.phone_number;
+    this.password = userData.password;
+    this.access_token = userData.access_token;
   }
 
   sonarLint(){
