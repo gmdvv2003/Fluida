@@ -14,14 +14,15 @@ const UserController = require('./user/user.controller.js')
 
 // INSTÂNCIAS
 
-const userControler = new UserController();
+const userController = new UserController();
 
 // ====================================================================================
 
 // ENDPOINTS
 
-app.get('/users', (req, res) => userControler.findAll(req, res))
-app.post('/users/register', (req, res) => userControler.createUser(req, res));
+app.get('/users', (req, res) => userController.findAll(req, res))
+app.post('/users/register', (req, res) => userController.createUser(req, res));
+app.post('/users/login', (req, res) => userController.login(req, res));
 
 // ====================================================================================
 

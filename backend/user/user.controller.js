@@ -1,3 +1,5 @@
+const { json } = require('body-parser');
+const jwt = require('jsonwebtoken');
 const UserService = require('./user.service')
 const userService = new UserService();
 
@@ -12,6 +14,16 @@ class UserController {
     const { user_id, username, name, lastname, email, phone_number, password } = req.body;
     const user = userService.createUser(user_id, username, name, lastname, email, phone_number, password);
     res.json(user);
+  }
+
+  login(req, res) {
+    const { email, password } = req.body;
+    try {
+      const token = userService.login(email, password);
+      res.json(token);
+    } catch (error) {
+      res.status(404).json({ error: error.message });
+    }
   }
 
 }
