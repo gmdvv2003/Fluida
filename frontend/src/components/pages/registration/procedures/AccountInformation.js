@@ -23,12 +23,12 @@ const AccountInformation = React.forwardRef(({ nextProcedure, previousProcedure 
 
 	return (
 		<div>
-			<div className="forms-container-holder fluida-background-waves-container">
-				<div className="forms-container-holder fluida-identity-fish-container">
-					<div className="forms-container">
-						<form className="forms">
+			<div className="LR-C-forms-container-holder BG-fluida-background-waves-container">
+				<div className="LR-C-forms-container-holder BG-fluida-identity-fish-container">
+					<div className="LR-C-forms-container">
+						<form className="LR-C-forms">
 							<div>
-								<h3 className="registration-header">Crie sua conta. É grátis.</h3>
+								<h3 className="R-registration-header">Crie sua conta. É grátis.</h3>
 							</div>
 
 							<div>
@@ -38,7 +38,7 @@ const AccountInformation = React.forwardRef(({ nextProcedure, previousProcedure 
 								>
 									<TextInputField
 										name="email"
-										placeholder="Insira um email válido."
+										placeholder="Insira um email válido"
 										grid_area="email_field"
 									/>
 								</InputFieldContainer>
@@ -76,17 +76,17 @@ const AccountInformation = React.forwardRef(({ nextProcedure, previousProcedure 
 								<InputFieldError error="Número de telefone inválido." />
 							)}
 
-							<div className="registration-button">
+							<div className="R-registration-button">
 								<button onClick={handleOnContinueButton}>Continuar</button>
 							</div>
 
-							<div className="registration-footer">
-								<span>
+							<div className="R-registration-footer">
+								<a href="/login">
 									Já possui uma conta? &nbsp;
-									<span className="registration-footer-login-href" href="/login">
+									<span className="R-registration-footer-login-href">
 										Entre aqui.
 									</span>
-								</span>
+								</a>
 							</div>
 						</form>
 					</div>

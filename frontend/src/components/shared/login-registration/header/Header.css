@@ -1,4 +1,4 @@
-.header-container {
+.H-header-container {
 	z-index: 10;
 	display: flex;
 	justify-content: center;
@@ -11,6 +11,6 @@
 	background-color: white;
 }
 
-.header-logo {
+.H-header-logo {
 	height: var(--header-logo-height);
 }

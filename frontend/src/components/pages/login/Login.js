@@ -14,29 +14,34 @@ function Login() {
 	return (
 		<div>
 			<Header />
-			<div className="forms-container-holder fluida-background-waves-container">
-				<div className="forms-container-holder fluida-identity-fish-container">
-					<div className="forms-col-container">
-						<div className="forms-container">
-							<form className="forms">
-								<div className="login-form-title-container">
-									<h1 className="login-form-title">Inicie sessão na sua conta</h1>
+			<div className="LR-C-forms-container-holder BG-fluida-background-waves-container">
+				<div className="LR-C-forms-container-holder BG-fluida-identity-fish-container">
+					<div className="L-forms-column-container">
+						<div className="LR-C-forms-container">
+							<form className="LR-C-forms">
+								<div className="L-login-form-title-container">
+									<h1 className="L-login-form-title">
+										Inicie sessão na sua conta
+									</h1>
 								</div>
-								<div className="google-icon-container">
-									<GoogleIcon className="google-icon" />
-									<div className="login-form-google-button-container">
-										<button className="login-form-google-button" type="button">
+								<div className="L-google-icon-container">
+									<GoogleIcon className="L-google-icon" />
+									<div className="L-login-form-google-button-container">
+										<button
+											className="L-login-form-google-button"
+											type="button"
+										>
 											Faça login com o Google.
 										</button>
 									</div>
 								</div>
 								<div>
-									<h1 className="login-or-text">ou</h1>
+									<h1 className="L-login-or-text">ou</h1>
 								</div>
 
-								<div className="left-email-icon-container">
-									<div className="left-icon-container">
-										<EmailIcon className="left-icon" />
+								<div className="L-left-email-icon-container">
+									<div className="L-left-icon-container">
+										<EmailIcon className="L-left-icon" />
 									</div>
 									<InputFieldContainer>
 										<TextInputField
@@ -50,9 +55,9 @@ function Login() {
 										/>
 									</InputFieldContainer>
 								</div>
-								<div className="left-password-icon-container">
-									<div className="left-icon-container">
-										<PadlockIcon className="left-icon" />
+								<div className="L-left-password-icon-container">
+									<div className="L-left-icon-container">
+										<PadlockIcon className="L-left-icon" />
 									</div>
 									<InputFieldContainer>
 										<TextInputField
@@ -68,26 +73,26 @@ function Login() {
 											placeholder="senha"
 										/>
 									</InputFieldContainer>
-									<div className="reveal-password-icon-container">
-										<OpenEyeIcon className="reveal-password-icon" />
+									<div className="L-reveal-password-icon-container">
+										<OpenEyeIcon className="L-reveal-password-icon" />
 									</div>
 								</div>
-								<div className="login-form-reset-container">
-									<href className="login-form-reset">
+								<div className="L-login-form-reset-container">
+									<href className="L-login-form-reset">
 										Não consegue fazer login?
 									</href>
 								</div>
-								<div className="start-session-button-container">
-									<button type="button" className="start-session-button">
+								<div className="L-start-session-button-container">
+									<button type="button" className="L-start-session-button">
 										Iniciar sessão
 									</button>
 								</div>
 							</form>
 						</div>
-						<div className="register-form-container">
-							<a href="/cadastro" className="register-form">
+						<div className="L-register-form-container">
+							<a href="/cadastro" className="L-register-form">
 								Ainda não tem uma conta?{" "}
-								<b className="register-here-text">Cadastre-se aqui.</b>
+								<b className="L-register-here-text">Cadastre-se aqui.</b>
 							</a>
 						</div>
 					</div>

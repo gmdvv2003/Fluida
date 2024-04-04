@@ -2,7 +2,7 @@ import "./InputFieldContainer.css";
 
 function InputFieldContainer({ children }) {
 	return (
-		<div className="input-field-container">
+		<div className="L-IFC-input-field-container">
 			<div>{children}</div>
 		</div>
 	);

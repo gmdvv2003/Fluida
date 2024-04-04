@@ -1,4 +1,4 @@
-.error-text-container {
+.E-error-text-container {
 	width: 80% !important;
 	display: flex !important;
 	justify-content: left !important;
@@ -6,7 +6,7 @@
 	padding-top: 8px;
 }
 
-.error-text {
+.E-error-text {
 	color: rgb(210, 43, 43);
 	font-size: small;
 }

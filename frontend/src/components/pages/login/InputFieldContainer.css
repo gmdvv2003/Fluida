@@ -1,11 +1,11 @@
-.input-field-container {
+.L-IFC-input-field-container {
 	display: flex;
 	align-items: center;
 	flex-direction: column;
 	width: 100%;
 }
 
-.input-field-container > div {
+.L-IFC-input-field-container > div {
 	display: flex;
 	align-items: center;
 	width: 100%;

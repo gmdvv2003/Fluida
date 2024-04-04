@@ -2,8 +2,8 @@ import "./InputFieldError.css";
 
 function InputFieldError({ error }) {
 	return (
-		<div className="error-text-container">
-			<a className="error-text">{error}</a>
+		<div className="E-error-text-container">
+			<a className="E-error-text">{error}</a>
 		</div>
 	);
 }

@@ -8,13 +8,13 @@ import TextInputField from "./../TextInputField";
 import "./PasswordField.css";
 
 const PasswordField = React.forwardRef(({ name, placeholder }, ref) => {
-	const [onPasswordChangeSubscribers, setOnPasswordChangeSubscribers] = useState([]);
-	const [visible, setVisible] = useState(false);
-
 	const passwordFieldReference = useRef(null);
 
+	const [onPasswordChangeSubscribers, setOnPasswordChangeSubscribers] = useState([]);
+	const [passwordVisibility, setPasswordVisibility] = useState(false);
+
 	function togglePasswordVisibility() {
-		setVisible(!visible);
+		setPasswordVisibility(!passwordVisibility);
 	}
 
 	function handleOnPasswordChange(event) {
@@ -33,10 +33,10 @@ const PasswordField = React.forwardRef(({ name, placeholder }, ref) => {
 
 	useEffect(() => {
 		passwordFieldReference.current.onTextChange(handleOnPasswordChange);
-	})
+	});
 
 	return (
-		<div className="password-input-field-container">
+		<div className="R-PF-password-input-field-container">
 			<TextInputField
 				ref={passwordFieldReference}
 				name="password"
@@ -46,16 +46,16 @@ const PasswordField = React.forwardRef(({ name, placeholder }, ref) => {
 					borderBottomRightRadius: "0px",
 					borderRight: "0px",
 				}}
-				type={!visible ? "text" : "password"}
+				type={!passwordVisibility ? "text" : "password"}
 			/>
 
-			<div className="toggle-password-button-container">
+			<div className="R-PF-toggle-password-button-container">
 				<button
 					type="button"
-					className="toggle-password-button"
+					className="R-PF-toggle-password-button"
 					onClick={togglePasswordVisibility}
 				>
-					{visible ? <ShowPasswordIcon /> : <HidePasswordIcon />}
+					{passwordVisibility ? <ShowPasswordIcon /> : <HidePasswordIcon />}
 				</button>
 			</div>
 		</div>

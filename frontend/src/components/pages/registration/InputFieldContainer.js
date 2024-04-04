@@ -2,12 +2,12 @@ import "./InputFieldContainer.css";
 
 function InputFieldContainer({ description, grid_template_areas, children }) {
 	return (
-		<div className="input-field-container-holder">
+		<div className="IFC-input-field-container-holder">
 			<div>
-				<span className="input-field-description">{description}</span>
+				<span className="IFC-input-field-description">{description}</span>
 			</div>
 			<div
-				className="input-field-container"
+				className="IFC-input-field-container"
 				style={{ gridTemplateAreas: `"${grid_template_areas}"` }}
 			>
 				{children}

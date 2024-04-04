@@ -4,18 +4,18 @@ import "./HeaderHome.css";
 
 function HeaderHome() {
 	return (
-		<div className="header-home-container">
-			<div className="container-logo">
-				<Logo className="header-logo" />
+		<div className="HM-header-home-container">
+			<div className="HM-container-logo">
+				<Logo className="HM-header-logo" />
 			</div>
-			<div className="input-container">
-				<input className="input-search" type="text"></input>
-				<i className="icon-search"></i>
+			<div className="HM-input-container">
+				<input className="HM-input-search" type="text"></input>
+				<i className="HM-icon-search"></i>
 			</div>
-			<div className="buttons-container">
-				<i className="bell-icon"></i>
-				<i className="settins-icon"></i>
-				<i className="photo-icon"></i>
+			<div className="HM-buttons-container">
+				<i className="HM-bell-icon"></i>
+				<i className="HM-settins-icon"></i>
+				<i className="HM-photo-icon"></i>
 			</div>
 		</div>
 	);

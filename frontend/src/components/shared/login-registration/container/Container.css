@@ -1,4 +1,4 @@
-.forms-container-holder {
+.LR-C-forms-container-holder {
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -6,7 +6,7 @@
 	height: calc(100vh - var(--header-height));
 }
 
-.forms-container {
+.LR-C-forms-container {
 	width: clamp(260px, 30%, 550px);
 	height: clamp(240px, 70%, 720px);
 	display: flex;
@@ -17,28 +17,14 @@
 	background-color: white;
 }
 
-.forms {
+.LR-C-forms {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	width: 100%;
 }
 
-.forms > div {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	width: 100%;
-}
-
-.forms {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	width: 100%;
-}
-
-.forms > div {
+.LR-C-forms > div {
 	display: flex;
 	flex-direction: column;
 	align-items: center;

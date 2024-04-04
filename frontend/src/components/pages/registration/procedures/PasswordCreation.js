@@ -6,6 +6,8 @@ import InputFieldContainer from "./../InputFieldContainer";
 import PasswordField from "../input-types/password/PasswordField";
 import PasswordFieldStrength from "../input-types/password/PasswordFieldStrength";
 
+import { ReactComponent as GoBackArrowIcon } from "assets/action-icons/left-circle.svg";
+
 import "./../../../shared/login-registration/background/Background.css";
 import "./../../../shared/login-registration/container/Container.css";
 
@@ -13,10 +15,10 @@ import "./../Registration.css";
 import "./PasswordCreation.css";
 
 const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure }, ref) => {
-	const [matchingPassword, setMatchingPassword] = useState(false);
-
 	const passwordFieldReference = useRef(null);
 	const passwordConfirmationFieldReference = useRef(null);
+
+	const [matchingPassword, setMatchingPassword] = useState(true);
 
 	function onPasswordsChange() {
 		const password = passwordFieldReference.current.ref.current.ref.current.value;
@@ -32,12 +34,12 @@ const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure },
 
 	return (
 		<div>
-			<div className="forms-container-holder fluida-background-waves-container">
-				<div className="forms-container-holder fluida-identity-fish-container">
-					<div className="forms-container">
-						<form className="forms">
+			<div className="LR-C-forms-container-holder BG-fluida-background-waves-container">
+				<div className="LR-C-forms-container-holder BG-fluida-identity-fish-container">
+					<div className="LR-C-forms-container">
+						<form className="LR-C-forms">
 							<div>
-								<h3 className="registration-header">Crie uma senha.</h3>
+								<h3 className="R-registration-header">Crie uma senha.</h3>
 							</div>
 
 							<div>
@@ -67,8 +69,17 @@ const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure },
 
 								<PasswordFieldStrength ref={passwordFieldReference} />
 
-								<div className="registration-button">
+								<div className="R-registration-button">
 									<button>Continuar</button>
+								</div>
+
+								<div className="R-go-back-button-container">
+									<button
+										onClick={previousProcedure}
+										className="R-go-back-button"
+									>
+										<GoBackArrowIcon />
+									</button>
 								</div>
 							</div>
 						</form>

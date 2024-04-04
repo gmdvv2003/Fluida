@@ -1,4 +1,4 @@
-.input-field-container-holder {
+.IFC-input-field-container-holder {
 	width: 80%;
 	display: flex;
 	justify-content: left;
@@ -7,12 +7,12 @@
 	padding-top: 1rem;
 }
 
-.input-field-container {
+.IFC-input-field-container {
 	display: grid;
 	gap: 1rem;
 }
 
-.input-field-description {
+.IFC-input-field-description {
 	color: #3e3e3e;
 	font-size: small;
 	font-weight: bold;
