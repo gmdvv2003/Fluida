@@ -4,7 +4,7 @@ import "./HeaderHome.css";
 
 function HeaderHome() {
 	return (
-		<div className="header-container">
+		<div className="header-home-container">
 			<div className="container-logo">
 				<Logo className="header-logo" />
 			</div>
