@@ -1,0 +1,161 @@
+.login-form-title {
+	text-align: center;
+	font-size: 30px;
+	font-weight: lighter;
+	color: #3e3e3e;
+}
+
+.google-icon-container {
+	width: 100% !important;
+	height: 100% !important;
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	flex-direction: row !important;
+	border-top-left-radius: 0px;
+	border-bottom-left-radius: 0px;
+	border: 1px solid #d1d1d1;
+	border-radius: 5px;
+}
+
+.google-icon {
+	width: 30px;
+	height: 30px;
+}
+
+.left-icon-container,
+.reveal-password-icon-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 50px;
+	height: 50px;
+	border: 1px solid #d1d1d1;
+	border-radius: 5px;
+	box-sizing: border-box;
+}
+
+.left-icon,
+.reveal-password-icon {
+	padding: 10px;
+	width: 50px !important;
+	height: 50px !important;
+	box-sizing: border-box;
+}
+
+.left-icon-container {
+	border-top-right-radius: 0px !important;
+	border-bottom-right-radius: 0px !important;
+	background-color: #f3f3f3;
+	border-right: none;
+}
+
+.reveal-password-icon-container {
+	border-top-left-radius: 0px !important;
+	border-bottom-left-radius: 0px !important;
+	border-left: none;
+}
+
+.login-form-google-button-container {
+	display: flex;
+	justify-content: center;
+}
+
+.login-form-google-button {
+	background-color: transparent;
+	width: 100%;
+	height: 60px;
+	padding: 0px 10px;
+	font-size: 15px;
+	cursor: pointer;
+	border: none;
+}
+
+.login-or-text {
+	text-align: center;
+	color: #3e3e3e;
+	font-size: 17px;
+	font-weight: lighter;
+	margin: 30px;
+}
+
+.login-form-reset {
+	width: 100%;
+	text-align: center;
+	color: #467ef7;
+	font-size: 17px;
+	font-weight: bold;
+	margin: 10px;
+	cursor: pointer;
+}
+
+.login-form-reset-container {
+	display: flex;
+	justify-content: center;
+}
+
+.left-email-icon-container,
+.left-password-icon-container {
+	display: flex !important;
+	justify-content: center !important;
+	align-content: center !important;
+	width: 100% !important;
+	height: 100% !important;
+	flex-direction: row !important;
+}
+
+.forms-col-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+}
+
+.register-form-container {
+	margin-top: 20px;
+}
+
+.register-form {
+	color: white;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.register-here-text:hover {
+	text-decoration: underline;
+}
+
+.start-session-button {
+	background-color: #fe8e04;
+	width: 100%;
+	height: 60px;
+	padding: 0px 10px;
+	margin-top: 40px;
+	border: none;
+	border-radius: 5px;
+	font-size: 20px;
+	color: white;
+	font-weight: bold;
+}
+
+.start-session-button:hover {
+	cursor: pointer;
+}
+.google-icon-container,
+.left-email-icon-container,
+.left-password-icon-container,
+.login-form-reset-container,
+.start-session-button-container {
+	padding-top: 1rem;
+	width: 80% !important;
+}
+
+.left-email-icon-container {
+	padding-top: 0 !important;
+}
+
+.google-icon-container {
+	padding-top: 0 !important;
+}

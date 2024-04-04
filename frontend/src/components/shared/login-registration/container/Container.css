@@ -7,11 +7,26 @@
 }
 
 .forms-container {
+	width: clamp(260px, 30%, 550px);
+	height: clamp(240px, 70%, 720px);
 	display: flex;
 	justify-content: center;
-	width: max(20%, 400px);
-	height: max(60%, 600px);
+	align-items: center;
 	box-shadow: var(--border-shadow-color) 0px 0px var(--border-shadow-radius);
 	border-radius: var(--border-radius);
 	background-color: white;
+}
+
+.forms {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+}
+
+.forms > div {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
 }
