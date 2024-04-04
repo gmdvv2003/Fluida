@@ -55,6 +55,11 @@
 	width: 80% !important;
 }
 
+.R-registration-footer a {
+	text-decoration: none;
+	color: black;
+}
+
 .R-registration-footer-login-href {
 	text-decoration: none;
 	color: var(--action-button-background-color);
@@ -62,4 +67,12 @@
 
 .R-registration-footer {
 	font-weight: normal;
+}
+
+.R-registration-button button:hover {
+	background-color: var(--action-button-selected-background-color);
+}
+
+.R-go-back-button:hover path {
+	fill: var(--action-button-selected-background-color) !important;
 }

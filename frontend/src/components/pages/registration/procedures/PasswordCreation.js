@@ -70,7 +70,7 @@ const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure },
 								<PasswordFieldStrength ref={passwordFieldReference} />
 
 								<div className="R-registration-button">
-									<button>Continuar</button>
+									<button type="button">Continuar</button>
 								</div>
 
 								<div className="R-go-back-button-container">

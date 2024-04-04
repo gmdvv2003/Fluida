@@ -18,3 +18,7 @@
 .R-TIF-text-input-field:focus {
 	outline: none;
 }
+
+.R-TIF-text-input-field:hover {
+	border: #a1a1a1 1px solid;
+}
