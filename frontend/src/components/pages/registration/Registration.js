@@ -1,61 +1,37 @@
+import { useRef, useState } from "react";
+
 import Header from "components/shared/login-registration/header/Header";
 
-import InputFieldContainer from "./InputFieldContainer";
-import TextInputField from "./input-types/TextInputField";
-import PhoneNumberField from "./input-types/PhoneNumberField";
-
-import "./../../shared/login-registration/background/Background.css";
-import "./../../shared/login-registration/container/Container.css";
-
-import "./Registration.css";
+import AccountInformation from "./procedures/AccountInformation";
+import PasswordCreation from "./procedures/PasswordCreation";
 
 function Registration() {
+	const [currentProcedure, setCurrentProcedure] = useState(0);
+
+	function nextProcedure() {
+		setCurrentProcedure(currentProcedure + 1);
+	}
+
+	function previousProcedure() {
+		setCurrentProcedure(Math.max(currentProcedure - 1, 0));
+	}
+
 	return (
 		<div>
 			<Header />
-			<div className="forms-container-holder fluida-background-waves-container">
-				<div className="forms-container-holder fluida-identity-fish-container">
-					<div className="forms-container">
-						<form>
-							<div>
-								<h1>Cria sua conta. É grátis.</h1>
-							</div>
+			<div>
+				{(() => {
+					switch (currentProcedure) {
+						case 0:
+							return <AccountInformation nextProcedure={nextProcedure} previousProcedure={previousProcedure} />;
 
-							<div>
-								<InputFieldContainer description="Insera o seu email de prefêrencia.">
-									<TextInputField
-										name="email"
-										placeholder="Insira um email válido."
-									/>
-								</InputFieldContainer>
-							</div>
+						case 1:
+							return <PasswordCreation nextProcedure={nextProcedure} previousProcedure={previousProcedure} />;
 
-							<div>
-								<InputFieldContainer
-									description="Insera o nome e sobrenome."
-									grid_template="first-name last-name"
-								>
-									<TextInputField
-										name="name"
-										placeholder="Primeiro nome"
-										grid_area="first-name"
-									/>
-									<TextInputField
-										name="name"
-										placeholder="Ultimo nome"
-										grid_area="last-name"
-									/>
-								</InputFieldContainer>
-							</div>
-
-							<div>
-								<InputFieldContainer description="Insira o seu número de telefone.">
-									<PhoneNumberField />
-								</InputFieldContainer>
-							</div>
-						</form>
-					</div>
-				</div>
+						default:
+							break;
+					}
+				})()}
 			</div>
 		</div>
 	);

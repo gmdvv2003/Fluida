@@ -8,11 +8,11 @@ function HeaderHome() {
 			<div className="container-logo">
 				<Logo className="header-logo" />
 			</div>
-			<div className="input-container" >
+			<div className="input-container">
 				<input className="input-search" type="text"></input>
 				<i className="icon-search"></i>
 			</div>
-			<div className="buttons-container" >
+			<div className="buttons-container">
 				<i className="bell-icon"></i>
 				<i className="settins-icon"></i>
 				<i className="photo-icon"></i>

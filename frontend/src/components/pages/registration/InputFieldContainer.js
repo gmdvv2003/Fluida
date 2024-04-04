@@ -1,12 +1,17 @@
 import "./InputFieldContainer.css";
 
-function InputFieldContainer({ description, grid_area, children }) {
+function InputFieldContainer({ description, grid_template_areas, children }) {
 	return (
-		<div className="input-field-container">
+		<div className="input-field-container-holder">
 			<div>
-				<span>{description}</span>
+				<span className="input-field-description">{description}</span>
 			</div>
-			<div>{children}</div>
+			<div
+				className="input-field-container"
+				style={{ gridTemplateAreas: `"${grid_template_areas}"` }}
+			>
+				{children}
+			</div>
 		</div>
 	);
 }

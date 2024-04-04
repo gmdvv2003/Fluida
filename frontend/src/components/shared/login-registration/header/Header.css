@@ -4,6 +4,7 @@
 	justify-content: center;
 	position: relative;
 	align-items: center;
+	position: relative;
 	width: 100%;
 	height: var(--header-height);
 	box-shadow: black 0px 0px 1px;

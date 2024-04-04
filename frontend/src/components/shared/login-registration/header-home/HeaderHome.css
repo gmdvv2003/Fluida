@@ -8,7 +8,7 @@
 	background-color: white;
 }
 
-.container-home-logo{
+.container-logo {
 	display: flex;
 	width: 25%;
 	height: 100%;
@@ -23,38 +23,38 @@
 }
 
 .input-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 50%;
-    height: 100%;
-    position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 50%;
+	height: 100%;
+	position: relative;
 }
 
 .input-search {
-    display: flex;
-    width: calc(100% - 20px); 
-    height: 20px;
-    border-radius: 6px;
-    border: 1px solid rgb(215, 215, 215);
-    background-color: rgb(244, 244, 244);
-    padding-right: 20px; 
+	display: flex;
+	width: calc(100% - 20px);
+	height: 20px;
+	border-radius: 6px;
+	border: 1px solid rgb(215, 215, 215);
+	background-color: rgb(244, 244, 244);
+	padding-right: 20px;
 }
 
 .input-search:focus {
-    outline: none;
+	outline: none;
 }
 
 .icon-search {
-    position: absolute; 
-    top: 50%;
-    right: 5px; 
-    transform: translateY(-50%);
-    height: 15px;
-    content: url('./../../../../assets/action-icons/lens.svg');
+	position: absolute;
+	top: 50%;
+	right: 5px;
+	transform: translateY(-50%);
+	height: 15px;
+	content: url("./../../../../assets/action-icons/lens.svg");
 }
 
-.buttons-container{
+.buttons-container {
 	display: flex;
 	width: 25%;
 	height: 100%;
@@ -62,27 +62,27 @@
 	justify-content: right;
 }
 
-.bell-icon{
+.bell-icon {
 	display: flex;
 	margin-right: 10px;
-    height: 25px;
-    content: url('./../../../../assets/action-icons/bell-notifications.svg');
+	height: 25px;
+	content: url("./../../../../assets/action-icons/bell-notifications.svg");
 	border-radius: 50%;
 	cursor: pointer;
 }
 
-.settins-icon{
+.settins-icon {
 	margin-right: 10px;
 	height: 27px;
-    content: url('./../../../../assets/action-icons/settings.svg');
+	content: url("./../../../../assets/action-icons/settings.svg");
 	border-radius: 50%;
 	cursor: pointer;
 }
 
-.photo-icon{
+.photo-icon {
 	margin-right: 15px;
 	height: 35px;
-    content: url('./../../../../assets/action-icons/add-circle-full.svg');
+	content: url("./../../../../assets/action-icons/add-circle-full.svg");
 	border: 1px solid #c9c9c9;
 	border-radius: 50%;
 	padding: 2px;
