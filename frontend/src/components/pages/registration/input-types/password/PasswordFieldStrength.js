@@ -23,7 +23,7 @@ const PasswordFieldStrength = React.forwardRef((_, ref) => {
 	}
 
 	useEffect(() => {
-		ref.current.onPasswordChange(handleOnPasswordChange);
+		return ref.current.onPasswordChange(handleOnPasswordChange);
 	});
 
 	return (

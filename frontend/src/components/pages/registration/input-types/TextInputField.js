@@ -1,4 +1,6 @@
-import React, { useRef, useState, useImperativeHandle } from "react";
+import React, { useRef, useImperativeHandle } from "react";
+
+import ReactSubscriptionHelper from "utilities/react-subscription-helper/ReactSubscriptionHelper";
 
 import "./TextInputField.css";
 
@@ -6,17 +8,17 @@ const TextInputField = React.forwardRef(
 	({ name, placeholder, grid_area, style = {}, type = "text" }, ref) => {
 		const realRef = useRef(null);
 
-		const [onTextChangeSubscribers, setOnTextChangeSubscribers] = useState([]);
+		const onTextChangeSubscriptionHelper = new ReactSubscriptionHelper();
 
 		function handleOnTextChange(event) {
-			onTextChangeSubscribers.forEach((subscriber) => {
-				subscriber(event);
+			onTextChangeSubscriptionHelper.getSubscriptions().forEach((subscriber) => {
+				subscriber.notify(event);
 			});
 		}
 
 		useImperativeHandle(ref, () => ({
 			onTextChange: (subscriber) => {
-				setOnTextChangeSubscribers([...onTextChangeSubscribers, subscriber]);
+				return onTextChangeSubscriptionHelper.subscribe(subscriber);
 			},
 			ref: realRef,
 		}));

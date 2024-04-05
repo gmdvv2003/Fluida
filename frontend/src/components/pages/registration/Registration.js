@@ -6,7 +6,7 @@ import AccountInformation from "./procedures/AccountInformation";
 import PasswordCreation from "./procedures/PasswordCreation";
 
 function Registration() {
-	const [currentProcedure, setCurrentProcedure] = useState(0);
+	const [currentProcedure, setCurrentProcedure] = useState(1);
 
 	function nextProcedure() {
 		setCurrentProcedure(currentProcedure + 1);
@@ -23,10 +23,20 @@ function Registration() {
 				{(() => {
 					switch (currentProcedure) {
 						case 0:
-							return <AccountInformation nextProcedure={nextProcedure} previousProcedure={previousProcedure} />;
+							return (
+								<AccountInformation
+									nextProcedure={nextProcedure}
+									previousProcedure={previousProcedure}
+								/>
+							);
 
 						case 1:
-							return <PasswordCreation nextProcedure={nextProcedure} previousProcedure={previousProcedure} />;
+							return (
+								<PasswordCreation
+									nextProcedure={nextProcedure}
+									previousProcedure={previousProcedure}
+								/>
+							);
 
 						default:
 							break;

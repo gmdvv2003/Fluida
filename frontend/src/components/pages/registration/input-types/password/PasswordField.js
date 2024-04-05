@@ -3,6 +3,8 @@ import React, { useRef, useState, useEffect, useImperativeHandle } from "react";
 import { ReactComponent as ShowPasswordIcon } from "assets/action-icons/eye-closed.svg";
 import { ReactComponent as HidePasswordIcon } from "assets/action-icons/eye-open.svg";
 
+import ReactSubscriptionHelper from "utilities/react-subscription-helper/ReactSubscriptionHelper";
+
 import TextInputField from "./../TextInputField";
 
 import "./PasswordField.css";
@@ -10,29 +12,30 @@ import "./PasswordField.css";
 const PasswordField = React.forwardRef(({ name, placeholder }, ref) => {
 	const passwordFieldReference = useRef(null);
 
-	const [onPasswordChangeSubscribers, setOnPasswordChangeSubscribers] = useState([]);
 	const [passwordVisibility, setPasswordVisibility] = useState(false);
+
+	const onPasswordChangeSubscriptionHelper = new ReactSubscriptionHelper();
 
 	function togglePasswordVisibility() {
 		setPasswordVisibility(!passwordVisibility);
 	}
 
 	function handleOnPasswordChange(event) {
-		onPasswordChangeSubscribers.forEach((subscriber) => {
-			subscriber(event);
+		onPasswordChangeSubscriptionHelper.getSubscriptions().forEach((subscription) => {
+			subscription.notify(event);
 		});
 	}
 
 	useImperativeHandle(ref, () => ({
 		onPasswordChange: (subscriber) => {
-			setOnPasswordChangeSubscribers([...onPasswordChangeSubscribers, subscriber]);
+			return onPasswordChangeSubscriptionHelper.subscribe(subscriber);
 		},
 
 		ref: passwordFieldReference,
 	}));
 
 	useEffect(() => {
-		passwordFieldReference.current.onTextChange(handleOnPasswordChange);
+		return passwordFieldReference.current.onTextChange(handleOnPasswordChange);
 	});
 
 	return (

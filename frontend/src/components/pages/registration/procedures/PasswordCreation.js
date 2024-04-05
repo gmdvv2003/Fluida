@@ -28,9 +28,17 @@ const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure },
 	}
 
 	useEffect(() => {
-		passwordFieldReference.current.onPasswordChange(onPasswordsChange);
-		passwordConfirmationFieldReference.current.onPasswordChange(onPasswordsChange);
-	}, []);
+		const unbindPasswordChangeSubscription =
+			passwordFieldReference.current.onPasswordChange(onPasswordsChange);
+
+		const unbindPasswordConfirmationChangeSubscription =
+			passwordConfirmationFieldReference.current.onPasswordChange(onPasswordsChange);
+
+		return () => {
+			unbindPasswordChangeSubscription();
+			unbindPasswordConfirmationChangeSubscription();
+		};
+	});
 
 	return (
 		<div>

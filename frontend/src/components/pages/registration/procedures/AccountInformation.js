@@ -50,11 +50,25 @@ const AccountInformation = React.forwardRef(({ nextProcedure, previousProcedure 
 	}
 
 	useEffect(() => {
-		emailFieldReference.current.onTextChange(handleOnEmailChange);
-		firstNameFieldReference.current.onTextChange(handleOnNameChange);
-		lastNameFieldReference.current.onTextChange(handleOnLastNameChange);
-		phoneNumberReference.current.onTextChange(handleOnPhoneNumberChange);
-	}, []);
+		const unbindEmailChangeSubscription =
+			emailFieldReference.current.onTextChange(handleOnEmailChange);
+
+		const unbindFirstNameChangeSubscription =
+			firstNameFieldReference.current.onTextChange(handleOnNameChange);
+
+		const unbindLastNameChangeSubscription =
+			lastNameFieldReference.current.onTextChange(handleOnLastNameChange);
+
+		const unbindPhoneNumberChangeSubscription =
+			phoneNumberReference.current.onTextChange(handleOnPhoneNumberChange);
+
+		return () => {
+			unbindEmailChangeSubscription();
+			unbindFirstNameChangeSubscription();
+			unbindLastNameChangeSubscription();
+			unbindPhoneNumberChangeSubscription();
+		};
+	});
 
 	return (
 		<div>
