@@ -1,3 +1,5 @@
+import { useRef, useState, useEffect } from "react";
+
 import Header from "components/shared/login-registration/header/Header";
 import InputFieldContainer from "./InputFieldContainer";
 import TextInputField from "./input-types/TextInputField";
@@ -6,11 +8,49 @@ import "./../../shared/login-registration/container/Container.css";
 import "./Login.css";
 import { ReactComponent as GoogleIcon } from "assets/action-icons/google-icon.svg";
 import { ReactComponent as EmailIcon } from "assets/action-icons/email.svg";
-import { ReactComponent as PadlockIcon } from "assets/action-icons/padlock.svg";
-import { ReactComponent as OpenEyeIcon } from "assets/action-icons/eye-open.svg";
-import { ReactComponent as ClosedEyeIcon } from "assets/action-icons/eye-closed.svg";
+import PasswordField from "./input-types/PasswordField";
+import InputFieldError from "components/shared/login-registration/error/InputFieldError";
 
 function Login() {
+	const emailFieldReference = useRef(null);
+	const passwordFieldReference = useRef(null);
+
+	const [enteredEmail, setEnteredEmail] = useState(false);
+	const [enteredPassword, setEnteredPassword] = useState(false);
+
+	const [invalidEmail, setInvalidEmail] = useState(false);
+	const [invalidPassword, setInvalidPassword] = useState(false);
+
+	const [wrongCredentials, setWrongCredentials] = useState(false);
+
+	function handleOnLoginButton() {
+		setInvalidEmail(emailFieldReference.current.ref.current.value.length <= 0);
+		setInvalidPassword(
+			passwordFieldReference.current.ref.current.ref.current.value.length <= 0
+		);
+	}
+
+	function handleOnEmailChange(event) {
+		setEnteredEmail(event.target.value);
+	}
+
+	function handleOnPasswordChange(event) {
+		setEnteredPassword(event.target.value);
+	}
+
+	useEffect(() => {
+		const unbindEmailChangeSubscription =
+			emailFieldReference.current.onTextChange(handleOnEmailChange);
+
+		const unbindPasswordChangeSubscription =
+			passwordFieldReference.current.onPasswordChange(handleOnPasswordChange);
+
+		return () => {
+			unbindEmailChangeSubscription();
+			unbindPasswordChangeSubscription();
+		};
+	});
+
 	return (
 		<div>
 			<Header />
@@ -45,6 +85,7 @@ function Login() {
 									</div>
 									<InputFieldContainer>
 										<TextInputField
+											ref={emailFieldReference}
 											style={{
 												borderTopLeftRadius: "0px",
 												borderBottomLeftRadius: "0px",
@@ -55,35 +96,32 @@ function Login() {
 										/>
 									</InputFieldContainer>
 								</div>
-								<div className="L-left-password-icon-container">
-									<div className="L-left-icon-container">
-										<PadlockIcon className="L-left-icon" />
-									</div>
-									<InputFieldContainer>
-										<TextInputField
-											style={{
-												borderTopLeftRadius: "0px",
-												borderBottomLeftRadius: "0px",
-												borderTopRightRadius: "0px",
-												borderBottomRightRadius: "0px",
-												borderLeft: "none",
-												borderRight: "none",
-											}}
-											name="password"
-											placeholder="senha"
-										/>
-									</InputFieldContainer>
-									<div className="L-reveal-password-icon-container">
-										<OpenEyeIcon className="L-reveal-password-icon" />
-									</div>
-								</div>
+
+								{invalidEmail && !wrongCredentials && (
+									<InputFieldError error="Preencha este campo." />
+								)}
+
+								<PasswordField ref={passwordFieldReference} />
+
+								{invalidPassword && !wrongCredentials && (
+									<InputFieldError error="Preencha este campo." />
+								)}
+
+								{wrongCredentials && (
+									<InputFieldError error="Email e usuário ou senha inválidos." />
+								)}
+
 								<div className="L-login-form-reset-container">
 									<href className="L-login-form-reset">
 										Não consegue fazer login?
 									</href>
 								</div>
 								<div className="L-start-session-button-container">
-									<button type="button" className="L-start-session-button">
+									<button
+										onClick={handleOnLoginButton}
+										type="button"
+										className="L-start-session-button"
+									>
 										Iniciar sessão
 									</button>
 								</div>
