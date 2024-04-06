@@ -5,7 +5,7 @@ import ReactSubscriptionHelper from "utilities/react-subscription-helper/ReactSu
 import "./TextInputField.css";
 
 const TextInputField = React.forwardRef(
-	({ name, placeholder, grid_area, style = {}, type = "text" }, ref) => {
+	({ name, placeholder, grid_area, container_style = {}, style = {}, type = "text" }, ref) => {
 		const realRef = useRef(null);
 
 		const onTextChangeSubscriptionHelper = new ReactSubscriptionHelper();
@@ -23,8 +23,10 @@ const TextInputField = React.forwardRef(
 			ref: realRef,
 		}));
 
+		container_style.gridArea = grid_area;
+
 		return (
-			<div className="R-TIF-text-input-field-container" style={{ gridArea: grid_area }}>
+			<div className="R-TIF-text-input-field-container" style={container_style}>
 				<input
 					ref={realRef}
 					className="R-TIF-text-input-field"

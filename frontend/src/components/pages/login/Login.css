@@ -1,3 +1,6 @@
+.L-login-form-title-container {
+	padding-top: 0rem;
+}
 .L-login-form-title {
 	text-align: center;
 	font-size: 30px;
@@ -7,7 +10,6 @@
 
 .L-google-icon-container {
 	width: 100% !important;
-	height: 100% !important;
 	display: flex !important;
 	align-items: center !important;
 	justify-content: center !important;
@@ -96,6 +98,7 @@
 	font-weight: bold;
 	margin: 10px;
 	cursor: pointer;
+	text-decoration: none;
 }
 
 .L-login-form-reset-container {
@@ -109,7 +112,6 @@
 	justify-content: center !important;
 	align-content: center !important;
 	width: 100% !important;
-	height: 100% !important;
 	flex-direction: row !important;
 }
 
@@ -143,7 +145,7 @@
 	padding: 0px 10px;
 	margin-top: 40px;
 	border: none;
-	border-radius: 5px;
+	border-radius: var(--border-radius);
 	font-size: 20px;
 	color: white;
 	font-weight: bold;

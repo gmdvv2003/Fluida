@@ -1,16 +1,16 @@
 .R-registration-header {
 	width: 100%;
 	font-weight: 500;
-	padding-top: 3rem;
 	padding-left: 10%;
 	padding-right: 10%;
 	text-align: center;
+	font-size: var(--login-registration-header-font-size);
 }
 
 .R-registration-button {
 	padding-top: 3rem;
 	width: 80% !important;
-	height: 3rem;
+	height: var(--action-button-height);
 }
 
 .R-registration-button button {
@@ -20,6 +20,12 @@
 	color: white;
 	border-radius: var(--border-radius);
 	background-color: var(--action-button-background-color);
+	font-size: var(--action-button-font-size);
+	font-weight: bold;
+}
+
+.R-registration-button button:hover {
+	cursor: pointer;
 }
 
 .R-go-back-button-container {
@@ -75,4 +81,8 @@
 
 .R-go-back-button:hover path {
 	fill: var(--action-button-selected-background-color) !important;
+}
+
+.R-container-offset {
+	height: 38px;
 }

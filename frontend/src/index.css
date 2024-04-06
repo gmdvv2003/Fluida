@@ -8,7 +8,13 @@
 	--header-logo-height: 45%;
 
 	--action-button-background-color: #fe8e04;
-	--action-button-selected-background-color: rgb(218, 120, 0);
+	--action-button-selected-background-color: #f48700;
+	--action-button-height: 60px;
+	--action-button-font-size: 20px;
+
+	--login-registration-header-font-size: 30px;
+	--login-registration-input-field-title-font-size: 15px;
+	--login-registration-placeholder-font-size: 14px;
 }
 
 body {
@@ -17,7 +23,7 @@ body {
 	font-family: Arial, Helvetica, sans-serif, Geneva, Verdana;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-	font-size: small;
+	font-size: 16px;
 }
 
 code {

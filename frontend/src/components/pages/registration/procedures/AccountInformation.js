@@ -82,13 +82,13 @@ const AccountInformation = React.forwardRef(({ nextProcedure, previousProcedure 
 
 							<div>
 								<InputFieldContainer
-									description="Insira o seu email de prefêrencia."
+									description="Insira o seu email de prefêrencia"
 									grid_template_areas="email_field"
 								>
 									<TextInputField
 										ref={emailFieldReference}
 										name="email"
-										placeholder="Insira um email válido"
+										placeholder="Email"
 										grid_area="email_field"
 									/>
 								</InputFieldContainer>
@@ -98,19 +98,19 @@ const AccountInformation = React.forwardRef(({ nextProcedure, previousProcedure 
 
 							<div>
 								<InputFieldContainer
-									description="Insira o nome e sobrenome."
+									description="Insira seu nome e sobrenome"
 									grid_template_areas="first_name last_name"
 								>
 									<TextInputField
 										ref={firstNameFieldReference}
-										name="name"
+										name="given-name"
 										placeholder="Primeiro nome"
 										grid_area="first_name"
 									/>
 									<TextInputField
 										ref={lastNameFieldReference}
-										name="name"
-										placeholder="Ultimo nome"
+										name="family-name"
+										placeholder="Último nome"
 										grid_area="last_name"
 									/>
 								</InputFieldContainer>
@@ -121,7 +121,7 @@ const AccountInformation = React.forwardRef(({ nextProcedure, previousProcedure 
 							)}
 
 							<div>
-								<InputFieldContainer description="Insira o seu número de telefone.">
+								<InputFieldContainer description="Insira o seu número de telefone">
 									<PhoneNumberField ref={phoneNumberReference} />
 								</InputFieldContainer>
 							</div>
@@ -146,6 +146,7 @@ const AccountInformation = React.forwardRef(({ nextProcedure, previousProcedure 
 							</div>
 						</form>
 					</div>
+					<div className="R-container-offset"></div>
 				</div>
 			</div>
 		</div>

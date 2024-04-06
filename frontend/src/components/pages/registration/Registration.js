@@ -6,7 +6,7 @@ import AccountInformation from "./procedures/AccountInformation";
 import PasswordCreation from "./procedures/PasswordCreation";
 
 function Registration() {
-	const [currentProcedure, setCurrentProcedure] = useState(1);
+	const [currentProcedure, setCurrentProcedure] = useState(0);
 
 	function nextProcedure() {
 		setCurrentProcedure(currentProcedure + 1);

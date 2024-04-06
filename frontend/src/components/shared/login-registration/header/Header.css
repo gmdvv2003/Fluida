@@ -7,7 +7,7 @@
 	position: relative;
 	width: 100%;
 	height: var(--header-height);
-	box-shadow: black 0px 0px 1px;
+	box-shadow: rgb(211, 211, 211) 0px 0px 6px;
 	background-color: white;
 }
 
