@@ -1,6 +1,5 @@
 import React, { useState, useRef, useImperativeHandle, useEffect } from "react";
-import TextInputField from "./TextInputField";
-import InputFieldContainer from "./../InputFieldContainer";
+import TextInputField from "components/shared/text-input-field/TextInputField";
 import "./PasswordField.css";
 import "./../Login.css";
 
@@ -44,27 +43,21 @@ const PasswordField = React.forwardRef(({}, ref) => {
 			<div className="L-left-icon-container">
 				<PadlockIcon className="L-left-icon" />
 			</div>
-			<InputFieldContainer>
-				<TextInputField
-					ref={passwordFieldReference}
-					style={{
-						borderTopLeftRadius: "0px",
-						borderBottomLeftRadius: "0px",
-						borderTopRightRadius: "0px",
-						borderBottomRightRadius: "0px",
-						borderLeft: "none",
-						borderRight: "none",
-					}}
-					placeholder="senha"
-					type={passwordVisibility ? "text" : "password"}
-				/>
-			</InputFieldContainer>
+			<TextInputField
+				ref={passwordFieldReference}
+				style={{
+					borderTopLeftRadius: "0px",
+					borderBottomLeftRadius: "0px",
+					borderTopRightRadius: "0px",
+					borderBottomRightRadius: "0px",
+					borderLeft: "none",
+					borderRight: "none",
+				}}
+				placeholder="senha"
+				type={passwordVisibility ? "text" : "password"}
+			/>
 			<div className="L-reveal-password-icon-container">
-				<button
-					type="button"
-					className="L-PF-toggle-password-button"
-					onClick={togglePasswordVisibility}
-				>
+				<button type="button" className="L-PF-toggle-password-button" onClick={togglePasswordVisibility}>
 					{(passwordVisibility && <OpenEyeIcon className="L-reveal-password-icon" />) || (
 						<ClosedEyeIcon className="L-reveal-password-icon" />
 					)}

@@ -1,7 +1,8 @@
 import { useRef, useState, useEffect } from "react";
 import Header from "components/shared/login-registration/header/Header";
-import InputFieldContainer from "./InputFieldContainer";
-import TextInputField from "./input-types/TextInputField";
+// import InputFieldContainer from "./InputFieldContainer";
+// import TextInputField from "./input-types/TextInputField";
+import TextInputField from "components/shared/text-input-field/TextInputField";
 import PasswordField from "./input-types/PasswordField";
 import InputFieldError from "components/shared/login-registration/error/InputFieldError";
 
@@ -26,9 +27,7 @@ function Login() {
 
 	function handleOnLoginButton() {
 		setInvalidEmail(emailFieldReference.current.ref.current.value.length <= 0);
-		setInvalidPassword(
-			passwordFieldReference.current.ref.current.ref.current.value.length <= 0
-		);
+		setInvalidPassword(passwordFieldReference.current.ref.current.ref.current.value.length <= 0);
 	}
 
 	function handleOnEmailChange(event) {
@@ -40,11 +39,9 @@ function Login() {
 	}
 
 	useEffect(() => {
-		const unbindEmailChangeSubscription =
-			emailFieldReference.current.onTextChange(handleOnEmailChange);
+		const unbindEmailChangeSubscription = emailFieldReference.current.onTextChange(handleOnEmailChange);
 
-		const unbindPasswordChangeSubscription =
-			passwordFieldReference.current.onPasswordChange(handleOnPasswordChange);
+		const unbindPasswordChangeSubscription = passwordFieldReference.current.onPasswordChange(handleOnPasswordChange);
 
 		return () => {
 			unbindEmailChangeSubscription();
@@ -78,33 +75,25 @@ function Login() {
 								<div className="L-left-icon-container">
 									<EmailIcon className="L-left-icon" />
 								</div>
-								<InputFieldContainer>
-									<TextInputField
-										ref={emailFieldReference}
-										style={{
-											borderTopLeftRadius: "0px",
-											borderBottomLeftRadius: "0px",
-											borderLeft: "none",
-										}}
-										name="email"
-										placeholder="usuário/email"
-									/>
-								</InputFieldContainer>
+								<TextInputField
+									ref={emailFieldReference}
+									style={{
+										borderTopLeftRadius: "0px",
+										borderBottomLeftRadius: "0px",
+										borderLeft: "none",
+									}}
+									name="email"
+									placeholder="usuário/email"
+								/>
 							</div>
 
-							{invalidEmail && !wrongCredentials && (
-								<InputFieldError error="Preencha este campo." />
-							)}
+							{invalidEmail && !wrongCredentials && <InputFieldError error="Preencha este campo." />}
 
 							<PasswordField ref={passwordFieldReference} />
 
-							{invalidPassword && !wrongCredentials && (
-								<InputFieldError error="Preencha este campo." />
-							)}
+							{invalidPassword && !wrongCredentials && <InputFieldError error="Preencha este campo." />}
 
-							{wrongCredentials && (
-								<InputFieldError error="Email e usuário ou senha inválidos." />
-							)}
+							{wrongCredentials && <InputFieldError error="Email e usuário ou senha inválidos." />}
 
 							<div className="L-login-form-reset-container">
 								<a href="/send-password-reset" className="L-login-form-reset">
@@ -112,11 +101,7 @@ function Login() {
 								</a>
 							</div>
 							<div className="L-start-session-button-container">
-								<button
-									onClick={handleOnLoginButton}
-									type="button"
-									className="L-start-session-button"
-								>
+								<button onClick={handleOnLoginButton} type="button" className="L-start-session-button">
 									Iniciar sessão
 								</button>
 							</div>
@@ -124,8 +109,7 @@ function Login() {
 					</div>
 					<div className="L-register-form-container">
 						<a href="/registration" className="L-register-form">
-							Ainda não tem uma conta?{" "}
-							<b className="L-register-here-text">Cadastre-se aqui.</b>
+							Ainda não tem uma conta? <b className="L-register-here-text">Cadastre-se aqui.</b>
 						</a>
 					</div>
 				</div>

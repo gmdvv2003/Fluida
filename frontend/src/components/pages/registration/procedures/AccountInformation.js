@@ -6,8 +6,8 @@ import PhoneNumberInputTypeValidator from "utilities/inputs-validators/models/Ph
 
 import InputFieldError from "components/shared/login-registration/error/InputFieldError";
 
-import InputFieldContainer from "./../InputFieldContainer";
-import TextInputField from "./../input-types/TextInputField";
+import InputFieldContainer from "../../../shared/text-input-field/InputFieldContainer";
+import TextInputField from "../../../shared/text-input-field/TextInputField";
 import PhoneNumberField from "./../input-types/PhoneNumberField";
 
 import "./../../../shared/login-registration/background/Background.css";
@@ -50,17 +50,13 @@ const AccountInformation = React.forwardRef(({ nextProcedure, previousProcedure 
 	}
 
 	useEffect(() => {
-		const unbindEmailChangeSubscription =
-			emailFieldReference.current.onTextChange(handleOnEmailChange);
+		const unbindEmailChangeSubscription = emailFieldReference.current.onTextChange(handleOnEmailChange);
 
-		const unbindFirstNameChangeSubscription =
-			firstNameFieldReference.current.onTextChange(handleOnNameChange);
+		const unbindFirstNameChangeSubscription = firstNameFieldReference.current.onTextChange(handleOnNameChange);
 
-		const unbindLastNameChangeSubscription =
-			lastNameFieldReference.current.onTextChange(handleOnLastNameChange);
+		const unbindLastNameChangeSubscription = lastNameFieldReference.current.onTextChange(handleOnLastNameChange);
 
-		const unbindPhoneNumberChangeSubscription =
-			phoneNumberReference.current.onTextChange(handleOnPhoneNumberChange);
+		const unbindPhoneNumberChangeSubscription = phoneNumberReference.current.onTextChange(handleOnPhoneNumberChange);
 
 		return () => {
 			unbindEmailChangeSubscription();
@@ -75,32 +71,21 @@ const AccountInformation = React.forwardRef(({ nextProcedure, previousProcedure 
 			<div className="LR-C-forms-container-holder BG-fluida-background-waves-container">
 				<div className="LR-C-forms-container-holder BG-fluida-identity-fish-container">
 					<div className="LR-C-forms-container">
-						<form className="LR-C-forms">
+						<form className="LR-C-forms" style={{ width: "80%" }}>
 							<div>
 								<h3 className="R-registration-header">Crie sua conta. É grátis.</h3>
 							</div>
 
 							<div>
-								<InputFieldContainer
-									description="Insira o seu email de prefêrencia"
-									grid_template_areas="email_field"
-								>
-									<TextInputField
-										ref={emailFieldReference}
-										name="email"
-										placeholder="Email"
-										grid_area="email_field"
-									/>
+								<InputFieldContainer description="Insira o seu email de prefêrencia" grid_template_areas="email_field">
+									<TextInputField ref={emailFieldReference} name="email" placeholder="Email" grid_area="email_field" />
 								</InputFieldContainer>
 							</div>
 
 							{invalidEmail && <InputFieldError error="Email inválido." />}
 
 							<div>
-								<InputFieldContainer
-									description="Insira seu nome e sobrenome"
-									grid_template_areas="first_name last_name"
-								>
+								<InputFieldContainer description="Insira seu nome e sobrenome" grid_template_areas="first_name last_name">
 									<TextInputField
 										ref={firstNameFieldReference}
 										name="given-name"
@@ -116,9 +101,7 @@ const AccountInformation = React.forwardRef(({ nextProcedure, previousProcedure 
 								</InputFieldContainer>
 							</div>
 
-							{(invalidFirstName || invalidLastName) && (
-								<InputFieldError error="Nome inválido." />
-							)}
+							{(invalidFirstName || invalidLastName) && <InputFieldError error="Nome inválido." />}
 
 							<div>
 								<InputFieldContainer description="Insira o seu número de telefone">
@@ -126,9 +109,7 @@ const AccountInformation = React.forwardRef(({ nextProcedure, previousProcedure 
 								</InputFieldContainer>
 							</div>
 
-							{invalidPhoneNumber && (
-								<InputFieldError error="Número de telefone inválido." />
-							)}
+							{invalidPhoneNumber && <InputFieldError error="Número de telefone inválido." />}
 
 							<div className="R-registration-button">
 								<button type="button" onClick={handleOnContinueButton}>
@@ -139,9 +120,7 @@ const AccountInformation = React.forwardRef(({ nextProcedure, previousProcedure 
 							<div className="R-registration-footer">
 								<a href="/login">
 									Já possui uma conta? &nbsp;
-									<span className="R-registration-footer-login-href">
-										Entre aqui.
-									</span>
+									<span className="R-registration-footer-login-href">Entre aqui.</span>
 								</a>
 							</div>
 						</form>

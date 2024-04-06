@@ -2,9 +2,9 @@ import React, { useRef, useState, useEffect } from "react";
 
 import InputFieldError from "components/shared/login-registration/error/InputFieldError";
 
-import InputFieldContainer from "./../InputFieldContainer";
-import PasswordField from "../input-types/password/PasswordField";
-import PasswordFieldStrength from "../input-types/password/PasswordFieldStrength";
+import InputFieldContainer from "../../../shared/text-input-field/InputFieldContainer";
+import PasswordField from "../../../shared/password-input-field/PasswordField";
+import PasswordFieldStrength from "../../../shared/password-input-field/PasswordFieldStrength";
 
 import { ReactComponent as GoBackArrowIcon } from "assets/action-icons/left-circle.svg";
 
@@ -22,17 +22,14 @@ const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure },
 
 	function onPasswordsChange() {
 		const password = passwordFieldReference.current.ref.current.ref.current.value;
-		const passwordConfirmation =
-			passwordConfirmationFieldReference.current.ref.current.ref.current.value;
+		const passwordConfirmation = passwordConfirmationFieldReference.current.ref.current.ref.current.value;
 		setMatchingPassword(password == passwordConfirmation);
 	}
 
 	useEffect(() => {
-		const unbindPasswordChangeSubscription =
-			passwordFieldReference.current.onPasswordChange(onPasswordsChange);
+		const unbindPasswordChangeSubscription = passwordFieldReference.current.onPasswordChange(onPasswordsChange);
 
-		const unbindPasswordConfirmationChangeSubscription =
-			passwordConfirmationFieldReference.current.onPasswordChange(onPasswordsChange);
+		const unbindPasswordConfirmationChangeSubscription = passwordConfirmationFieldReference.current.onPasswordChange(onPasswordsChange);
 
 		return () => {
 			unbindPasswordChangeSubscription();
@@ -45,24 +42,17 @@ const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure },
 			<div className="LR-C-forms-container-holder BG-fluida-background-waves-container">
 				<div className="LR-C-forms-container-holder BG-fluida-identity-fish-container">
 					<div className="LR-C-forms-container">
-						<form className="LR-C-forms">
+						<form className="LR-C-forms" style={{ width: "80%" }}>
 							<div>
 								<h3 className="R-registration-header">Crie uma senha.</h3>
 							</div>
 
 							<div>
 								<InputFieldContainer description="Digite a sua senha.">
-									<PasswordField
-										ref={passwordFieldReference}
-										name="password"
-										placeholder="Digite uma senha forte"
-									/>
+									<PasswordField ref={passwordFieldReference} name="password" placeholder="Digite uma senha forte" />
 								</InputFieldContainer>
 
-								<InputFieldContainer
-									description="Confirme a sua senha."
-									grid_template_areas="password_confirmation_field"
-								>
+								<InputFieldContainer description="Confirme a sua senha." grid_template_areas="password_confirmation_field">
 									<PasswordField
 										ref={passwordConfirmationFieldReference}
 										name="password"
@@ -71,9 +61,7 @@ const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure },
 									/>
 								</InputFieldContainer>
 
-								{!matchingPassword ? (
-									<InputFieldError error="Senhas não coincidem." />
-								) : null}
+								{!matchingPassword ? <InputFieldError error="Senhas não coincidem." /> : null}
 
 								<PasswordFieldStrength ref={passwordFieldReference} />
 
@@ -82,10 +70,7 @@ const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure },
 								</div>
 
 								<div className="R-go-back-button-container">
-									<button
-										onClick={previousProcedure}
-										className="R-go-back-button"
-									>
+									<button onClick={previousProcedure} className="R-go-back-button">
 										<GoBackArrowIcon />
 									</button>
 								</div>

@@ -1,5 +1,4 @@
-import InputFieldContainer from "../registration/InputFieldContainer";
-import TextInputField from "../registration/input-types/TextInputField";
+import TextInputField from "../../shared/text-input-field/TextInputField";
 import "./SendPasswordReset.css";
 import Header from "components/shared/login-registration/header/Header";
 
@@ -8,8 +7,8 @@ function SendPasswordReset() {
 		<div className="SPR-background-container">
 			<Header />
 			<div className="SPR-box-container">
-				<div className="SPR-form-container" style={{ height: "35%" }}>
-					<div className="SPR-form">
+				<div className="SPR-form-container" style={{ height: "35%", height: "50%" }}>
+					<div className="SPR-form" style={{ width: "80%" }}>
 						<h1 className="SPR-form-title">Esqueceu sua senha?</h1>
 						<p className="SPR-form-description">
 							Insira o email da sua conta, caso ele esteja correto, <br />

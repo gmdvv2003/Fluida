@@ -1,11 +1,11 @@
-.R-TIF-text-input-field-container {
+.TIF-text-input-field-container {
 	width: 100%;
 	height: 100%;
 }
 
-.R-TIF-text-input-field {
+.TIF-text-input-field {
 	width: 100%;
-	height: 2.5rem;
+	height: 50px;
 	padding-top: 0.5rem;
 	padding-bottom: 0.5rem;
 	background-color: transparent;
@@ -16,10 +16,10 @@
 	font-size: var(--login-registration-placeholder-font-size);
 }
 
-.R-TIF-text-input-field:focus {
+.TIF-text-input-field:focus {
 	outline: none;
 }
 
-.R-TIF-text-input-field:hover {
+.TIF-text-input-field:hover {
 	border: #a1a1a1 1px solid;
 }

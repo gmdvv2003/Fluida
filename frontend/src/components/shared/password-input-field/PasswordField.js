@@ -5,7 +5,7 @@ import { ReactComponent as HidePasswordIcon } from "assets/action-icons/eye-open
 
 import ReactSubscriptionHelper from "utilities/react-subscription-helper/ReactSubscriptionHelper";
 
-import TextInputField from "./../TextInputField";
+import TextInputField from "components/shared/text-input-field/TextInputField";
 
 import "./PasswordField.css";
 
@@ -53,11 +53,7 @@ const PasswordField = React.forwardRef(({ name, placeholder }, ref) => {
 			/>
 
 			<div className="R-PF-toggle-password-button-container">
-				<button
-					type="button"
-					className="R-PF-toggle-password-button"
-					onClick={togglePasswordVisibility}
-				>
+				<button type="button" className="R-PF-toggle-password-button" onClick={togglePasswordVisibility}>
 					{passwordVisibility ? <ShowPasswordIcon /> : <HidePasswordIcon />}
 				</button>
 			</div>
