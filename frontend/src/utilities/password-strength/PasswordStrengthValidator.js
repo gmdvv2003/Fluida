@@ -4,7 +4,7 @@ const PASSWORD_STRENGTH_VALIDATORS = {
 			isSatisfied: (password) => {
 				return password.length >= length;
 			},
-			description: `At least ${length} characters`,
+			description: `Pelo menos ${length} caracteres.`,
 		};
 	},
 
@@ -13,7 +13,7 @@ const PASSWORD_STRENGTH_VALIDATORS = {
 			isSatisfied: (password) => {
 				return password.match(/[a-z]/);
 			},
-			description: "At least one lowercase letter",
+			description: "Pelo menos 1 caractere minúsculo.",
 		};
 	},
 
@@ -22,7 +22,7 @@ const PASSWORD_STRENGTH_VALIDATORS = {
 			isSatisfied: (password) => {
 				return password.match(/[A-Z]/);
 			},
-			description: "At least one uppercase letter",
+			description: "Pelo menos 1 caractere maiúsculo.",
 		};
 	},
 
@@ -31,7 +31,7 @@ const PASSWORD_STRENGTH_VALIDATORS = {
 			isSatisfied: (password) => {
 				return password.match(/[0-9]/);
 			},
-			description: "At least one number",
+			description: "Pelo menos 1 número.",
 		};
 	},
 
@@ -40,7 +40,7 @@ const PASSWORD_STRENGTH_VALIDATORS = {
 			isSatisfied: (password) => {
 				return password.match(/[^a-zA-Z0-9]/);
 			},
-			description: "At least one symbol",
+			description: "Pelo menos 1 caractere especial.",
 		};
 	},
 };

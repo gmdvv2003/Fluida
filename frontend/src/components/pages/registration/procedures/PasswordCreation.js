@@ -14,21 +14,36 @@ import "./../../../shared/login-registration/container/Container.css";
 import "./../Registration.css";
 import "./PasswordCreation.css";
 
-const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure }, ref) => {
+const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure, setState }, ref) => {
 	const passwordFieldReference = useRef(null);
 	const passwordConfirmationFieldReference = useRef(null);
+	const passwordStrengthFieldRefrence = useRef(null);
 
+	const [enteredPassword, setEnteredPassword] = useState();
+
+	const [isPasswordNotSatisfied, setIsPasswordNotSatisfied] = useState(false);
 	const [matchingPassword, setMatchingPassword] = useState(true);
 
 	function onPasswordsChange() {
 		const password = passwordFieldReference.current.ref.current.ref.current.value;
 		const passwordConfirmation = passwordConfirmationFieldReference.current.ref.current.ref.current.value;
 		setMatchingPassword(password == passwordConfirmation);
+
+		const isPasswordSatisfied = passwordStrengthFieldRefrence.current.isPasswordSatisfied();
+		setIsPasswordNotSatisfied(!isPasswordSatisfied);
+
+		setEnteredPassword(password);
+	}
+
+	function handleOnContinueButton() {
+		if (matchingPassword && !isPasswordNotSatisfied) {
+			setState("password", enteredPassword);
+			nextProcedure();
+		}
 	}
 
 	useEffect(() => {
 		const unbindPasswordChangeSubscription = passwordFieldReference.current.onPasswordChange(onPasswordsChange);
-
 		const unbindPasswordConfirmationChangeSubscription = passwordConfirmationFieldReference.current.onPasswordChange(onPasswordsChange);
 
 		return () => {
@@ -61,12 +76,24 @@ const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure },
 									/>
 								</InputFieldContainer>
 
-								{!matchingPassword ? <InputFieldError error="Senhas não coincidem." /> : null}
+								{(() => {
+									if (!matchingPassword) {
+										return <InputFieldError error="Senhas não coincidem." />;
+									}
 
-								<PasswordFieldStrength ref={passwordFieldReference} />
+									if (isPasswordNotSatisfied) {
+										return <InputFieldError error="A senha não atende aos requisitos." />;
+									}
+
+									return null;
+								})()}
+
+								<PasswordFieldStrength field={passwordFieldReference} ref={passwordStrengthFieldRefrence} />
 
 								<div className="R-registration-button">
-									<button type="button">Continuar</button>
+									<button type="button" onClick={handleOnContinueButton}>
+										Continuar
+									</button>
 								</div>
 
 								<div className="R-go-back-button-container">

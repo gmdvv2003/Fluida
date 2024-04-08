@@ -1,0 +1,51 @@
+.R-VE-form {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	row-gap: 20px;
+}
+
+.R-VE-form-title {
+	font-size: var(--login-registration-header-font-size);
+	font-weight: 500;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+}
+
+.R-VE-form-sub-title {
+	font-size: calc(var(--login-registration-header-font-size) - 6px);
+	font-weight: 500;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+}
+
+.R-VE-form-description {
+	text-align: center;
+	margin: 0;
+	padding: 0;
+}
+
+.R-VE-button-container {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+}
+
+.R-VE-button {
+	width: 100%;
+	height: var(--action-button-height);
+	border: none;
+	border-radius: var(--border-radius);
+	font-size: var(--action-button-font-size);
+	font-weight: lighter;
+	color: white;
+	background-color: var(--action-button-background-color);
+}
+
+.R-VE-button:hover {
+	cursor: pointer;
+	background-color: var(--action-button-selected-background-color);
+}

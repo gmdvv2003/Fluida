@@ -5,6 +5,7 @@
 	flex-direction: column;
 	width: 100vw;
 	height: calc(100vh - var(--header-height));
+	background-color: var(--background-color);
 }
 
 .LR-C-forms-container {

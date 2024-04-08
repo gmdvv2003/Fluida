@@ -8,7 +8,7 @@
 }
 
 .R-registration-button {
-	padding-top: 3rem;
+	padding-top: 1rem;
 	width: 80% !important;
 	height: var(--action-button-height);
 }

@@ -9,12 +9,14 @@
 
 	--action-button-background-color: #fe8e04;
 	--action-button-selected-background-color: #f48700;
-	--action-button-height: 60px;
+	--action-button-height: 50px;
 	--action-button-font-size: 20px;
 
 	--login-registration-header-font-size: 30px;
 	--login-registration-input-field-title-font-size: 15px;
 	--login-registration-placeholder-font-size: 14px;
+
+	--background-color: rgb(246, 246, 246);
 }
 
 body {

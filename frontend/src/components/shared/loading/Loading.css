@@ -1,0 +1,31 @@
+.S-L-container {
+	width: 100%;
+	height: 100%;
+}
+
+.S-L-logo-container {
+	position: absolute;
+	margin-top: 50px;
+	top: 50%;
+	left: 50%;
+	width: 100%;
+	height: 300px;
+	transform: translate(-50%, -100%);
+	overflow: hidden;
+}
+
+.S-L-logo {
+	position: absolute;
+	top: 100%;
+	left: 50%;
+	width: 400px;
+	height: 400px;
+	margin: -400px 0 0 -200px;
+}
+
+.S-L-text {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, 100%);
+}

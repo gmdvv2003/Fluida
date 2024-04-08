@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useImperativeHandle } from "react";
+import React, { useRef, useState, useEffect } from "react";
 
 import EmailInputTypeValidator from "utilities/inputs-validators/models/EmailInputTypeValidator";
 import NameInputTypeValidator from "utilities/inputs-validators/models/NameInputTypeValidator";
@@ -16,46 +16,64 @@ import "./../../../shared/login-registration/container/Container.css";
 import "./../Registration.css";
 import "./AccountInformation.css";
 
-const AccountInformation = React.forwardRef(({ nextProcedure, previousProcedure }, ref) => {
+const AccountInformation = React.forwardRef(({ nextProcedure, previousProcedure, setState }, ref) => {
 	const emailFieldReference = useRef(null);
 	const firstNameFieldReference = useRef(null);
 	const lastNameFieldReference = useRef(null);
 	const phoneNumberReference = useRef(null);
+
+	const [enteredEmail, setEnteredEmail] = useState();
+	const [enteredFirstName, setEnteredFirstName] = useState();
+	const [enteredLastName, setEnteredLastName] = useState();
+	const [enteredPhoneNumber, setEnteredPhoneNumber] = useState();
 
 	const [invalidEmail, setInvalidEmail] = useState(true);
 	const [invalidFirstName, setInvalidFirstName] = useState(true);
 	const [invalidLastName, setInvalidLastName] = useState(true);
 	const [invalidPhoneNumber, setInvalidPhoneNumber] = useState(true);
 
+	const [hasInvalidFields, setHasInvalidFields] = useState(false);
+
 	function handleOnEmailChange(event) {
 		setInvalidEmail(!EmailInputTypeValidator.validate(event.target.value));
+		setEnteredEmail(event.target.value);
+		setHasInvalidFields(false);
 	}
 
 	function handleOnNameChange(event) {
 		setInvalidFirstName(!NameInputTypeValidator.validate(event.target.value));
+		setEnteredFirstName(event.target.value);
+		setHasInvalidFields(false);
 	}
 
 	function handleOnLastNameChange(event) {
 		setInvalidLastName(!NameInputTypeValidator.validate(event.target.value));
+		setEnteredLastName(event.target.value);
+		setHasInvalidFields(false);
 	}
 
 	function handleOnPhoneNumberChange(event) {
 		setInvalidPhoneNumber(!PhoneNumberInputTypeValidator.validate(event.target.value));
+		setEnteredPhoneNumber(event.target.value);
+		setHasInvalidFields(false);
 	}
 
 	function handleOnContinueButton() {
 		if (!invalidEmail && !invalidFirstName && !invalidLastName && !invalidPhoneNumber) {
+			setState("email", enteredEmail);
+			setState("firstName", enteredFirstName);
+			setState("lastName", enteredLastName);
+			setState("phoneNumber", enteredPhoneNumber);
 			nextProcedure();
+		} else {
+			setHasInvalidFields(true);
 		}
 	}
 
 	useEffect(() => {
 		const unbindEmailChangeSubscription = emailFieldReference.current.onTextChange(handleOnEmailChange);
-
 		const unbindFirstNameChangeSubscription = firstNameFieldReference.current.onTextChange(handleOnNameChange);
-
 		const unbindLastNameChangeSubscription = lastNameFieldReference.current.onTextChange(handleOnLastNameChange);
-
 		const unbindPhoneNumberChangeSubscription = phoneNumberReference.current.onTextChange(handleOnPhoneNumberChange);
 
 		return () => {
@@ -111,10 +129,13 @@ const AccountInformation = React.forwardRef(({ nextProcedure, previousProcedure 
 
 							{invalidPhoneNumber && <InputFieldError error="Número de telefone inválido." />}
 
-							<div className="R-registration-button">
-								<button type="button" onClick={handleOnContinueButton}>
-									Continuar
-								</button>
+							<div style={{ width: "100%" }}>
+								{hasInvalidFields && <InputFieldError error="Todos os campos devem ser preenchidos corretamente." />}
+								<div className="R-registration-button">
+									<button type="button" onClick={handleOnContinueButton}>
+										Continuar
+									</button>
+								</div>
 							</div>
 
 							<div className="R-registration-footer">

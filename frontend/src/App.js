@@ -4,6 +4,7 @@ import Login from "./components/pages/login/Login";
 import HomeProjects from "./components/pages/home-projects/HomeProjects";
 import SendPasswordReset from "components/pages/login-password-reset/SendPasswordReset";
 import LoginPasswordReset from "components/pages/login-password-reset/LoginPasswordReset";
+import ValidateEmail from "components/pages/validate-email/ValidateEmail";
 
 function App() {
 	return (
@@ -13,6 +14,7 @@ function App() {
 				<Route path="/login" element={<Login />} />
 				<Route path="/send-password-reset" element={<SendPasswordReset />} />
 				<Route path="/reset-password" element={<LoginPasswordReset />} />
+				<Route path="/validate-email" element={<ValidateEmail />} />
 				<Route path="/home" element={<HomeProjects />} />
 			</Routes>
 		</Router>
