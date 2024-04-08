@@ -36,51 +36,56 @@
 				font-weight: bold;
 				text-align: center;
 				padding-top: 20px;
+				color: black;
 			}
 
 			.sub-title {
 				font-weight: bold;
 				text-align: center;
 				padding-top: 20px;
+				color: black;
 			}
 
 			.description {
 				text-align: center;
 				padding-top: 20px;
+				color: black;
 			}
 
 			.button-container-table {
 				width: 100%;
-				height: 240px;
-				padding-top: 60px;
-				padding-bottom: 60px;
+				height: 120px;
 			}
 
 			.button-container {
 				width: 100%;
 				height: 100%;
-				padding-top: 25px;
-				padding-bottom: 25px;
 				border-radius: 8px;
 				background-color: #fce9d3;
 				text-align: center;
+				display: table;
 			}
 
-			.button {
+			.button-background {
 				width: 60%;
-				height: 80%;
+				height: 40%;
 				border: none;
 				border-radius: 8px;
 				color: white !important;
 				background-color: #fe8e04;
+				display: table-cell;
+			}
+
+			.button {
 				font-size: larger !important;
-				display: inline-block;
 				text-decoration: none;
+				text-align: center;
+				color: white;
 			}
 
 			.leading-text {
 				text-align: center;
-				padding-top: 20px;
+				color: black;
 			}
 
 			.footer {
@@ -120,11 +125,25 @@
 					</div>
 
 					<table cellspacing="0" cellpadding="0" class="button-container-table">
-						<tr>
+						<tr style="width: 100%; height: 20px"></tr>
+						<tr style="height: 60px">
+							<td style="width: 40px; height: 100%"></td>
 							<td class="button-container">
-								<a href="{{ButtonLink}}" class="button">{{Button}}</a>
+								<table cellspacing="0" cellpadding="0" style="width: 100%; height: 100%">
+									<tr style="width: 100%; height: 20px"></tr>
+									<tr>
+										<td style="width: 40px; height: 100%"></td>
+										<td class="button-background">
+											<a href="{{ButtonLink}}" class="button">{{Button}}</a>
+										</td>
+										<td style="width: 40px; height: 100%"></td>
+									</tr>
+									<tr style="width: 100%; height: 20px"></tr>
+								</table>
 							</td>
+							<td style="width: 40px; height: 100%"></td>
 						</tr>
+						<tr style="width: 100%; height: 20px"></tr>
 					</table>
 
 					<div class="leading-text">
