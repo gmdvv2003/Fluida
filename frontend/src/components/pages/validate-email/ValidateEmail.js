@@ -49,7 +49,7 @@ function ValidateEmail() {
 		} else {
 			const token = searchParameters.get("token");
 
-			fetch("http://localhost:8080/validateEmail", {
+			fetch("http://localhost:8080/users/validateEmail", {
 				headers: { "Content-Type": "application/json" },
 				mode: "cors",
 				cache: "no-cache",

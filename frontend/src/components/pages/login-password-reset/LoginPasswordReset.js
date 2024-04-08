@@ -33,7 +33,7 @@ function LoginPasswordReset() {
 			setIsPasswordNotSatisfied(!isPasswordSatisfied);
 
 			if (isPasswordSatisfied) {
-				fetch("http://localhost:8080/resetPassword", {
+				fetch("http://localhost:8080/users/resetPassword", {
 					headers: { "Content-Type": "application/json" },
 					mode: "cors",
 					cache: "no-cache",

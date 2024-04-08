@@ -34,7 +34,7 @@ function Registration() {
 
 		setWaitingForRegistration(true);
 
-		fetch("http://localhost:8080/register", {
+		fetch("http://localhost:8080/users/register", {
 			headers: { "Content-Type": "application/json" },
 			mode: "cors",
 			cache: "no-cache",

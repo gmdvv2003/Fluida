@@ -35,7 +35,7 @@ function SendPasswordReset() {
 		setInvalidEmail(isInvalidEmail);
 
 		if (isValidEmailFormat && !isInvalidEmail) {
-			fetch("http://localhost:8080/requestPasswordReset", {
+			fetch("http://localhost:8080/users/requestPasswordReset", {
 				headers: { "Content-Type": "application/json" },
 				mode: "cors",
 				cache: "no-cache",
