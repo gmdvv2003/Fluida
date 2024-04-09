@@ -18,10 +18,12 @@ function HomeProjects() {
 				</div>
 				<div className="HP-container-projects">
 					<div className="HP-container-label-your-projects">
-						Seus projetos
+						<div className="HP-label">Seus projetos</div>
 					</div>
 					<div className="HP-container-project">
-
+						<div className="HP-project">
+							Projetos
+						</div>
 					</div>
 				</div>
 			</div>
