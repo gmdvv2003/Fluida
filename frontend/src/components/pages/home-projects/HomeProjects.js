@@ -5,7 +5,7 @@ import HeaderHome from "../../shared/login-registration/header-home/HeaderHome.j
 function HomeProjects() {
 	const username = "variableUserName"
 	return (
-		<div className="teste">
+		<div>
 			<HeaderHome />
 			<div className="HP-container-user-projects">
 				<div className="HP-container-user">
