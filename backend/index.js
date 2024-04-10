@@ -1,7 +1,5 @@
 require("dotenv").config();
 
-const url = require("url");
-
 const admin = require("firebase-admin");
 admin.initializeApp();
 
@@ -15,8 +13,9 @@ const app = express();
 app.use(bodyParser.json());
 
 app.use((_, response, next) => {
+	// TODO: Trocar dominio caso o sistema esteja em produção
 	response.setHeader("Access-Control-Allow-Origin", `http://localhost:${process.env.WEB_PORT}`);
-	response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
+	response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
 	response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 	response.setHeader("Access-Control-Allow-Credentials", "true");
 	next();
@@ -50,8 +49,26 @@ const ProjectsController = require("./models/projects/ProjectsController");
 const usersRoutes = require("./models/users/users.routes");
 const projectsRoutes = require("./models/projects/projects.routes");
 
-const usersController = new UsersController();
-const projectsController = new ProjectsController();
+// Serviços inicializados
+const INSTANTIATED_SERVICES = {};
+
+// Provider de serviços para garantir que os controllers tenham acesso a todos os serviços
+const servicesProvider = {
+	register(identifier, controller) {
+		INSTANTIATED_SERVICES[identifier] = controller.getService();
+	},
+
+	get(identifier) {
+		return INSTANTIATED_SERVICES[identifier];
+	},
+};
+
+const usersController = new UsersController(servicesProvider);
+const projectsController = new ProjectsController(servicesProvider);
+
+// Registrando os serviços de cada controller
+servicesProvider.register("users", usersController);
+servicesProvider.register("projects", projectsController);
 
 usersRoutes(app, usersController);
 projectsRoutes(app, projectsController);

@@ -6,10 +6,11 @@ class Route {
 	 *
 	 * @param {*} param0
 	 * @param {Function} next
-	 * @param {Function} decoder
+	 * @param {Object} binder
+	 * @param {Array} decoder
 	 * @returns Middleware
 	 */
-	static newRoute({ secure }, next, binder, decoder = () => {}) {
+	static newRoute({ secure }, next, binder, decoder = []) {
 		return secure ? this.#secureRoute(next.bind(binder), decoder) : this.#unsecureRoute(next.bind(binder));
 	}
 
@@ -17,7 +18,7 @@ class Route {
 	 * Cria um middleware para uma rota segura
 	 *
 	 * @param {Function} next
-	 * @param {Function} decoder
+	 * @param {Array} decoder
 	 * @returns Middleware
 	 */
 	static #secureRoute(next, decoder) {
@@ -29,7 +30,14 @@ class Route {
 
 			const [validated, decoded] = Session.validate(token);
 			if (validated) {
-				decoder(request, decoded);
+				decoder.forEach((decode) => {
+					try {
+						request[decode] = decoded[decode];
+					} catch (error) {
+						console.error(`Falha ao inserir ${decode} no request. Erro: ${error}`);
+					}
+				});
+
 				await next(request, response);
 			}
 

@@ -5,7 +5,9 @@ const Session = require("../../context/session/Session");
 const UsersDTO = require("./UsersDTO");
 const UserEntity = require("./UsersEntity");
 
-const users = [];
+const users = [
+	
+];
 
 class UsersService {
 	// ==================================== Métodos Privados ==================================== //

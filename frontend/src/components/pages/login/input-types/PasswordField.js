@@ -1,13 +1,13 @@
-import React, { useState, useRef, useImperativeHandle, useEffect } from "react";
-import TextInputField from "components/shared/text-input-field/TextInputField";
 import "./PasswordField.css";
 import "./../Login.css";
 
-import ReactSubscriptionHelper from "utilities/react-subscription-helper/ReactSubscriptionHelper";
+import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
 
-import { ReactComponent as PadlockIcon } from "assets/action-icons/padlock.svg";
-import { ReactComponent as OpenEyeIcon } from "assets/action-icons/eye-open.svg";
 import { ReactComponent as ClosedEyeIcon } from "assets/action-icons/eye-closed.svg";
+import { ReactComponent as OpenEyeIcon } from "assets/action-icons/eye-open.svg";
+import { ReactComponent as PadlockIcon } from "assets/action-icons/padlock.svg";
+import ReactSubscriptionHelper from "utilities/react-subscription-helper/ReactSubscriptionHelper";
+import TextInputField from "components/shared/text-input-field/TextInputField";
 
 const PasswordField = React.forwardRef(({}, ref) => {
 	const passwordFieldReference = useRef(null);

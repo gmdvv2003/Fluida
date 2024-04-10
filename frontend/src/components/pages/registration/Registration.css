@@ -1,10 +1,10 @@
 .R-registration-header {
+	padding-right: 10%;
+	padding-left: 10%;
 	width: 100%;
 	font-weight: 500;
-	padding-left: 10%;
-	padding-right: 10%;
-	text-align: center;
 	font-size: var(--login-registration-header-font-size);
+	text-align: center;
 }
 
 .R-registration-button {
@@ -14,14 +14,14 @@
 }
 
 .R-registration-button button {
-	width: 100%;
-	height: 100%;
 	border: 0px;
-	color: white;
 	border-radius: var(--border-radius);
 	background-color: var(--action-button-background-color);
-	font-size: var(--action-button-font-size);
+	width: 100%;
+	height: 100%;
+	color: white;
 	font-weight: bold;
+	font-size: var(--action-button-font-size);
 }
 
 .R-registration-button button:hover {
@@ -29,23 +29,23 @@
 }
 
 .R-go-back-button-container {
+	display: flex;
+	justify-content: left;
 	padding-top: 1rem;
 	padding-left: 1rem;
 	width: 100% !important;
-	display: flex;
-	justify-content: left;
 }
 
 .R-go-back-button {
-	margin: 0;
-	padding: 0;
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	margin: 0;
 	border: 0px;
+	background-color: transparent;
+	padding: 0;
 	width: 2rem !important;
 	height: 2rem;
-	background-color: transparent;
 }
 
 .R-go-back-button svg {
@@ -56,19 +56,19 @@
 .R-registration-footer {
 	display: flex;
 	justify-content: center;
-	font-weight: 600;
 	padding-top: 1rem;
 	width: 80% !important;
+	font-weight: 600;
 }
 
 .R-registration-footer a {
-	text-decoration: none;
 	color: black;
+	text-decoration: none;
 }
 
 .R-registration-footer-login-href {
-	text-decoration: none;
 	color: var(--action-button-background-color);
+	text-decoration: none;
 }
 
 .R-registration-footer {

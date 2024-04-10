@@ -1,6 +1,6 @@
-import HeaderHome from "../../shared/login-registration/header-home/HeaderHome.js";
-
 import "./HomeProjects.css";
+
+import HeaderHome from "../../shared/login-registration/header-home/HeaderHome.js";
 
 function HomeProjects() {
 	return (

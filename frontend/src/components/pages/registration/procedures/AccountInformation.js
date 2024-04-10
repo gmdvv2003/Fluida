@@ -1,20 +1,17 @@
-import React, { useRef, useState, useEffect } from "react";
-
-import EmailInputTypeValidator from "utilities/inputs-validators/models/EmailInputTypeValidator";
-import NameInputTypeValidator from "utilities/inputs-validators/models/NameInputTypeValidator";
-import PhoneNumberInputTypeValidator from "utilities/inputs-validators/models/PhoneNumberInputTypeValidator";
-
-import InputFieldError from "components/shared/login-registration/error/InputFieldError";
-
-import InputFieldContainer from "../../../shared/text-input-field/InputFieldContainer";
-import TextInputField from "../../../shared/text-input-field/TextInputField";
-import PhoneNumberField from "./../input-types/PhoneNumberField";
-
 import "./../../../shared/login-registration/background/Background.css";
 import "./../../../shared/login-registration/container/Container.css";
-
 import "./../Registration.css";
 import "./AccountInformation.css";
+
+import React, { useEffect, useRef, useState } from "react";
+
+import EmailInputTypeValidator from "utilities/inputs-validators/models/EmailInputTypeValidator";
+import InputFieldContainer from "../../../shared/text-input-field/InputFieldContainer";
+import InputFieldError from "components/shared/login-registration/error/InputFieldError";
+import NameInputTypeValidator from "utilities/inputs-validators/models/NameInputTypeValidator";
+import PhoneNumberField from "./../input-types/PhoneNumberField";
+import PhoneNumberInputTypeValidator from "utilities/inputs-validators/models/PhoneNumberInputTypeValidator";
+import TextInputField from "../../../shared/text-input-field/TextInputField";
 
 const AccountInformation = React.forwardRef(({ nextProcedure, previousProcedure, setState }, ref) => {
 	const emailFieldReference = useRef(null);

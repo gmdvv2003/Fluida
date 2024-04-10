@@ -1,10 +1,8 @@
-import React from "react";
+import "./PhoneNumberField.css";
 
 import FlagsImporter from "utilities/flags-importer/FlagsImporter";
-
+import React from "react";
 import TextInputField from "components/shared/text-input-field/TextInputField";
-
-import "./PhoneNumberField.css";
 
 const PhoneNumberField = React.forwardRef(({}, ref) => {
 	return (

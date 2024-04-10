@@ -1,17 +1,15 @@
-import { useRef, useState, useEffect } from "react";
-import Header from "components/shared/login-registration/header/Header";
-// import InputFieldContainer from "./InputFieldContainer";
-// import TextInputField from "./input-types/TextInputField";
-import TextInputField from "components/shared/text-input-field/TextInputField";
-import PasswordField from "./input-types/PasswordField";
-import InputFieldError from "components/shared/login-registration/error/InputFieldError";
-
 import "./../../shared/login-registration/background/Background.css";
 import "./../../shared/login-registration/container/Container.css";
 import "./Login.css";
 
-import { ReactComponent as GoogleIcon } from "assets/action-icons/google-icon.svg";
+import { useEffect, useRef, useState } from "react";
+
 import { ReactComponent as EmailIcon } from "assets/action-icons/email.svg";
+import { ReactComponent as GoogleIcon } from "assets/action-icons/google-icon.svg";
+import Header from "components/shared/login-registration/header/Header";
+import InputFieldError from "components/shared/login-registration/error/InputFieldError";
+import PasswordField from "./input-types/PasswordField";
+import TextInputField from "components/shared/text-input-field/TextInputField";
 
 function Login() {
 	const emailFieldReference = useRef(null);

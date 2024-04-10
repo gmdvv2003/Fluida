@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useImperativeHandle } from "react";
+import "./PasswordFieldStrength.css";
 
-import { ReactComponent as TickIcon } from "assets/action-icons/tick.svg";
-import { ReactComponent as TickXIcon } from "assets/action-icons/tick-x.svg";
+import React, { useEffect, useImperativeHandle, useState } from "react";
 
 import PasswordStrengthValidador from "utilities/password-strength/PasswordStrengthValidator";
-
-import "./PasswordFieldStrength.css";
+import { ReactComponent as TickIcon } from "assets/action-icons/tick.svg";
+import { ReactComponent as TickXIcon } from "assets/action-icons/tick-x.svg";
 
 const PasswordFieldStrength = React.forwardRef(({ field }, ref) => {
 	const [currentPassword, setCurrentPassword] = useState("");

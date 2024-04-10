@@ -1,13 +1,11 @@
-import React, { useRef, useState, useEffect, useImperativeHandle } from "react";
-
-import { ReactComponent as ShowPasswordIcon } from "assets/action-icons/eye-closed.svg";
-import { ReactComponent as HidePasswordIcon } from "assets/action-icons/eye-open.svg";
-
-import ReactSubscriptionHelper from "utilities/react-subscription-helper/ReactSubscriptionHelper";
-
-import TextInputField from "components/shared/text-input-field/TextInputField";
-
 import "./PasswordField.css";
+
+import React, { useEffect, useImperativeHandle, useRef, useState } from "react";
+
+import { ReactComponent as HidePasswordIcon } from "assets/action-icons/eye-open.svg";
+import ReactSubscriptionHelper from "utilities/react-subscription-helper/ReactSubscriptionHelper";
+import { ReactComponent as ShowPasswordIcon } from "assets/action-icons/eye-closed.svg";
+import TextInputField from "components/shared/text-input-field/TextInputField";
 
 const PasswordField = React.forwardRef(({ name, placeholder }, ref) => {
 	const passwordFieldReference = useRef(null);

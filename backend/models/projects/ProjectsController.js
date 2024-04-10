@@ -1,5 +1,11 @@
+const ProjectsService = require("./ProjectsService");
+
 class ProjectsController {
-    // ==================================== Métodos Seguros ==================================== //
+	constructor() {
+		super(new ProjectsService());
+	}
+
+	// ==================================== Métodos Seguros ==================================== //
 	getProjectsAuthenticated(request, response) {
 		console.log("getProjects");
 	}
@@ -14,6 +20,10 @@ class ProjectsController {
 
 	deleteProjectAuthenticated(request, response) {
 		console.log("deleteProject");
+	}
+
+	participateAuthenticated(request, response) {
+		const { userId, projectId } = request.body;
 	}
 }
 

@@ -1,14 +1,14 @@
 .H-header-container {
-	z-index: 10;
 	display: flex;
+	position: relative;
+	position: relative;
 	justify-content: center;
-	position: relative;
 	align-items: center;
-	position: relative;
-	width: 100%;
-	height: var(--header-height);
+	z-index: 10;
 	box-shadow: rgb(211, 211, 211) 0px 0px 6px;
 	background-color: white;
+	width: 100%;
+	height: var(--header-height);
 }
 
 .H-header-logo {

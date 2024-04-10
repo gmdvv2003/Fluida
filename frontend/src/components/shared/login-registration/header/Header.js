@@ -1,6 +1,6 @@
-import { ReactComponent as Logo } from "assets/icons/fluida-logo.svg";
-
 import "./Header.css";
+
+import { ReactComponent as Logo } from "assets/icons/fluida-logo.svg";
 
 function Header() {
 	return (

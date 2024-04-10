@@ -1,18 +1,15 @@
-import React, { useRef, useState, useEffect } from "react";
-
-import InputFieldError from "components/shared/login-registration/error/InputFieldError";
-
-import InputFieldContainer from "../../../shared/text-input-field/InputFieldContainer";
-import PasswordField from "../../../shared/password-input-field/PasswordField";
-import PasswordFieldStrength from "../../../shared/password-input-field/PasswordFieldStrength";
-
-import { ReactComponent as GoBackArrowIcon } from "assets/action-icons/left-circle.svg";
-
 import "./../../../shared/login-registration/background/Background.css";
 import "./../../../shared/login-registration/container/Container.css";
-
 import "./../Registration.css";
 import "./PasswordCreation.css";
+
+import React, { useEffect, useRef, useState } from "react";
+
+import { ReactComponent as GoBackArrowIcon } from "assets/action-icons/left-circle.svg";
+import InputFieldContainer from "../../../shared/text-input-field/InputFieldContainer";
+import InputFieldError from "components/shared/login-registration/error/InputFieldError";
+import PasswordField from "../../../shared/password-input-field/PasswordField";
+import PasswordFieldStrength from "../../../shared/password-input-field/PasswordFieldStrength";
 
 const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure, setState }, ref) => {
 	const passwordFieldReference = useRef(null);

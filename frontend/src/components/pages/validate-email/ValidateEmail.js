@@ -1,9 +1,9 @@
+import "./ValidateEmail.css";
+
 import { useEffect, useState } from "react";
 
 import Header from "components/shared/login-registration/header/Header";
 import Loading from "components/shared/loading/Loading";
-
-import "./ValidateEmail.css";
 
 function ValidateEmail() {
 	const [waitingForValidation, setWaitingForValidation] = useState(true);

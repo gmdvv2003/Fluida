@@ -1,8 +1,8 @@
-import React, { useRef, useImperativeHandle } from "react";
+import "./TextInputField.css";
+
+import React, { useImperativeHandle, useRef } from "react";
 
 import ReactSubscriptionHelper from "utilities/react-subscription-helper/ReactSubscriptionHelper";
-
-import "./TextInputField.css";
 
 const TextInputField = React.forwardRef(({ name, placeholder, grid_area, container_style = {}, style = {}, type = "text" }, ref) => {
 	const realRef = useRef(null);

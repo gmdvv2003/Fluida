@@ -1,14 +1,13 @@
-import { useRef, useState, useEffect } from "react";
-
-import Header from "components/shared/login-registration/header/Header";
-import InputFieldError from "components/shared/login-registration/error/InputFieldError";
-
-import InputFieldContainer from "../../shared/text-input-field/InputFieldContainer";
-import PasswordField from "../../shared/password-input-field/PasswordField";
-import PasswordFieldStrength from "../../shared/password-input-field/PasswordFieldStrength";
-
 import "./LoginPasswordReset.css";
 import "./../validate-email/ValidateEmail.css";
+
+import { useEffect, useRef, useState } from "react";
+
+import Header from "components/shared/login-registration/header/Header";
+import InputFieldContainer from "../../shared/text-input-field/InputFieldContainer";
+import InputFieldError from "components/shared/login-registration/error/InputFieldError";
+import PasswordField from "../../shared/password-input-field/PasswordField";
+import PasswordFieldStrength from "../../shared/password-input-field/PasswordFieldStrength";
 
 function LoginPasswordReset() {
 	const passwordFieldReference = useRef(null);

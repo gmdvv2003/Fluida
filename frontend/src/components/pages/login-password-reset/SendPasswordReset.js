@@ -1,11 +1,11 @@
-import { useRef, useEffect, useState } from "react";
+import "./SendPasswordReset.css";
 
-import TextInputField from "../../shared/text-input-field/TextInputField";
+import { useEffect, useRef, useState } from "react";
+
+import EmailInputTypeValidator from "utilities/inputs-validators/models/EmailInputTypeValidator";
 import Header from "components/shared/login-registration/header/Header";
 import InputFieldError from "components/shared/login-registration/error/InputFieldError";
-import EmailInputTypeValidator from "utilities/inputs-validators/models/EmailInputTypeValidator";
-
-import "./SendPasswordReset.css";
+import TextInputField from "../../shared/text-input-field/TextInputField";
 
 function SendPasswordReset() {
 	const emailFieldReference = useRef(null);

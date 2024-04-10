@@ -1,12 +1,11 @@
+import "../validate-email/ValidateEmail.css";
+
 import { useRef, useState } from "react";
 
+import AccountInformation from "./procedures/AccountInformation";
 import Header from "components/shared/login-registration/header/Header";
 import Loading from "components/shared/loading/Loading";
-
-import AccountInformation from "./procedures/AccountInformation";
 import PasswordCreation from "./procedures/PasswordCreation";
-
-import "../validate-email/ValidateEmail.css";
 
 function Registration() {
 	const [currentProcedure, setCurrentProcedure] = useState(0);

@@ -1,9 +1,9 @@
 .E-error-text-container {
-	width: 100% !important;
 	display: flex !important;
-	justify-content: left !important;
 	flex-direction: row !important;
+	justify-content: left !important;
 	padding-top: 8px;
+	width: 100% !important;
 }
 
 .E-error-text {

@@ -1,22 +1,18 @@
+const Controller = require("../__types/Controller");
+
 const PasswordReseterComponent = require("./components/PasswordReseterComponent");
 const EmailValidatorComponent = require("./components/EmailValidatorComponent");
 
 const UsersService = require("./UsersService");
 
-class UsersController {
-	UsersService = new UsersService();
-
+class UsersController extends Controller {
 	#EmailValidatorComponent;
 	#PasswordReseterComponent;
 
 	constructor() {
 		this.#EmailValidatorComponent = new EmailValidatorComponent(this);
 		this.#PasswordReseterComponent = new PasswordReseterComponent(this);
-	}
-
-	// ==================================== Métodos Privados ==================================== //
-	get service() {
-		return this.UsersService;
+		super(new UsersService());
 	}
 
 	// ==================================== Métodos publicos ==================================== //
@@ -27,7 +23,7 @@ class UsersController {
 	 * @param {Response} response
 	 */
 	async getUsers(_, response) {
-		response.status(200).json(this.service.getUsers());
+		response.status(200).json(this.getService().getUsers());
 	}
 
 	/**
@@ -37,7 +33,7 @@ class UsersController {
 	 * @param {Response} response
 	 */
 	async getUserById(request, response) {
-		const user = this.service.getUserById(request.params["userId"]);
+		const user = this.getService().getUserById(request.params["userId"]);
 		if (!user) {
 			return response.status(404).json({ message: "Usuário não encontrado." });
 		}
@@ -54,7 +50,7 @@ class UsersController {
 	async register(request, response) {
 		const { firstName, lastName, email, phoneNumber, password } = request.body;
 
-		const result = this.service.register(firstName, lastName, email, phoneNumber, password);
+		const result = this.getService().register(firstName, lastName, email, phoneNumber, password);
 		if (!result.success) {
 			return response.status(400).json({ message: result.message });
 		}
@@ -81,7 +77,7 @@ class UsersController {
 	async login(request, response) {
 		const { email, password } = request.body;
 
-		const result = this.service.login(email, password);
+		const result = this.getService().login(email, password);
 		if (!result.success) {
 			return response.status(400).json({ message: result.message });
 		}
@@ -98,7 +94,7 @@ class UsersController {
 	 * @param {Response} response
 	 */
 	async logoutAuthenticated(request, response) {
-		const result = this.service.logoutAuthenticated(request.header["authorization"]);
+		const result = this.getService().logoutAuthenticated(request.header["authorization"]);
 		if (!result.success) {
 			return response.status(400).json({ message: result.message });
 		}
