@@ -4,6 +4,42 @@ import HeaderHome from "../../shared/login-registration/header-home/HeaderHome.j
 
 function HomeProjects() {
 	const username = "variableUserName"
+	const projects = [
+		{
+			projectName: "Projeto 1"
+
+		},
+		{
+			projectName: "Projeto 2"
+
+		},
+		{
+			projectName: "Projeto 3"
+
+		},
+		{
+			projectName: "Projeto 4"
+
+		},
+		{
+			projectName: "Projeto 1"
+
+		},
+		{
+			projectName: "Projeto 2"
+
+		},
+		{
+			projectName: "Projeto 3"
+
+		},
+		{
+			projectName: "Projeto 4"
+
+		},
+		
+	];
+	
 	return (
 		<div>
 			<HeaderHome />
@@ -22,7 +58,21 @@ function HomeProjects() {
 					</div>
 					<div className="HP-container-project">
 						<div className="HP-project">
-							Projetos
+							<div className="HP-grid-container">
+								{projects.map((project, index) => (
+                                    <div key={index} className="HP-grid-item">
+                                        {project.projectName}
+                                    </div>
+                                ))}
+								<div className="HP-grid-item">
+									<div className="HP-container-new-project">
+										<i className="HP-add-new-project"></i>
+										<div className="HP-label-new-project">
+											Criar novo projeto
+										</div>
+									</div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
