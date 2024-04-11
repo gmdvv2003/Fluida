@@ -7,35 +7,27 @@ function HomeProjects() {
 	const projects = [
 		{
 			projectName: "Projeto 1"
-
 		},
 		{
 			projectName: "Projeto 2"
-
 		},
 		{
 			projectName: "Projeto 3"
-
 		},
 		{
 			projectName: "Projeto 4"
-
 		},
 		{
 			projectName: "Projeto 1"
-
 		},
 		{
 			projectName: "Projeto 2"
-
 		},
 		{
 			projectName: "Projeto 3"
-
 		},
 		{
 			projectName: "Projeto 4"
-
 		},
 		
 	];
@@ -59,8 +51,8 @@ function HomeProjects() {
 					<div className="HP-container-project">
 						<div className="HP-project">
 							<div className="HP-grid-container">
-								{projects.map((project, index) => (
-                                    <div key={index} className="HP-grid-item">
+								{projects.map((project) => (
+                                    <div key={project} className="HP-grid-item">
                                         {project.projectName}
                                     </div>
                                 ))}
