@@ -8,6 +8,7 @@ import InputFieldContainer from "../../shared/text-input-field/InputFieldContain
 import InputFieldError from "components/shared/login-registration/error/InputFieldError";
 import PasswordField from "../../shared/password-input-field/PasswordField";
 import PasswordFieldStrength from "../../shared/password-input-field/PasswordFieldStrength";
+import ActionFeedback from "components/shared/action-feedback/ActionFeedback";
 
 function LoginPasswordReset() {
 	const passwordFieldReference = useRef(null);
@@ -23,6 +24,36 @@ function LoginPasswordReset() {
 
 	const [successfullyChangedPassword, setSuccessfullyChangedPassword] = useState(false);
 	const [failedToChangePassword, setFailedToChangePassword] = useState(false);
+
+	function successed() {
+		return (
+			<ActionFeedback
+				elements={[
+					{ type: "title", text: "Sua senha foi alterada." },
+					{
+						type: "subTitle",
+						text: "Agora você pode logar com a sua nova senha. Clique no botão abaixo para ser redirecionado para a página de login.",
+					},
+					{ type: "button", text: "Logar" },
+				]}
+			/>
+		);
+	}
+
+	function failed() {
+		return (
+			<ActionFeedback
+				elements={[
+					{ type: "title", text: "Ops! :(" },
+					{ type: "subTitle", text: "Não foi possível alterar a sua senha." },
+					{
+						type: "description",
+						text: "Favor tente novamente mais tarde. Se o problema persistir, entre em contato conosco para que possamos resolver o problema.",
+					},
+				]}
+			/>
+		);
+	}
 
 	function handleOnSubmitButton() {
 		if (matchingPassword) {
@@ -84,100 +115,62 @@ function LoginPasswordReset() {
 		}
 	}, [matchingPassword]);
 
-	function successed() {
-		return (
-			<div className="R-VE-form">
-				<h2 className="R-VE-form-sub-title">Sua senha foi alterada.</h2>
-				<p className="R-VE-form-description">
-					Agora você pode logar com a sua nova senha. Clique no botão abaixo para ser redirecionado para a página de login.
-				</p>
-				<div className="R-VE-button-container">
-					<button className="R-VE-button">Logar</button>
-				</div>
-			</div>
-		);
-	}
-
-	function failed() {
-		return (
-			<div className="R-VE-form">
-				<h1 className="R-VE-form-title">Ops! :(</h1>
-				<h2 className="R-VE-form-sub-title">Não foi possível alterar a sua senha.</h2>
-				<p className="R-VE-form-description">
-					Favor tente novamente mais tarde. Se o problema persistir, entre em contato conosco para que possamos resolver o
-					problema.
-				</p>
-			</div>
-		);
-	}
-
 	return (
 		<div className="SPR-background-container">
 			<Header />
-			<div className="SPR-box-container">
-				<div
-					className="SPR-form-container"
-					style={{ width: "22%", height: successfullyChangedPassword || failedToChangePassword ? "40%" : "70%" }}
-				>
-					<div className="SPR-form" style={{ width: "80%" }}>
-						{(() => {
-							if (successfullyChangedPassword) {
-								return successed();
-							} else if (failedToChangePassword) {
-								return failed();
-							} else {
-								return (
-									<div style={{ width: "100%" }}>
-										<h1 className="SPR-form-title">Redefinir senha</h1>
+			{successfullyChangedPassword ? (
+				successed()
+			) : failedToChangePassword ? (
+				failed()
+			) : (
+				<div className="SPR-box-container">
+					<div
+						className="SPR-form-container"
+						style={{ width: "22%", height: successfullyChangedPassword || failedToChangePassword ? "40%" : "70%" }}
+					>
+						<div className="SPR-form" style={{ width: "80%" }}>
+							<div style={{ width: "100%" }}>
+								<h1 className="SPR-form-title">Redefinir senha</h1>
 
-										<InputFieldContainer description="Digite a sua nova senha">
-											<PasswordField
-												ref={passwordFieldReference}
-												name="password"
-												placeholder="Digite uma senha forte"
-											/>
-										</InputFieldContainer>
+								<InputFieldContainer description="Digite a sua nova senha">
+									<PasswordField ref={passwordFieldReference} name="password" placeholder="Digite uma senha forte" />
+								</InputFieldContainer>
 
-										<InputFieldContainer
-											description="Confirme a sua senha"
-											grid_template_areas="password_confirmation_field"
-										>
-											<PasswordField
-												ref={passwordConfirmationFieldReference}
-												name="password"
-												placeholder="Repita a senha"
-												grid_area="password_confirmation_field"
-											/>
-										</InputFieldContainer>
+								<InputFieldContainer description="Confirme a sua senha" grid_template_areas="password_confirmation_field">
+									<PasswordField
+										ref={passwordConfirmationFieldReference}
+										name="password"
+										placeholder="Repita a senha"
+										grid_area="password_confirmation_field"
+									/>
+								</InputFieldContainer>
 
-										<PasswordFieldStrength field={passwordFieldReference} ref={passwordStrengthFieldRefrence} />
+								<PasswordFieldStrength field={passwordFieldReference} ref={passwordStrengthFieldRefrence} />
 
-										{!matchingPassword ? <InputFieldError error="Senhas não coincidem." /> : null}
+								{!matchingPassword ? <InputFieldError error="Senhas não coincidem." /> : null}
 
-										<div style={{ width: "100%" }}>
-											{(() => {
-												if (samePasswordAsBefore) {
-													return <InputFieldError error="A nova senha não pode ser igual a anterior." />;
-												}
+								<div style={{ width: "100%" }}>
+									{(() => {
+										if (samePasswordAsBefore) {
+											return <InputFieldError error="A nova senha não pode ser igual a anterior." />;
+										}
 
-												if (isPasswordNotSatisfied) {
-													return <InputFieldError error="A senha não atende aos requisitos." />;
-												}
-											})()}
+										if (isPasswordNotSatisfied) {
+											return <InputFieldError error="A senha não atende aos requisitos." />;
+										}
+									})()}
 
-											<div className="SPR-button-container">
-												<button onClick={handleOnSubmitButton} className="SPR-button">
-													Redefinir Senha
-												</button>
-											</div>
-										</div>
+									<div className="SPR-button-container">
+										<button onClick={handleOnSubmitButton} className="SPR-button">
+											Redefinir Senha
+										</button>
 									</div>
-								);
-							}
-						})()}
+								</div>
+							</div>
+						</div>
 					</div>
 				</div>
-			</div>
+			)}
 		</div>
 	);
 }

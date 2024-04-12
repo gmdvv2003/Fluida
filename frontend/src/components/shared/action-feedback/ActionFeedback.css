@@ -1,0 +1,51 @@
+.AF-form {
+	display: flex;
+	row-gap: 20px;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.AF-form-title {
+	margin: 0;
+	padding: 0;
+	font-weight: 500;
+	font-size: var(--login-registration-header-font-size);
+	text-align: center;
+}
+
+.AF-form-sub-title {
+	margin: 0;
+	padding: 0;
+	font-weight: 500;
+	font-size: calc(var(--login-registration-header-font-size) - 6px);
+	text-align: center;
+}
+
+.AF-form-description {
+	margin: 0;
+	padding: 0;
+	text-align: center;
+}
+
+.AF-button-container {
+	display: flex;
+	justify-content: center;
+	width: 100%;
+}
+
+.AF-button {
+	border: none;
+	border-radius: var(--border-radius);
+	background-color: var(--action-button-background-color);
+	width: 100%;
+	height: var(--action-button-height);
+	color: white;
+	font-weight: lighter;
+	font-size: var(--action-button-font-size);
+}
+
+.AF-button:hover {
+	cursor: pointer;
+	background-color: var(--action-button-selected-background-color);
+}

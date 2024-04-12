@@ -1,24 +1,36 @@
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import HomeProjects from "./components/pages/home-projects/HomeProjects";
-import Login from "./components/pages/login/Login";
-import LoginPasswordReset from "components/pages/login-password-reset/LoginPasswordReset";
-import Registration from "./components/pages/registration/Registration";
+import Registration from "components/pages/registration/Registration";
+import Login from "components/pages/login/Login";
 import SendPasswordReset from "components/pages/login-password-reset/SendPasswordReset";
+import LoginPasswordReset from "components/pages/login-password-reset/LoginPasswordReset";
 import ValidateEmail from "components/pages/validate-email/ValidateEmail";
+import HomeProjects from "components/pages/home-projects/HomeProjects";
+
+import PrivateRoute from "functionalities/PrivateRoute";
 
 function App() {
 	return (
-		<Router>
+		<BrowserRouter>
 			<Routes>
+				{/* Rotas Públicas */}
 				<Route path="/registration" element={<Registration />} />
 				<Route path="/login" element={<Login />} />
 				<Route path="/send-password-reset" element={<SendPasswordReset />} />
 				<Route path="/reset-password" element={<LoginPasswordReset />} />
 				<Route path="/validate-email" element={<ValidateEmail />} />
-				<Route path="/home" element={<HomeProjects />} />
+
+				{/* Rotas Seguras */}
+				<Route
+					path="/home"
+					element={
+						<PrivateRoute>
+							<HomeProjects />
+						</PrivateRoute>
+					}
+				/>
 			</Routes>
-		</Router>
+		</BrowserRouter>
 	);
 }
 

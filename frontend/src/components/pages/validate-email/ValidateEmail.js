@@ -1,9 +1,8 @@
-import "./ValidateEmail.css";
-
 import { useEffect, useState } from "react";
 
 import Header from "components/shared/login-registration/header/Header";
 import Loading from "components/shared/loading/Loading";
+import ActionFeedback from "components/shared/action-feedback/ActionFeedback";
 
 function ValidateEmail() {
 	const [waitingForValidation, setWaitingForValidation] = useState(true);
@@ -11,30 +10,32 @@ function ValidateEmail() {
 
 	function successed() {
 		return (
-			<div className="R-VE-form">
-				<h1 className="R-VE-form-title">Parabéns,</h1>
-				<h2 className="R-VE-form-sub-title">Sua conta foi verificada com sucesso!</h2>
-				<p className="R-VE-form-description">
-					Agora que sua conta foi verificada, você esta livre para logar em sua conta e começar a sua jornada explorando a nossa
-					plataforma!
-				</p>
-				<div className="R-VE-button-container">
-					<button className="R-VE-button">Logar</button>
-				</div>
-			</div>
+			<ActionFeedback
+				elements={[
+					{ type: "title", text: "Parabéns," },
+					{ type: "subTitle", text: "Sua conta foi verificada com sucesso!" },
+					{
+						type: "description",
+						text: "Agora que sua conta foi verificada, você esta livre para logar em sua conta e começar a sua jornada explorando a nossa plataforma!",
+					},
+					{ type: "button", text: "Logar" },
+				]}
+			/>
 		);
 	}
 
 	function failed() {
 		return (
-			<div className="R-VE-form">
-				<h1 className="R-VE-form-title">Ops! :(</h1>
-				<h2 className="R-VE-form-sub-title">Aparentemente algo de errado ocorreu enquanto sua conta era verificada.</h2>
-				<p className="R-VE-form-description">
-					Se você acredita que isso foi um erro por nossa parte, por favor, entre em contato conosco para que possamos resolver o
-					problema.
-				</p>
-			</div>
+			<ActionFeedback
+				elements={[
+					{ type: "title", text: "Ops! :(" },
+					{ type: "subTitle", text: "Aparentemente algo de errado ocorreu enquanto sua conta era verificada." },
+					{
+						type: "description",
+						text: "Se você acredita que isso foi um erro por nossa parte, por favor, entre em contato conosco para que possamos resolver o problema.",
+					},
+				]}
+			/>
 		);
 	}
 
@@ -75,17 +76,7 @@ function ValidateEmail() {
 	return (
 		<div>
 			<Header />
-			{waitingForValidation ? (
-				waiting()
-			) : (
-				<div className="LR-C-forms-container-holder" style={{ justifyContent: "start", paddingTop: "50px" }}>
-					<div className="LR-C-forms-container" style={{ height: "40%" }}>
-						<div className="LR-C-forms" style={{ width: "80%" }}>
-							{emailValidatedSuccessfully ? successed() : failed()}
-						</div>
-					</div>
-				</div>
-			)}
+			{waitingForValidation ? waiting() : emailValidatedSuccessfully ? successed() : failed()}
 		</div>
 	);
 }

@@ -6,6 +6,7 @@ import EmailInputTypeValidator from "utilities/inputs-validators/models/EmailInp
 import Header from "components/shared/login-registration/header/Header";
 import InputFieldError from "components/shared/login-registration/error/InputFieldError";
 import TextInputField from "../../shared/text-input-field/TextInputField";
+import LoadingDots from "components/shared/loading/LoadingDots";
 
 function SendPasswordReset() {
 	const emailFieldReference = useRef(null);
@@ -70,7 +71,7 @@ function SendPasswordReset() {
 		<div className="SPR-background-container">
 			<Header />
 			<div className="SPR-box-container">
-				<div className="SPR-form-container" style={{ height: "35%", height: !emailSent ? "40%" : "30%" }}>
+				<div className="SPR-form-container" style={{ height: "35%" }}>
 					<div className="SPR-form" style={{ width: "80%" }}>
 						<h1 className="SPR-form-title">Esqueceu sua senha?</h1>
 						<p className="SPR-form-description">
@@ -93,6 +94,10 @@ function SendPasswordReset() {
 							</div>
 						)}
 						{(() => {
+							if (waitingForResponse) {
+								return <LoadingDots style={{ paddingTop: "20px" }} />;
+							}
+
 							if (failedToSendEmail) {
 								return (
 									<p className="SPR-form-description">

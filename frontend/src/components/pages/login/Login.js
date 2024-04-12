@@ -4,12 +4,14 @@ import "./Login.css";
 
 import { useEffect, useRef, useState } from "react";
 
+import { useAuthentication } from "context/AuthenticationContext";
 import { ReactComponent as EmailIcon } from "assets/action-icons/email.svg";
 import { ReactComponent as GoogleIcon } from "assets/action-icons/google-icon.svg";
 import Header from "components/shared/login-registration/header/Header";
 import InputFieldError from "components/shared/login-registration/error/InputFieldError";
 import PasswordField from "./input-types/PasswordField";
 import TextInputField from "components/shared/text-input-field/TextInputField";
+import LoadingDots from "components/shared/loading/LoadingDots";
 
 function Login() {
 	const emailFieldReference = useRef(null);
@@ -21,11 +23,30 @@ function Login() {
 	const [invalidEmail, setInvalidEmail] = useState(false);
 	const [invalidPassword, setInvalidPassword] = useState(false);
 
+	const [waitingForValidation, setWaitingForValidation] = useState(false);
 	const [wrongCredentials, setWrongCredentials] = useState(false);
 
+	const { login } = useAuthentication();
+
 	function handleOnLoginButton() {
-		setInvalidEmail(emailFieldReference.current.ref.current.value.length <= 0);
-		setInvalidPassword(passwordFieldReference.current.ref.current.ref.current.value.length <= 0);
+		setInvalidEmail(enteredEmail.length <= 0);
+		setInvalidPassword(enteredPassword.length <= 0);
+
+		if (invalidEmail || invalidPassword) {
+			login(enteredEmail, enteredPassword)
+				.then((result) => result.json())
+				.then((data) => {
+					if (data.wrongEmailAndOrPassword) {
+						setWrongCredentials(true);
+					}
+				})
+				.catch((error) => {})
+				.finally(() => {
+					setWaitingForValidation(false);
+				});
+
+			setWaitingForValidation(true);
+		}
 	}
 
 	function handleOnEmailChange(event) {
@@ -38,7 +59,6 @@ function Login() {
 
 	useEffect(() => {
 		const unbindEmailChangeSubscription = emailFieldReference.current.onTextChange(handleOnEmailChange);
-
 		const unbindPasswordChangeSubscription = passwordFieldReference.current.onPasswordChange(handleOnPasswordChange);
 
 		return () => {
