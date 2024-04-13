@@ -16,7 +16,6 @@ class ProjectsEntity {
         this.projectId = projectId;
         this.createdBy = createdBy;
         this.projectName = projectName
-        
     }
 
 }

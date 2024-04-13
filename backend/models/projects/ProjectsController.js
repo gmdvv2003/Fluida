@@ -1,6 +1,8 @@
+const Controller = require("../__types/Controller");
+
 const ProjectsService = require("./ProjectsService");
 
-class ProjectsController {
+class ProjectsController extends Controller {
 	constructor() {
 		super(new ProjectsService());
 	}
@@ -15,7 +17,15 @@ class ProjectsController {
 	}
 
 	createProjectAuthenticated(request, response) {
-		console.log("createProject");
+		const { createdBy, projectName } = request.body;
+		
+		const result = this.getService().createProject(createdBy, projectName);
+
+		if (!result.success) {
+			return response.status(400).json({ message: result.message });
+		}
+
+		response.status(201).json({ message: "Projeto cadastrado com sucesso.", successfullyRegistered: true });
 	}
 
 	deleteProjectAuthenticated(request, response) {
