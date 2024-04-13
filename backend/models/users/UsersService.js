@@ -1,15 +1,14 @@
 const { v4 } = require("uuid");
 
+const Service = require("../__types/Service");
 const Session = require("../../context/session/Session");
 
 const UsersDTO = require("./UsersDTO");
 const UserEntity = require("./UsersEntity");
 
-const users = [
-	
-];
+const users = [];
 
-class UsersService {
+class UsersService extends Service {
 	// ==================================== Métodos Privados ==================================== //
 	/**
 	 * Pega um usuário pelo email
@@ -104,13 +103,8 @@ class UsersService {
 	 * @param {string} token
 	 * @returns Estrutura que diz se a ação foi bem sucedida ou não
 	 */
-	logoutAuthenticated(token) {
-		const [validated, decoded] = Session.validate(token);
-		if (!validated) {
-			return { success: false, message: "Token inválido." };
-		}
-
-		const user = users.find((user) => user.email == decoded.email);
+	logoutAuthenticated(userId) {
+		const user = this.getUserById(userId);
 		if (!user) {
 			return { success: false, message: "Usuário não encontrado." };
 		}

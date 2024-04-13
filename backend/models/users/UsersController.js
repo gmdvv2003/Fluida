@@ -2,17 +2,26 @@ const Controller = require("../__types/Controller");
 
 const PasswordReseterComponent = require("./components/PasswordReseterComponent");
 const EmailValidatorComponent = require("./components/EmailValidatorComponent");
+const UserSettingsComponent = require("./components/UserSettings/UserSettingsComponent");
 
 const UsersService = require("./UsersService");
 
 class UsersController extends Controller {
 	#EmailValidatorComponent;
 	#PasswordReseterComponent;
+	#UserSettingsComponent;
 
-	constructor() {
+	constructor(servicesProvider) {
+		// Inicializa o controller e o serviço
+		super(new UsersService(), servicesProvider);
+		this.getService().setController(this);
+
+		// Inicializa os componentes do controller
 		this.#EmailValidatorComponent = new EmailValidatorComponent(this);
 		this.#PasswordReseterComponent = new PasswordReseterComponent(this);
-		super(new UsersService());
+		this.#UserSettingsComponent = new UserSettingsComponent(this);
+
+		// Inicializa as funcionalidades do controller
 	}
 
 	// ==================================== Métodos publicos ==================================== //
@@ -33,7 +42,9 @@ class UsersController extends Controller {
 	 * @param {Response} response
 	 */
 	async getUserById(request, response) {
-		const user = this.getService().getUserById(request.params["userId"]);
+		const { userId } = request.params;
+
+		const user = this.getService().getUserById(userId);
 		if (!user) {
 			return response.status(404).json({ message: "Usuário não encontrado." });
 		}
@@ -94,7 +105,9 @@ class UsersController extends Controller {
 	 * @param {Response} response
 	 */
 	async logoutAuthenticated(request, response) {
-		const result = this.getService().logoutAuthenticated(request.header["authorization"]);
+		const { userId } = request.body;
+
+		const result = this.getService().logoutAuthenticated(userId);
 		if (!result.success) {
 			return response.status(400).json({ message: result.message });
 		}
@@ -102,8 +115,21 @@ class UsersController extends Controller {
 		response.status(200).json({ message: "Logout realizado com sucesso." });
 	}
 
-	async testAuthenticaded(_, response) {
-		response.status(200).json({ message: "Rota segura." });
+	/**
+	 * Altera as configurações de um usuário autenticado
+	 *
+	 * @param {Request} request
+	 * @param {Response} response
+	 */
+	async alterSettingsAuthenticated(request, response) {
+		const { userId, toAlter } = request.body;
+
+		const result = this.#UserSettingsComponent.alterSettings(userId, toAlter);
+		if (!result.success) {
+			return response.status(400).json({ message: result.message });
+		}
+
+		response.status(200).json({ message: "Configurações alteradas com sucesso.", altered: result.altered });
 	}
 
 	// ==================================== Métodos Intermediários ==================================== //

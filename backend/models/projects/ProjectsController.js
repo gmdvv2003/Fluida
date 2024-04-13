@@ -1,40 +1,65 @@
 const Controller = require("../__types/Controller");
 
 const ProjectsService = require("./ProjectsService");
+const { Project } = require("./functionalities/project/Project");
 
 class ProjectsController extends Controller {
-	constructor() {
-		super(new ProjectsService());
+	constructor(servicesProvider) {
+		// Inicializa o controller e o serviço
+		super(new ProjectsService(), servicesProvider);
+		this.getService().setController(this);
+
+		// Inicializa as funcionalidades do controller
+		new Project(this);
 	}
 
 	// ==================================== Métodos Seguros ==================================== //
-	getProjectsAuthenticated(request, response) {
-		console.log("getProjects");
-	}
+	/**
+	 * Realiza a criação de um novo projeto
+	 *
+	 * @param {Request} request
+	 * @param {Response} response
+	 */
+	async createProjectAuthenticated(request, response) {
+		const { userId, projectName } = request.body;
+		if (!userId || !projectName) {
+			return response.status(400).json({ message: "Usuário ou nome do projeto não informado." });
+		}
 
-	getProjectByIdAuthenticated(request, response) {
-		console.log("getProjectById");
-	}
-
-	createProjectAuthenticated(request, response) {
-		const { createdBy, projectName } = request.body;
-		
-		const result = this.getService().createProject(createdBy, projectName);
-
+		const result = this.getService().createProjectAuthenticated(userId, projectName);
 		if (!result.success) {
 			return response.status(400).json({ message: result.message });
 		}
 
-		response.status(201).json({ message: "Projeto cadastrado com sucesso.", successfullyRegistered: true });
+		response.status(201).json({ message: "Projeto criado com sucesso.", successfullyCreated: true });
 	}
 
-	deleteProjectAuthenticated(request, response) {
+	async deleteProjectAuthenticated(request, response) {
 		console.log("deleteProject");
 	}
 
-	participateAuthenticated(request, response) {
+	/**
+	 * Prepara a participação de um usuário em um projeto
+	 *
+	 * @param {Request} request
+	 * @param {Response} response
+	 */
+	async participateAuthenticated(request, response) {
 		const { userId, projectId } = request.body;
+		if (!userId || !projectId) {
+			return response.status(400).json({ message: "Usuário ou projeto não informado." });
+		}
+
+		const isInProject = this.getService("users").isUserInProject(userId, projectId);
+		if (!isInProject) {
+			return response.status(400).json({ message: "Usuário não está no projeto." });
+		}
 	}
+
+	async inviteMemberAuthenticated(request, response) {}
+
+	// ==================================== Métodos Intermediários ==================================== //
+	validateInvite(request, response) {}
 }
 
 module.exports = ProjectsController;

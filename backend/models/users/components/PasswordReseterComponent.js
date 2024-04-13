@@ -1,9 +1,10 @@
 const jwt = require("jsonwebtoken");
 
 const EmailTransporter = require("../../../context/nodemailer/EmailTransporter");
-const UserEntity = require("../UsersEntity");
 
 class PasswordReseterComponent {
+	controller;
+
 	constructor(controller) {
 		this.controller = controller;
 	}

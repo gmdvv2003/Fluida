@@ -2,12 +2,12 @@ module.exports = function (user, resetUrl) {
 	return {
 		to: user.email,
 
-		subject: "Redefinição de senha",
+		subject: "Redefinição de Senha",
 		text: "reset-password",
 
 		replacer: function () {
 			return {
-				Title: "Redefinição de senha",
+				Title: "Redefinição de Senha",
 				SubTitle: `Olá, ${user.firstName} ${user.lastName}`,
 				Description:
 					"Uma solicitação de redefinição de senha foi enviada para esta conta.\nPara redefinir a sua senha, clique no botão abaixo:",

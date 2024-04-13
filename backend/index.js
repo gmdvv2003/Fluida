@@ -1,5 +1,8 @@
 require("dotenv").config();
 
+const http = require("http");
+const socket = require("socket.io");
+
 const admin = require("firebase-admin");
 admin.initializeApp();
 
@@ -9,7 +12,26 @@ global.__URLS__ = urls;
 const express = require("express");
 const bodyParser = require("body-parser");
 
+// Inicializando o express
 const app = express();
+
+// Inicializando o servidor HTTP
+const server = http.createServer(app);
+
+// Inicializando o socket.io
+const io = new socket.Server(server, {
+	allowRequest: (request, callback) => {
+		const noOriginHeader = request.headers.origin === undefined;
+		callback(null, noOriginHeader);
+	},
+
+	cors: {
+		origin: `http://localhost:${process.env.WEB_PORT}`,
+		methods: ["GET", "POST", "PUT", "DELETE"],
+		credentials: true,
+	},
+});
+
 app.use(bodyParser.json());
 
 app.use((_, response, next) => {
@@ -70,8 +92,8 @@ const projectsController = new ProjectsController(servicesProvider);
 servicesProvider.register("users", usersController);
 servicesProvider.register("projects", projectsController);
 
-usersRoutes(app, usersController);
-projectsRoutes(app, projectsController);
+usersRoutes(app, io, usersController);
+projectsRoutes(app, io, projectsController);
 
 const port = process.env.SERVER_PORT || 8080;
 

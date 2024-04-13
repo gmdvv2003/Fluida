@@ -1,6 +1,6 @@
 const Route = require("./../../context/route/Route");
 
-module.exports = function (app, usersController) {
+module.exports = function (app, _, usersController) {
 	// ==================================== Rotas Publicas ==================================== //
 	// (Teste)
 	app.get("/users", Route.newRoute({ secure: false }, usersController.getUsers, usersController));
@@ -10,8 +10,12 @@ module.exports = function (app, usersController) {
 	app.post("/users/login", Route.newRoute({ secure: false }, usersController.login, usersController));
 
 	// ==================================== Rotas Seguras ==================================== //
-	app.post("/users/logout", Route.newRoute({ secure: true }, usersController.logoutAuthenticated, usersController));
-	app.put("/users/test", Route.newRoute({ secure: true }, usersController.testAuthenticaded, usersController));
+	app.post("/users/logout", Route.newRoute({ secure: true }, usersController.logoutAuthenticated, usersController, ["userId"]));
+
+	app.put(
+		"/users/alterSettings",
+		Route.newRoute({ secure: true }, usersController.alterSettingsAuthenticated, usersController, ["userId"])
+	);
 
 	// ==================================== Rotas Intermediárias ==================================== //
 	// Validação do Email

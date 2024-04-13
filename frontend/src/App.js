@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import { AuthenticationProvider } from "context/AuthenticationContext";
+
 import Registration from "components/pages/registration/Registration";
 import Login from "components/pages/login/Login";
 import SendPasswordReset from "components/pages/login-password-reset/SendPasswordReset";
@@ -11,26 +13,28 @@ import PrivateRoute from "functionalities/PrivateRoute";
 
 function App() {
 	return (
-		<BrowserRouter>
-			<Routes>
-				{/* Rotas Públicas */}
-				<Route path="/registration" element={<Registration />} />
-				<Route path="/login" element={<Login />} />
-				<Route path="/send-password-reset" element={<SendPasswordReset />} />
-				<Route path="/reset-password" element={<LoginPasswordReset />} />
-				<Route path="/validate-email" element={<ValidateEmail />} />
+		<AuthenticationProvider>
+			<BrowserRouter>
+				<Routes>
+					{/* Rotas Públicas */}
+					<Route path="/registration" element={<Registration />} />
+					<Route path="/login" element={<Login />} />
+					<Route path="/send-password-reset" element={<SendPasswordReset />} />
+					<Route path="/reset-password" element={<LoginPasswordReset />} />
+					<Route path="/validate-email" element={<ValidateEmail />} />
 
-				{/* Rotas Seguras */}
-				<Route
-					path="/home"
-					element={
-						<PrivateRoute>
-							<HomeProjects />
-						</PrivateRoute>
-					}
-				/>
-			</Routes>
-		</BrowserRouter>
+					{/* Rotas Seguras */}
+					<Route
+						path="/home"
+						element={
+							<PrivateRoute>
+								<HomeProjects />
+							</PrivateRoute>
+						}
+					/>
+				</Routes>
+			</BrowserRouter>
+		</AuthenticationProvider>
 	);
 }
 
