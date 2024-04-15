@@ -44,4 +44,5 @@ module.exports = {
 	resetPassword: new Url("/reset-password"),
 	sendPasswordReset: new Url("/send-password-reset"),
 	validateEmail: new Url("/validate-email"),
+	valitateInvitation: new Url("/validate-invitation"),
 };

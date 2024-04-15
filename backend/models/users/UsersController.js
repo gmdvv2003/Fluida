@@ -20,8 +20,6 @@ class UsersController extends Controller {
 		this.#EmailValidatorComponent = new EmailValidatorComponent(this);
 		this.#PasswordReseterComponent = new PasswordReseterComponent(this);
 		this.#UserSettingsComponent = new UserSettingsComponent(this);
-
-		// Inicializa as funcionalidades do controller
 	}
 
 	// ==================================== Métodos publicos ==================================== //
@@ -61,7 +59,13 @@ class UsersController extends Controller {
 	async register(request, response) {
 		const { firstName, lastName, email, phoneNumber, password } = request.body;
 
-		const result = this.getService().register(firstName, lastName, email, phoneNumber, password);
+		const result = this.getService().register(
+			firstName,
+			lastName,
+			email,
+			phoneNumber,
+			password
+		);
 		if (!result.success) {
 			return response.status(400).json({ message: result.message });
 		}
@@ -76,7 +80,9 @@ class UsersController extends Controller {
 				console.error(`Falha ao enviar email de validação. Erro: ${error}`);
 			});
 
-		response.status(201).json({ message: "Usuário cadastrado com sucesso.", successfullyRegistered: true });
+		response
+			.status(201)
+			.json({ message: "Usuário cadastrado com sucesso.", successfullyRegistered: true });
 	}
 
 	/**
@@ -129,7 +135,9 @@ class UsersController extends Controller {
 			return response.status(400).json({ message: result.message });
 		}
 
-		response.status(200).json({ message: "Configurações alteradas com sucesso.", altered: result.altered });
+		response
+			.status(200)
+			.json({ message: "Configurações alteradas com sucesso.", altered: result.altered });
 	}
 
 	// ==================================== Métodos Intermediários ==================================== //
@@ -148,10 +156,14 @@ class UsersController extends Controller {
 		try {
 			const success = this.#EmailValidatorComponent.validateValidationEmail(token);
 			if (!success) {
-				return response.status(400).json({ message: "Falha ao validar email. Token inválido." });
+				return response
+					.status(400)
+					.json({ message: "Falha ao validar email. Token inválido." });
 			}
 
-			return response.status(200).json({ message: "Email validado com sucesso.", isValidated: true });
+			return response
+				.status(200)
+				.json({ message: "Email validado com sucesso.", isValidated: true });
 		} catch (error) {
 			return response.status(400).json({ message: `Falha ao validar email. Erro: ${error}` });
 		}
@@ -188,7 +200,9 @@ class UsersController extends Controller {
 	async resetPassword(request, response) {
 		const { token, newPassword } = request.body;
 		if (!token || !newPassword) {
-			return response.status(400).json({ message: "Token ou nova senha não encontrados na requisição" });
+			return response
+				.status(400)
+				.json({ message: "Token ou nova senha não encontrados na requisição" });
 		}
 
 		try {
@@ -198,7 +212,9 @@ class UsersController extends Controller {
 			}
 
 			if (result.samePasswordAsBefore) {
-				return response.status(200).json({ message: "Senha igual a anterior.", samePasswordAsBefore: true });
+				return response
+					.status(200)
+					.json({ message: "Senha igual a anterior.", samePasswordAsBefore: true });
 			}
 
 			return response.status(200).json({ message: "Senha resetada com sucesso." });

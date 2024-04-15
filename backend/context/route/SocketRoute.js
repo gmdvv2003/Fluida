@@ -10,16 +10,19 @@ class SocketRoute {
 	 */
 	static newSecureSocketRoute(io, binder, decoder = []) {
 		io.use((socket, next) => {
-			const token = socket.handshake.auth.token;
-			if (!token) {
+			const { socketToken, sessionToken } = socket.handshake.auth;
+			if (!socketToken || !sessionToken) {
 				return next(new Error("Não autorizado."));
 			}
 
-			const [validated, decoded] = Session.validate(token);
-			if (validated) {
+			// Valida ambos os tokens para garantir que o usuário é quem diz ser
+			const [socketTokenValidated, socketTokenDecoded] = Session.validate(socketToken);
+			const [sessionTokenValidated, sessionTokenDecoded] = Session.validate(sessionToken);
+
+			if (socketTokenValidated && sessionTokenValidated) {
 				decoder.forEach((decode) => {
 					try {
-						socket[decode] = decoded[decode];
+						socket[decode] = socketTokenDecoded[decode] || sessionTokenDecoded[decode];
 					} catch (error) {
 						console.error(`Falha ao inserir ${decode} no socket. Erro: ${error}`);
 					}

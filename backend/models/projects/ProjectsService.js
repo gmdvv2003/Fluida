@@ -7,12 +7,18 @@ const ProjectsEntity = require("./ProjectsEntity");
 
 const projects = [];
 
+const projectsMembers = [];
+const projectsInvitations = [];
+
 class ProjectsService extends Service {
 	// ==================================== Métodos Privados ==================================== //
-	isUserInProject(userId, projectId) {
-		return projects.some((project) => project.userId === userId && project.projectId === projectId);
+	get Members() {
+		return projectsMembers;
 	}
 
+	get Invitations() {
+		return projectsInvitations;
+	}
 	// ==================================== Métodos Abertos ==================================== //
 	// ==================================== Métodos Seguros ==================================== //
 	/**
@@ -34,24 +40,7 @@ class ProjectsService extends Service {
 
 	deleteProjectAuthenticated(userId, projectId) {}
 
-	participateAuthenticated(userId, projectId) {
-		if (!this.isUserInProject(userId, projectId)) {
-			return { success: false, message: "Usuário não está no projeto." };
-		}
-	}
-
-	// TODO: Mover a função abaixo para a classe ProjectMembersInterface
-	/**
-	 * Retorna projetos do usuário pelo ID
-	 *
-	 * @param {number} userId
-	 * @returns DTO dos projetos do usuário
-	 */
-	getProjectsByUserId(userId) {
-		const projectsUser = projects.filter((project) => project.userId === userId);
-		const projectsUserDTO = projectsUser.map((project) => new ProjectsDTO(project));
-		return projectsUserDTO;
-	}
+	participateAuthenticated(userId, projectId) {}
 }
 
 module.exports = ProjectsService;

@@ -1,6 +1,3 @@
-// Tipos para linting
-const UserEntity = require("../../models/users/UsersEntity");
-
 const jwt = require("jsonwebtoken");
 
 const ISSUER = "Fluida";
@@ -21,13 +18,13 @@ const publicKey = process.env.JWT_PUBLIC_KEY;
 
 class Session {
 	/**
-	 * Cria uma nova sessão para um usuário
+	 * Cria uma nova sessão com os dados providos
 	 *
-	 * @param {UserEntity} user
+	 * @param {Map} signatures
 	 * @returns Novo token JWT
 	 */
-	static newSession(user) {
-		return jwt.sign({ userId: user.userId }, privateKey, JWT_OPTIONS);
+	static newSession(signatures = {}, options = {}) {
+		return jwt.sign({ ...signatures }, privateKey, { ...JWT_OPTIONS, ...options });
 	}
 
 	/**

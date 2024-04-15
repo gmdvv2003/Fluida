@@ -3,6 +3,8 @@ const jwt = require("jsonwebtoken");
 const EmailTransporter = require("../../../context/nodemailer/EmailTransporter");
 const UserEntity = require("../UsersEntity");
 
+const Session = require("../../../context/session/Session");
+
 class EmailValidatorComponent {
 	controller;
 
@@ -22,9 +24,7 @@ class EmailValidatorComponent {
 		}
 
 		// Cria um token de validação para o email
-		const token = jwt.sign({ userId: user.userId }, process.env.JWT_PRIVATE_KEY, {
-			algorithm: "RS256",
-		});
+		const token = Session.newSession({ userId: user.userId }, { expiresIn: "24h" });
 
 		// Associa o token ao usuário
 		user.emailValidationToken = token;

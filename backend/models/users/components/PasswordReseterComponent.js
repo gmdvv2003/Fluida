@@ -1,6 +1,6 @@
-const jwt = require("jsonwebtoken");
-
 const EmailTransporter = require("../../../context/nodemailer/EmailTransporter");
+
+const Session = require("../../../context/session/Session");
 
 class PasswordReseterComponent {
 	controller;
@@ -22,10 +22,7 @@ class PasswordReseterComponent {
 		}
 
 		// Cria um token de reset de senha para o usuário
-		const token = jwt.sign({ email: user.email }, process.env.JWT_PRIVATE_KEY, {
-			algorithm: "RS256",
-			expiresIn: "1h",
-		});
+		const token = Session.newSession({ email: user.email });
 
 		// Associa o token ao usuário
 		user.passwordResetToken = token;
