@@ -100,6 +100,7 @@
                         display: flex;
                         justify-content: center;
                         align-items: center;
+                        cursor: pointer;
                         border-radius: 8px;
                         background-color: #f2f2f2;
                         width: 100%;
@@ -132,6 +133,23 @@
         }
 
     }
+
 }
 
+.HP-dialog-new-project-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid #000000;
+    border-radius: 8px;
+    background-color: #d1d1d1;
+    padding: 16px;
+    width: 30%;
+    height: 60%;
+}
+
+.blur-background {
+    filter: blur(3px);
+}
 
