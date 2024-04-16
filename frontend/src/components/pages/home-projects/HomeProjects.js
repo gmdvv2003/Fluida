@@ -1,41 +1,35 @@
 import "./HomeProjects.css";
 
+import React, { useState } from "react";
+
 import HeaderHome from "../../shared/login-registration/header-home/HeaderHome.js";
 
 function HomeProjects() {
-	const username = "variableUserName"
+	const username = "variableUserName";
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const projects = [
-		{
-			projectName: "Projeto 1"
-		},
-		{
-			projectName: "Projeto 2"
-		},
-		{
-			projectName: "Projeto 3"
-		},
-		{
-			projectName: "Projeto 4"
-		},
-		{
-			projectName: "Projeto 1"
-		},
-		{
-			projectName: "Projeto 2"
-		},
-		{
-			projectName: "Projeto 3"
-		},
-		{
-			projectName: "Projeto 4"
-		},
-		
-	];
+        { projectName: "Projeto 1" },
+        { projectName: "Projeto 2" },
+        { projectName: "Projeto 3" },
+        { projectName: "Projeto 4" },
+        { projectName: "Projeto 1" },
+        { projectName: "Projeto 2" },
+        { projectName: "Projeto 3" },
+        { projectName: "Projeto 4" },
+    ];
+
+	const handleNewProjectClick = () => {
+        setIsDialogOpen(true);
+    };
+
+	const handleCloseDialog = () => {
+        setIsDialogOpen(false);
+    };
 	
 	return (
 		<div>
 			<HeaderHome />
-			<div className="HP-container-user-projects">
+			<div className={`HP-container-user-projects ${isDialogOpen ? 'blur-background' : ''}`}>
 				<div className="HP-container-user">
 					<div className="HP-container-image-label">
 						<i className="HP-user-image"></i>
@@ -56,7 +50,7 @@ function HomeProjects() {
                                         {project.projectName}
                                     </div>
                                 ))}
-								<div className="HP-grid-item">
+								<div className="HP-grid-item" onClick={handleNewProjectClick}>
 									<div className="HP-container-new-project">
 										<i className="HP-add-new-project"></i>
 										<div className="HP-label-new-project">
@@ -69,6 +63,12 @@ function HomeProjects() {
 					</div>
 				</div>
 			</div>
+			{isDialogOpen && (
+                <div className="HP-dialog-new-project-container">
+                   	<div>TESTANDO</div>
+                    <button onClick={handleCloseDialog}>Fechar</button>
+                </div>
+            )}
 		</div>
 	);
 }
