@@ -1,15 +1,18 @@
 class PhaseFunctionality {
-	constructor(ProjectsFunctionalityInterface, inject) {
+	constructor(_, inject) {
 		inject("IOCreatePhase", this.#IOCreatePhase);
 		inject("IODeletePhase", this.#IODeletePhase);
 		inject("IOUpdatePhase", this.#IOUpdatePhase);
+		inject("IOMovePhase", this.#IOMovePhase);
 	}
 
-	#IOCreatePhase(projectsIO, project, socket, data) {}
+	#IOCreatePhase(projectsIO, socket, project, data) {}
 
-	#IODeletePhase(projectsIO, project, socket, data) {}
+	#IODeletePhase(projectsIO, socket, project, data) {}
 
-	#IOUpdatePhase(projectsIO, project, socket, data) {}
+	#IOUpdatePhase(projectsIO, socket, project, data) {}
+
+	#IOMovePhase(projectsIO, socket, project, data) {}
 }
 
 module.exports = PhaseFunctionality;

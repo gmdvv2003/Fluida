@@ -1,5 +1,5 @@
 const SocketRoute = require("../../context/route/SocketRoute");
-const Route = require("./../../context/route/Route");
+const Route = require("../../context/route/Route");
 
 module.exports = function (app, io, projectsController) {
 	// ==================================== Rotas Publicas ==================================== //
@@ -55,33 +55,29 @@ module.exports = function (app, io, projectsController) {
 	SocketRoute.newSecureSocketRoute(projectsIO, projectsController, ["userId", "projectId"]);
 
 	projectsIO.on("connection", (socket) => {
-		socket.on("subscribeToProject", (data) =>
-			projectsController.IOSubscribeToProject(projectsIO, socket, data)
-		);
-		socket.on("unsubscribeFromProject", (data) =>
-			projectsController.IOUnsubscribeFromProject(projectsIO, socket, data)
-		);
+		// Função utilitária para linkar os métodos do controller com os eventos do socket
+		function linkToMethod(method) {
+			return (data) => projectsController[method](projectsIO, socket, data);
+		}
+
+		socket.on("subscribeToProject", linkToMethod("subscribeToProject"));
+		socket.on("unsubscribeFromProject", linkToMethod("unsubscribeFromProject"));
 
 		// Rotas de manipulação de cards
-		socket.on("createCard", (data) =>
-			projectsController.IOCreateCard(projectsIO, socket, data)
-		);
-		socket.on("deleteCard", (data) =>
-			projectsController.IODeleteCard(projectsIO, socket, data)
-		);
-		socket.on("updateCard", (data) =>
-			projectsController.IOUpdateCard(projectsIO, socket, data)
-		);
+		socket.on("createCard", linkToMethod("createCard"));
+		socket.on("deleteCard", linkToMethod("deleteCard"));
+		socket.on("updateCard", linkToMethod("updateCard"));
+		socket.on("moveCard", linkToMethod("moveCard"));
 
 		// Rotas de manipulação de fases
-		socket.on("createPhase", (data) =>
-			projectsController.IOCreatePhase(projectsIO, socket, data)
-		);
-		socket.on("deletePhase", (data) =>
-			projectsController.IODeletePhase(projectsIO, socket, data)
-		);
-		socket.on("updatePhase", (data) =>
-			projectsController.IOUpdatePhase(projectsIO, socket, data)
-		);
+		socket.on("createPhase", linkToMethod("createPhase"));
+		socket.on("deletePhase", linkToMethod("deletePhase"));
+		socket.on("updatePhase", linkToMethod("updatePhase"));
+		socket.on("movePhase", linkToMethod("movePhase"));
+
+		// Rotas do chat
+		socket.on("sendMessage", linkToMethod("sendMessage"));
+		socket.on("deleteMessage", linkToMethod("deleteMessage"));
+		socket.on("editMessage", linkToMethod("editMessage"));
 	});
 };

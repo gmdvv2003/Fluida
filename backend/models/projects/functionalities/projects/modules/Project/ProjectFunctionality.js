@@ -1,5 +1,5 @@
 class ProjectFunctionality {
-	constructor(ProjectsFunctionalityInterface, inject) {}
+	constructor(_, inject) {}
 }
 
 module.exports = ProjectFunctionality;

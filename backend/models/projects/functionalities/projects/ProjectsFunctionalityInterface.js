@@ -35,12 +35,13 @@ class Participant {
 }
 
 class Project {
-	#cards;
-	#phases;
+	#projectId;
 
-	constructor() {
-		this.#cards = [];
-		this.#phases = [];
+	#cards = [];
+	#phases = [];
+
+	constructor(projectId) {
+		this.#projectId = projectId;
 	}
 }
 
@@ -70,7 +71,7 @@ class ProjectsFunctionalityInterface {
 	 * @param {Function} next
 	 */
 	socketToProjectRedirector(next) {
-		return (socket, data) => {
+		return (projectsIO, socket, data) => {
 			const { projectId } = data;
 			if (!projectId) {
 				return socket.emit("error", { message: '"projectId" não informado.' });
@@ -93,7 +94,7 @@ class ProjectsFunctionalityInterface {
 				return socket.emit("error", { message: "Você não é membro deste projeto." });
 			}
 
-			next(project, socket, data);
+			next(projectsIO, socket, project, data);
 		};
 	}
 
@@ -147,11 +148,11 @@ class ProjectsFunctionalityInterface {
 	 * Realiza a inscrição de um usuário em um projeto.
 	 *
 	 * @param {Namespace} projectsIO
-	 * @param {Project} project
 	 * @param {Socket} socket
+	 * @param {Project} project
 	 * @param {*} data
 	 */
-	IOSubscribeToProject(projectsIO, project, socket, data) {
+	IOSubscribeToProject(projectsIO, socket, project, data) {
 		// Realiza a validação para obter o userId
 		const [_, { userId }] = Session.validate(socketToken);
 
@@ -175,11 +176,11 @@ class ProjectsFunctionalityInterface {
 	 * Realiza a remoção de um usuário de um projeto, invalidando o token de participação.
 	 *
 	 * @param {Namespace} projectsIO
-	 * @param {Project} project
 	 * @param {Socket} socket
+	 * @param {Project} project
 	 * @param {*} data
 	 */
-	IOUnsubscribeFromProject(projectsIO, project, socket, data) {}
+	IOUnsubscribeFromProject(projectsIO, socket, project, data) {}
 }
 
 module.exports = ProjectsFunctionalityInterface;

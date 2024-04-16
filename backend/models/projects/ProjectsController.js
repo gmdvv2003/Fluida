@@ -4,6 +4,7 @@ const ProjectInvitationComponent = require("./components/ProjectInvitationCompon
 
 const ProjectInvitationInterface = require("./relationship/project-invitations/ProjectInvitationsInterface");
 const ProjectMembersInterface = require("./relationship/project-members/ProjectMembersInterface");
+const ProjectChatsInterface = require("./relationship/project-chats/ProjectChatsInterface");
 
 const ProjectsService = require("./ProjectsService");
 
@@ -14,6 +15,7 @@ class ProjectsController extends Controller {
 
 	ProjectInvitationInterface;
 	ProjectMembersInterface;
+	ProjectChatsInterface;
 
 	ProjectsFunctionalityInterface;
 
@@ -28,6 +30,7 @@ class ProjectsController extends Controller {
 		// Inicializa as interfaces do controller
 		this.ProjectInvitationInterface = new ProjectInvitationInterface(this);
 		this.ProjectMembersInterface = new ProjectMembersInterface(this);
+		this.ProjectChatsInterface = new ProjectChatsInterface(this);
 
 		// Inicializa as funcionalidades do controller
 		this.ProjectsFunctionalityInterface = new ProjectsFunctionalityInterface(this);
