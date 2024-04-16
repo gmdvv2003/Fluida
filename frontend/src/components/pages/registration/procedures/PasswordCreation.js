@@ -23,7 +23,8 @@ const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure, s
 
 	function onPasswordsChange() {
 		const password = passwordFieldReference.current.ref.current.ref.current.value;
-		const passwordConfirmation = passwordConfirmationFieldReference.current.ref.current.ref.current.value;
+		const passwordConfirmation =
+			passwordConfirmationFieldReference.current.ref.current.ref.current.value;
 		setMatchingPassword(password == passwordConfirmation);
 
 		const isPasswordSatisfied = passwordStrengthFieldRefrence.current.isPasswordSatisfied();
@@ -40,8 +41,10 @@ const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure, s
 	}
 
 	useEffect(() => {
-		const unbindPasswordChangeSubscription = passwordFieldReference.current.onPasswordChange(onPasswordsChange);
-		const unbindPasswordConfirmationChangeSubscription = passwordConfirmationFieldReference.current.onPasswordChange(onPasswordsChange);
+		const unbindPasswordChangeSubscription =
+			passwordFieldReference.current.onPasswordChange(onPasswordsChange);
+		const unbindPasswordConfirmationChangeSubscription =
+			passwordConfirmationFieldReference.current.onPasswordChange(onPasswordsChange);
 
 		return () => {
 			unbindPasswordChangeSubscription();
@@ -54,17 +57,24 @@ const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure, s
 			<div className="LR-C-forms-container-holder BG-fluida-background-waves-container">
 				<div className="LR-C-forms-container-holder BG-fluida-identity-fish-container">
 					<div className="LR-C-forms-container">
-						<form className="LR-C-forms" style={{ width: "80%" }}>
+						<div className="LR-C-forms" style={{ width: "80%" }}>
 							<div>
 								<h3 className="R-registration-header">Crie uma senha.</h3>
 							</div>
 
 							<div>
 								<InputFieldContainer description="Digite a sua senha.">
-									<PasswordField ref={passwordFieldReference} name="password" placeholder="Digite uma senha forte" />
+									<PasswordField
+										ref={passwordFieldReference}
+										name="password"
+										placeholder="Digite uma senha forte"
+									/>
 								</InputFieldContainer>
 
-								<InputFieldContainer description="Confirme a sua senha." grid_template_areas="password_confirmation_field">
+								<InputFieldContainer
+									description="Confirme a sua senha."
+									grid_template_areas="password_confirmation_field"
+								>
 									<PasswordField
 										ref={passwordConfirmationFieldReference}
 										name="password"
@@ -79,13 +89,18 @@ const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure, s
 									}
 
 									if (isPasswordNotSatisfied) {
-										return <InputFieldError error="A senha não atende aos requisitos." />;
+										return (
+											<InputFieldError error="A senha não atende aos requisitos." />
+										);
 									}
 
 									return null;
 								})()}
 
-								<PasswordFieldStrength field={passwordFieldReference} ref={passwordStrengthFieldRefrence} />
+								<PasswordFieldStrength
+									field={passwordFieldReference}
+									ref={passwordStrengthFieldRefrence}
+								/>
 
 								<div className="R-registration-button">
 									<button type="button" onClick={handleOnContinueButton}>
@@ -94,12 +109,15 @@ const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure, s
 								</div>
 
 								<div className="R-go-back-button-container">
-									<button onClick={previousProcedure} className="R-go-back-button">
+									<button
+										onClick={previousProcedure}
+										className="R-go-back-button"
+									>
 										<GoBackArrowIcon />
 									</button>
 								</div>
 							</div>
-						</form>
+						</div>
 					</div>
 				</div>
 			</div>

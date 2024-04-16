@@ -10,9 +10,13 @@ class Route {
 	 * @param {Array} decoder
 	 * @returns Middleware
 	 */
-	static newRoute({ secure }, next, binder, decoder = []) {
+	static newRoute({ secure }, next, binder, decoder = [], sessionValidator) {
+		if (secure && !sessionValidator) {
+			throw new Error("A rota segura precisa de um validador de sessão.");
+		}
+
 		return secure
-			? this.#secureRoute(next.bind(binder), decoder)
+			? this.#secureRoute(next.bind(binder), decoder, sessionValidator)
 			: this.#unsecureRoute(next.bind(binder));
 	}
 
@@ -23,7 +27,7 @@ class Route {
 	 * @param {Array} decoder
 	 * @returns Middleware
 	 */
-	static #secureRoute(next, decoder) {
+	static #secureRoute(next, decoder, sessionValidator = () => true) {
 		return async (request, response) => {
 			// Pega o token de autorização que está no header
 			const { authorization } = request.headers;
@@ -34,6 +38,11 @@ class Route {
 			// Realiza a validação do token + a inserção dos dados no request
 			const [validated, decoded] = Session.validate(authorization);
 			if (validated) {
+				// Verifica se o token é válido
+				if (!sessionValidator(decoded)) {
+					return response.status(401).json({ message: "Sessão inválida." });
+				}
+
 				decoder.forEach((decode) => {
 					try {
 						request[decode] = decoded[decode];
@@ -45,7 +54,7 @@ class Route {
 				await next(request, response);
 			}
 
-			return response.status(500).json({ message: "Falha ao autenticar token." });
+			return response.status(401).json({ message: "Falha ao autenticar token." });
 		};
 	}
 

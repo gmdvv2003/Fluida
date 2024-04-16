@@ -5,47 +5,56 @@ import "./Login.css";
 import { useEffect, useRef, useState } from "react";
 
 import { useAuthentication } from "context/AuthenticationContext";
+
 import { ReactComponent as EmailIcon } from "assets/action-icons/email.svg";
 import { ReactComponent as GoogleIcon } from "assets/action-icons/google-icon.svg";
+
 import Header from "components/shared/login-registration/header/Header";
 import InputFieldError from "components/shared/login-registration/error/InputFieldError";
 import PasswordField from "./input-types/PasswordField";
 import TextInputField from "components/shared/text-input-field/TextInputField";
-import LoadingDots from "components/shared/loading/LoadingDots";
+import Loading from "components/shared/loading/Loading";
 
 function Login() {
 	const emailFieldReference = useRef(null);
 	const passwordFieldReference = useRef(null);
 
-	const [enteredEmail, setEnteredEmail] = useState(false);
-	const [enteredPassword, setEnteredPassword] = useState(false);
+	const [enteredEmail, setEnteredEmail] = useState("");
+	const [enteredPassword, setEnteredPassword] = useState("");
 
 	const [invalidEmail, setInvalidEmail] = useState(false);
 	const [invalidPassword, setInvalidPassword] = useState(false);
 
 	const [waitingForValidation, setWaitingForValidation] = useState(false);
 	const [wrongCredentials, setWrongCredentials] = useState(false);
+	const [somethingWentWrong, setSomethingWentWrong] = useState(false);
 
 	const { login } = useAuthentication();
 
-	function handleOnLoginButton() {
-		setInvalidEmail(enteredEmail.length <= 0);
-		setInvalidPassword(enteredPassword.length <= 0);
+	async function handleOnLoginButton() {
+		if (waitingForValidation) {
+			return null;
+		}
 
-		if (invalidEmail || invalidPassword) {
-			login(enteredEmail, enteredPassword)
-				.then((result) => result.json())
-				.then((data) => {
-					if (data.wrongEmailAndOrPassword) {
-						setWrongCredentials(true);
-					}
-				})
-				.catch((error) => {})
-				.finally(() => {
-					setWaitingForValidation(false);
-				});
+		const isEnteredEmailInvalid = enteredEmail.length <= 0;
+		const isEnteredPasswordInvalid = enteredPassword.length <= 0;
 
+		setInvalidEmail(isEnteredEmailInvalid);
+		setInvalidPassword(isEnteredPasswordInvalid);
+
+		if (!isEnteredEmailInvalid && !isEnteredPasswordInvalid) {
 			setWaitingForValidation(true);
+
+			// Realiza a requisição para o back
+			const response = await login(enteredEmail, enteredPassword);
+			if (response.success) {
+				setWrongCredentials(response.data?.wrongEmailAndOrPassword);
+			} else {
+				setSomethingWentWrong(true);
+			}
+
+			// Finaliza o processo de login
+			setWaitingForValidation(false);
 		}
 	}
 
@@ -58,8 +67,10 @@ function Login() {
 	}
 
 	useEffect(() => {
-		const unbindEmailChangeSubscription = emailFieldReference.current.onTextChange(handleOnEmailChange);
-		const unbindPasswordChangeSubscription = passwordFieldReference.current.onPasswordChange(handleOnPasswordChange);
+		const unbindEmailChangeSubscription =
+			emailFieldReference.current.onTextChange(handleOnEmailChange);
+		const unbindPasswordChangeSubscription =
+			passwordFieldReference.current.onPasswordChange(handleOnPasswordChange);
 
 		return () => {
 			unbindEmailChangeSubscription();
@@ -73,7 +84,7 @@ function Login() {
 			<div className="LR-C-forms-container-holder BG-fluida-background-waves-container">
 				<div className="LR-C-forms-container-holder BG-fluida-identity-fish-container">
 					<div className="LR-C-forms-container">
-						<form className="LR-C-forms">
+						<form className="LR-C-forms" style={{ width: "80%" }}>
 							<div className="L-login-form-title-container">
 								<h1 className="L-login-form-title">Inicie sessão na sua conta</h1>
 							</div>
@@ -91,7 +102,7 @@ function Login() {
 
 							<div className="L-left-email-icon-container">
 								<div className="L-left-icon-container">
-									<EmailIcon className="L-left-icon" />
+									<EmailIcon className="L-left-icon" />.
 								</div>
 								<TextInputField
 									ref={emailFieldReference}
@@ -105,29 +116,51 @@ function Login() {
 								/>
 							</div>
 
-							{invalidEmail && !wrongCredentials && <InputFieldError error="Preencha este campo." />}
+							{invalidEmail && !wrongCredentials && (
+								<InputFieldError error="Preencha este campo." />
+							)}
 
 							<PasswordField ref={passwordFieldReference} />
 
-							{invalidPassword && !wrongCredentials && <InputFieldError error="Preencha este campo." />}
+							{invalidPassword && !wrongCredentials && (
+								<InputFieldError error="Preencha este campo." />
+							)}
 
-							{wrongCredentials && <InputFieldError error="Email e usuário ou senha inválidos." />}
+							{wrongCredentials && (
+								<InputFieldError error="Email e usuário ou senha inválidos." />
+							)}
 
 							<div className="L-login-form-reset-container">
 								<a href="/send-password-reset" className="L-login-form-reset">
 									Não consegue fazer login?
 								</a>
 							</div>
-							<div className="L-start-session-button-container">
-								<button onClick={handleOnLoginButton} type="button" className="L-start-session-button">
-									Iniciar sessão
-								</button>
-							</div>
+
+							{waitingForValidation ? (
+								<div className="L-start-session-waiting-for-response">
+									<Loading />
+								</div>
+							) : (
+								<div className="L-start-session-button-container">
+									<button
+										onClick={handleOnLoginButton}
+										type="button"
+										className="L-start-session-button"
+									>
+										Iniciar sessão
+									</button>
+
+									{somethingWentWrong ? (
+										<InputFieldError error="Algo de errado ocorreu enquanto seu login era processado." />
+									) : null}
+								</div>
+							)}
 						</form>
 					</div>
 					<div className="L-register-form-container">
 						<a href="/registration" className="L-register-form">
-							Ainda não tem uma conta? <b className="L-register-here-text">Cadastre-se aqui.</b>
+							Ainda não tem uma conta?&nbsp;
+							<b className="L-register-here-text">Cadastre-se aqui.</b>
 						</a>
 					</div>
 				</div>

@@ -39,7 +39,7 @@ class EmailTransporter {
 	 * Envia um email para o destinatário especificado pelo sender
 	 *
 	 * @param {string} sender
-	 * @param  {...any} data
+	 * @param {...any} data
 	 * @returns Promise com o resultado do envio
 	 */
 	static send(sender, ...data) {
@@ -47,28 +47,33 @@ class EmailTransporter {
 			throw new Error("Invalid email sender type.");
 		}
 
-		const { to, subject, text, replacer, template } = require(`${EMAIL_SENDERS[sender]}.js`)(...data);
+		const { to, subject, text, replacer, template } = require(`${EMAIL_SENDERS[sender]}.js`)(
+			...data
+		);
 
 		return new Promise((resolve, reject) => {
-			readHTMLTemplateFile(__dirname + `\\senders\\templates\\${template}`, async function (error, html) {
-				if (error) {
-					return reject(error);
+			readHTMLTemplateFile(
+				__dirname + `\\senders\\templates\\${template}`,
+				async function (error, html) {
+					if (error) {
+						return reject(error);
+					}
+
+					// Prepara as opções de envio do email
+					const mailOptions = {
+						from: process.env.EMAIL_ADDRESS,
+						to: to,
+						subject: subject,
+						text: text,
+
+						// Substitui as variáveis do template pelo valor correto
+						html: handlebars.compile(html)(replacer()),
+					};
+
+					// Envia o email e espera por uma resposta
+					resolve(await TRANSPORTER.sendMail(mailOptions));
 				}
-
-				// Prepara as opções de envio do email
-				const mailOptions = {
-					from: process.env.EMAIL_ADDRESS,
-					to: to,
-					subject: subject,
-					text: text,
-
-					// Substitui as variáveis do template pelo valor correto
-					html: handlebars.compile(html)(replacer()),
-				};
-
-				// Envia o email e espera por uma resposta
-				resolve(await TRANSPORTER.sendMail(mailOptions));
-			});
+			);
 		});
 	}
 }

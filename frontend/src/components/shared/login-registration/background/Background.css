@@ -1,6 +1,7 @@
 .BG-fluida-background-waves-container {
 	background: url("./../../../../assets/icons/fluida-background-wave.png") center top no-repeat;
 	background-size: 100% 100%;
+	background-color: var(--background-color);
 }
 
 .BG-fluida-identity-fish-container {

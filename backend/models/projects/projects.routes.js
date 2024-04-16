@@ -10,7 +10,8 @@ module.exports = function (app, io, projectsController) {
 			{ secure: true },
 			projectsController.createProjectAuthenticated,
 			projectsController,
-			["userId"]
+			["userId"],
+			projectsController.getService("users").sessionValidator
 		)
 	);
 	app.delete(
@@ -19,7 +20,8 @@ module.exports = function (app, io, projectsController) {
 			{ secure: true },
 			projectsController.deleteProjectAuthenticated,
 			projectsController,
-			["userId"]
+			["userId"],
+			projectsController.getService("users").sessionValidator
 		)
 	);
 
@@ -29,7 +31,8 @@ module.exports = function (app, io, projectsController) {
 			{ secure: true },
 			projectsController.participateAuthenticated,
 			projectsController,
-			["userId"]
+			["userId"],
+			projectsController.getService("users").sessionValidator
 		)
 	);
 
@@ -39,7 +42,8 @@ module.exports = function (app, io, projectsController) {
 			{ secure: true },
 			projectsController.inviteMemberAuthenticated,
 			projectsController,
-			["userId"]
+			["userId"],
+			projectsController.getService("users").sessionValidator
 		)
 	);
 	// ==================================== Rotas Intermediárias ==================================== //

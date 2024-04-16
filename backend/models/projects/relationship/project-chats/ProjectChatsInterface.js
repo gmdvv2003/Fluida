@@ -18,3 +18,5 @@ class ProjectChatsInterface {
 	editMessage(messageId, content) {}
 	deleteMessage(messageId) {}
 }
+
+module.exports = ProjectChatsInterface;

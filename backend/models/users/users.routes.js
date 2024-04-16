@@ -3,13 +3,6 @@ const SocketRoute = require("../../context/route/SocketRoute");
 
 module.exports = function (app, io, usersController) {
 	// ==================================== Rotas Publicas ==================================== //
-	// (Teste)
-	app.get("/users", Route.newRoute({ secure: false }, usersController.getUsers, usersController));
-	app.get(
-		"/users/:userId",
-		Route.newRoute({ secure: false }, usersController.getUserById, usersController)
-	);
-
 	app.post(
 		"/users/register",
 		Route.newRoute({ secure: false }, usersController.register, usersController)
@@ -22,9 +15,13 @@ module.exports = function (app, io, usersController) {
 	// ==================================== Rotas Seguras ==================================== //
 	app.post(
 		"/users/logout",
-		Route.newRoute({ secure: true }, usersController.logoutAuthenticated, usersController, [
-			"userId",
-		])
+		Route.newRoute(
+			{ secure: true },
+			usersController.logoutAuthenticated,
+			usersController,
+			["userId"],
+			usersController.getService().sessionValidator
+		)
 	);
 
 	app.put(
@@ -33,7 +30,8 @@ module.exports = function (app, io, usersController) {
 			{ secure: true },
 			usersController.alterSettingsAuthenticated,
 			usersController,
-			["userId"]
+			["userId"],
+			usersController.getService().sessionValidator
 		)
 	);
 

@@ -1,16 +1,19 @@
 import "../validate-email/ValidateEmail.css";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 import AccountInformation from "./procedures/AccountInformation";
 import Header from "components/shared/login-registration/header/Header";
 import Loading from "components/shared/loading/Loading";
 import PasswordCreation from "./procedures/PasswordCreation";
+import ActionFeedback from "components/shared/action-feedback/ActionFeedback";
+
+import { RegisterUserEndpoint } from "utilities/Endpoints";
 
 function Registration() {
 	const [currentProcedure, setCurrentProcedure] = useState(0);
 
-	const [waitingForValidation, setWaitingForRegistration] = useState(false);
+	const [waitingForRegistration, setWaitingForRegistration] = useState(false);
 	const [finishedRegistrationProcess, setFinishedRegistrationProcess] = useState(false);
 	const [successfullyRegistered, setSuccessfullyRegistered] = useState(false);
 
@@ -22,8 +25,13 @@ function Registration() {
 		password: useState(false),
 	};
 
-	function finalizeRegistration() {
-		let { email, firstName, lastName, phoneNumber, password } = accountInformationFieldsProvider;
+	async function finalizeRegistration() {
+		if (waitingForRegistration) {
+			return null;
+		}
+
+		let { email, firstName, lastName, phoneNumber, password } =
+			accountInformationFieldsProvider;
 
 		email = email[0];
 		firstName = firstName[0];
@@ -33,33 +41,22 @@ function Registration() {
 
 		setWaitingForRegistration(true);
 
-		fetch("http://localhost:8080/users/register", {
-			headers: { "Content-Type": "application/json" },
-			mode: "cors",
-			cache: "no-cache",
-			credentials: "include",
-			method: "POST",
-			body: JSON.stringify({
-				email: email,
-				firstName: firstName,
-				lastName: lastName,
-				phoneNumber: phoneNumber,
-				password: password,
-			}),
-		})
-			.then((result) => result.json())
-			.then((data) => {
-				if (data.successfullyRegistered) {
-					setSuccessfullyRegistered(true);
-				}
-			})
-			.catch((error) => {
-				console.error(`Falha ao cadastrar conta. Erro: ${error}`);
-			})
-			.finally(() => {
-				setFinishedRegistrationProcess(true);
-				setWaitingForRegistration(false);
-			});
+		// Realiza a requisição para o back
+		const response = await RegisterUserEndpoint(
+			"POST",
+			JSON.stringify({ email, firstName, lastName, phoneNumber, password })
+		);
+
+		// Verifica se a requisição foi bem sucedida
+		if (response.success) {
+			setSuccessfullyRegistered(response.data?.successfullyRegistered);
+		} else {
+			console.error(`Falha ao cadastrar conta. Erro: ${response.error}`);
+		}
+
+		// Finaliza o processo de cadastro
+		setFinishedRegistrationProcess(true);
+		setWaitingForRegistration(false);
 	}
 
 	function nextProcedure() {
@@ -76,29 +73,34 @@ function Registration() {
 
 	function successed() {
 		return (
-			<div className="R-VE-form">
-				<h1 className="R-VE-form-title">Parabéns!</h1>
-				<h2 className="R-VE-form-sub-title">Sua conta foi cadastrada com sucesso!</h2>
-				<p className="R-VE-form-description">
-					Agora você está um passo mais próximo de começar a explorar a nossa plataforma.
-					<br />
-					<br />
-					Um email foi enviado para a sua caixa de entrada para que você possa validar a sua conta.
-				</p>
-			</div>
+			<ActionFeedback
+				elements={[
+					{ type: "title", text: "Parabéns!" },
+					{ type: "subSitle", text: "Sua conta foi cadastrada com sucesso!" },
+					{
+						type: "description",
+						text: "Agora você está um passo mais próximo de começar a explorar a nossa plataforma. Um email foi enviado para a sua caixa de entrada para que você possa validar a sua conta.",
+					},
+				]}
+			/>
 		);
 	}
 
 	function failed() {
 		return (
-			<div className="R-VE-form">
-				<h1 className="R-VE-form-title">Ops! :(</h1>
-				<h2 className="R-VE-form-sub-title">Não foi possível realizar o cadastro da sua conta.</h2>
-				<p className="R-VE-form-description">
-					Favor tente novamente mais tarde. Se o problema persistir, entre em contato conosco para que possamos resolver o
-					problema.
-				</p>
-			</div>
+			<ActionFeedback
+				elements={[
+					{ type: "title", text: "Ops! :(" },
+					{
+						type: "subTitle",
+						text: "Não foi possível realizar o cadastro da sua conta.",
+					},
+					{
+						type: "description",
+						text: "Favor tente novamente mais tarde. Se o problema persistir, entre em contato conosco para que possamos resolver o problema.",
+					},
+				]}
+			/>
 		);
 	}
 
@@ -107,20 +109,12 @@ function Registration() {
 			<Header />
 			<div>
 				{(() => {
-					if (waitingForValidation) {
+					if (waitingForRegistration) {
 						return <Loading text="Cadastrando sua conta" />;
 					}
 
 					if (finishedRegistrationProcess) {
-						return (
-							<div className="LR-C-forms-container-holder" style={{ justifyContent: "start", paddingTop: "50px" }}>
-								<div className="LR-C-forms-container" style={{ height: "40%" }}>
-									<div className="LR-C-forms" style={{ width: "80%" }}>
-										{successfullyRegistered ? successed() : failed()}
-									</div>
-								</div>
-							</div>
-						);
+						return successfullyRegistered ? successed() : failed();
 					}
 
 					switch (currentProcedure) {
@@ -135,14 +129,20 @@ function Registration() {
 
 						case 1:
 							return (
-								<PasswordCreation nextProcedure={nextProcedure} previousProcedure={previousProcedure} setState={setState} />
+								<PasswordCreation
+									nextProcedure={nextProcedure}
+									previousProcedure={previousProcedure}
+									setState={setState}
+								/>
 							);
 
 						// Envia as informações de cadastro para o back
 						case 2: {
 							// Assegura que todos os campos estão preenchidos
 							let allValid = true;
-							for (const [_, value] of Object.entries(accountInformationFieldsProvider)) {
+							for (const [_, value] of Object.entries(
+								accountInformationFieldsProvider
+							)) {
 								if (!value[0]) {
 									allValid = false;
 									break;

@@ -8,6 +8,8 @@ import InputFieldError from "components/shared/login-registration/error/InputFie
 import TextInputField from "../../shared/text-input-field/TextInputField";
 import LoadingDots from "components/shared/loading/LoadingDots";
 
+import { RequestPasswordResetEndpoint } from "utilities/Endpoints";
+
 function SendPasswordReset() {
 	const emailFieldReference = useRef(null);
 
@@ -36,25 +38,19 @@ function SendPasswordReset() {
 		setInvalidEmail(isInvalidEmail);
 
 		if (isValidEmailFormat && !isInvalidEmail) {
-			fetch("http://localhost:8080/users/requestPasswordReset", {
-				headers: { "Content-Type": "application/json" },
-				mode: "cors",
-				cache: "no-cache",
-				credentials: "include",
-				method: "PUT",
-				body: JSON.stringify({ email: enteredEmail }),
-			})
-				.then(() => {
-					setEmailSent(true);
-				})
-				.catch((error) => {
-					setFailedToSendEmail(true);
-					console.error(`Falha ao enviar email. Erro: ${error}`);
-				})
-				.finally(() => {
-					setWaitingForResponse(false);
-				});
+			// Realiza a requisição para o back
+			const response = RequestPasswordResetEndpoint(
+				"PUT",
+				JSON.stringify({ email: enteredEmail })
+			);
+			if (response.success) {
+				setEmailSent(true);
+			} else {
+				setFailedToSendEmail(true);
+			}
 		}
+
+		setWaitingForResponse(false);
 	}
 
 	function handleOnEmailChange(event) {
@@ -86,11 +82,18 @@ function SendPasswordReset() {
 										width: "100%",
 										height: "50px",
 									}}
-									style={{ height: "100%", backgroundColor: "rgb(246, 246, 246)" }}
+									style={{
+										height: "100%",
+										backgroundColor: "rgb(246, 246, 246)",
+									}}
 									placeholder="Endereço de email"
 								/>
-								{invalidEmailFormat && !invalidEmail && <InputFieldError error="O email informado é inválido." />}
-								{invalidEmail && invalidEmailFormat && <InputFieldError error="Você deve preencher o campo do email." />}
+								{invalidEmailFormat && !invalidEmail && (
+									<InputFieldError error="O email informado é inválido." />
+								)}
+								{invalidEmail && invalidEmailFormat && (
+									<InputFieldError error="Você deve preencher o campo do email." />
+								)}
 							</div>
 						)}
 						{(() => {

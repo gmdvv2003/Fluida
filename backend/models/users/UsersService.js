@@ -19,6 +19,28 @@ class UsersService extends Service {
 	}
 
 	/**
+	 * Método utilizado como validador de sessão nas SecureRoutes
+	 *
+	 * @param {string} authorization
+	 * @param {Map} decoded
+	 * @returns {boolean}
+	 */
+	sessionValidator(authorization, decoded) {
+		const { userId } = decoded;
+
+		const user = this.getUserById(userId);
+		if (!user) {
+			return false;
+		}
+
+		if (user.session != authorization) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Pega um usuário pelo email
 	 *
 	 * @param {string} email
@@ -83,7 +105,11 @@ class UsersService extends Service {
 	login(email, password) {
 		const user = users.find((user) => user.email == email && user.password == password);
 		if (!user) {
-			return { success: false, message: "Email ou senhas incorretos." };
+			return {
+				success: true,
+				wrongEmailAndOrPassword: true,
+				message: "Email ou senhas incorretos.",
+			};
 		}
 
 		if (!user.verified) {
@@ -100,7 +126,7 @@ class UsersService extends Service {
 		// Associando o token da sessão criado ao usuário
 		user.session = session;
 
-		return { success: true, user: user };
+		return { success: true, session: session };
 	}
 
 	// ==================================== Métodos Seguros ==================================== //

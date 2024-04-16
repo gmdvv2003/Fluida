@@ -99,7 +99,7 @@ class UsersController extends Controller {
 			return response.status(400).json({ message: result.message });
 		}
 
-		response.status(200).json(result.user);
+		response.status(200).json({ ...result, redirect: global.__URLS__.home.url });
 	}
 
 	// ==================================== Métodos Seguros ==================================== //

@@ -4,6 +4,8 @@ import Header from "components/shared/login-registration/header/Header";
 import Loading from "components/shared/loading/Loading";
 import ActionFeedback from "components/shared/action-feedback/ActionFeedback";
 
+import { ValidateEmailEndpoint } from "utilities/Endpoints";
+
 function ValidateEmail() {
 	const [waitingForValidation, setWaitingForValidation] = useState(true);
 	const [emailValidatedSuccessfully, setEmailValidatedSuccessfully] = useState(false);
@@ -29,7 +31,10 @@ function ValidateEmail() {
 			<ActionFeedback
 				elements={[
 					{ type: "title", text: "Ops! :(" },
-					{ type: "subTitle", text: "Aparentemente algo de errado ocorreu enquanto sua conta era verificada." },
+					{
+						type: "subTitle",
+						text: "Aparentemente algo de errado ocorreu enquanto sua conta era verificada.",
+					},
 					{
 						type: "description",
 						text: "Se você acredita que isso foi um erro por nossa parte, por favor, entre em contato conosco para que possamos resolver o problema.",
@@ -48,28 +53,20 @@ function ValidateEmail() {
 		if (!searchParameters.has("token")) {
 			setWaitingForValidation(false);
 		} else {
+			setWaitingForValidation(true);
+
+			// Pega o token da url
 			const token = searchParameters.get("token");
 
-			fetch("http://localhost:8080/users/validateEmail", {
-				headers: { "Content-Type": "application/json" },
-				mode: "cors",
-				cache: "no-cache",
-				credentials: "include",
-				method: "PUT",
-				body: JSON.stringify({ token: token }),
-			})
-				.then((result) => result.json())
-				.then((data) => {
-					if (data.isValidated) {
-						setEmailValidatedSuccessfully(true);
-					}
+			// Realiza a requisição para o back
+			const response = ValidateEmailEndpoint("PUT", JSON.stringify({ token: token }));
+			if (response.success) {
+				setEmailValidatedSuccessfully(response.data?.isValidated);
+			} else {
+				console.error(`Falha ao validar email. Erro: ${response.error}`);
+			}
 
-					setWaitingForValidation(false);
-				})
-				.catch((error) => {
-					setWaitingForValidation(false);
-					console.error(`Falha ao validar email. Erro: ${error}`);
-				});
+			setWaitingForValidation(false);
 		}
 	}, []);
 

@@ -10,6 +10,8 @@ import PasswordField from "../../shared/password-input-field/PasswordField";
 import PasswordFieldStrength from "../../shared/password-input-field/PasswordFieldStrength";
 import ActionFeedback from "components/shared/action-feedback/ActionFeedback";
 
+import { ResetPasswordEndpoint } from "utilities/Endpoints";
+
 function LoginPasswordReset() {
 	const passwordFieldReference = useRef(null);
 	const passwordConfirmationFieldReference = useRef(null);
@@ -63,35 +65,30 @@ function LoginPasswordReset() {
 			setIsPasswordNotSatisfied(!isPasswordSatisfied);
 
 			if (isPasswordSatisfied) {
-				fetch("http://localhost:8080/users/resetPassword", {
-					headers: { "Content-Type": "application/json" },
-					mode: "cors",
-					cache: "no-cache",
-					credentials: "include",
-					method: "PUT",
-					body: JSON.stringify({ token: urlToken, newPassword: enteredPassword }),
-				})
-					.then((result) => result.json())
-					.then((data) => {
-						if (data.samePasswordAsBefore) {
-							setSamePasswordAsBefore(true);
-						} else {
-							setSuccessfullyChangedPassword(true);
-						}
-					})
-					.catch((error) => {
-						setFailedToChangePassword(true);
-						console.error(`Falha ao alterar a senha. Erro: ${error}`);
-					});
+				// Realiza a requisição para o back
+				const response = ResetPasswordEndpoint(
+					"PUT",
+					JSON.stringify({ token: urlToken, newPassword: enteredPassword })
+				);
+				if (response.success) {
+					// Verifica se a senha é a mesma que a anterior
+					if (response.data?.samePasswordAsBefore) {
+						setSamePasswordAsBefore(true);
+					} else {
+						setSuccessfullyChangedPassword(true);
+					}
+				} else {
+					setFailedToChangePassword(true);
+				}
 			}
 		}
 	}
 
 	function onPasswordsChange() {
 		const password = passwordFieldReference.current.ref.current.ref.current.value;
-		const passwordConfirmation = passwordConfirmationFieldReference.current.ref.current.ref.current.value;
-		console.log(password);
-		console.log(passwordConfirmation);
+		const passwordConfirmation =
+			passwordConfirmationFieldReference.current.ref.current.ref.current.value;
+
 		setMatchingPassword(password == passwordConfirmation);
 	}
 
@@ -103,7 +100,8 @@ function LoginPasswordReset() {
 			setUrlToken(searchParameters.get("token"));
 
 			if (passwordFieldReference.current && passwordConfirmationFieldReference.current) {
-				const unbindPasswordChangeSubscription = passwordFieldReference.current.onPasswordChange(onPasswordsChange);
+				const unbindPasswordChangeSubscription =
+					passwordFieldReference.current.onPasswordChange(onPasswordsChange);
 				const unbindPasswordConfirmationChangeSubscription =
 					passwordConfirmationFieldReference.current.onPasswordChange(onPasswordsChange);
 
@@ -126,17 +124,30 @@ function LoginPasswordReset() {
 				<div className="SPR-box-container">
 					<div
 						className="SPR-form-container"
-						style={{ width: "22%", height: successfullyChangedPassword || failedToChangePassword ? "40%" : "70%" }}
+						style={{
+							width: "22%",
+							height:
+								successfullyChangedPassword || failedToChangePassword
+									? "40%"
+									: "70%",
+						}}
 					>
 						<div className="SPR-form" style={{ width: "80%" }}>
 							<div style={{ width: "100%" }}>
 								<h1 className="SPR-form-title">Redefinir senha</h1>
 
 								<InputFieldContainer description="Digite a sua nova senha">
-									<PasswordField ref={passwordFieldReference} name="password" placeholder="Digite uma senha forte" />
+									<PasswordField
+										ref={passwordFieldReference}
+										name="password"
+										placeholder="Digite uma senha forte"
+									/>
 								</InputFieldContainer>
 
-								<InputFieldContainer description="Confirme a sua senha" grid_template_areas="password_confirmation_field">
+								<InputFieldContainer
+									description="Confirme a sua senha"
+									grid_template_areas="password_confirmation_field"
+								>
 									<PasswordField
 										ref={passwordConfirmationFieldReference}
 										name="password"
@@ -145,23 +156,35 @@ function LoginPasswordReset() {
 									/>
 								</InputFieldContainer>
 
-								<PasswordFieldStrength field={passwordFieldReference} ref={passwordStrengthFieldRefrence} />
+								<PasswordFieldStrength
+									field={passwordFieldReference}
+									ref={passwordStrengthFieldRefrence}
+								/>
 
-								{!matchingPassword ? <InputFieldError error="Senhas não coincidem." /> : null}
+								{!matchingPassword ? (
+									<InputFieldError error="Senhas não coincidem." />
+								) : null}
 
 								<div style={{ width: "100%" }}>
 									{(() => {
 										if (samePasswordAsBefore) {
-											return <InputFieldError error="A nova senha não pode ser igual a anterior." />;
+											return (
+												<InputFieldError error="A nova senha não pode ser igual a anterior." />
+											);
 										}
 
 										if (isPasswordNotSatisfied) {
-											return <InputFieldError error="A senha não atende aos requisitos." />;
+											return (
+												<InputFieldError error="A senha não atende aos requisitos." />
+											);
 										}
 									})()}
 
 									<div className="SPR-button-container">
-										<button onClick={handleOnSubmitButton} className="SPR-button">
+										<button
+											onClick={handleOnSubmitButton}
+											className="SPR-button"
+										>
 											Redefinir Senha
 										</button>
 									</div>

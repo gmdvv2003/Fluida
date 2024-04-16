@@ -160,7 +160,6 @@
 .L-login-form-reset-container,
 .L-start-session-button-container {
 	padding-top: 1rem;
-	width: 80% !important;
 }
 
 .L-left-email-icon-container {
@@ -169,4 +168,21 @@
 
 .L-google-icon-container {
 	padding-top: 0 !important;
+}
+
+.L-start-session-waiting-for-response {
+	width: 100%;
+	height: 60px;
+
+	.S-L-logo-container {
+		width: 100%;
+		height: 60px;
+		top: calc(75% - 30px);
+	}
+
+	.S-L-logo-container > img {
+		width: 150px;
+		height: 150px;
+		margin: -150px 0 0 -75px;
+	}
 }

@@ -7,7 +7,7 @@ function Loading({ text }) {
 				<img src="fluida-loading.gif" alt="logo" className="S-L-logo" />
 			</div>
 
-			<p className="S-L-text">{text}</p>
+			{text ? <p className="S-L-text">{text}</p> : null}
 		</div>
 	);
 }

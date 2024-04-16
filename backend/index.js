@@ -13,6 +13,7 @@ global.__URLS__ = urls;
 const express = require("express");
 const bodyParser = require("body-parser");
 
+// Origem permitida para o CORS (quando em desenvolvimento, qualquer origem é permitida)
 const CORS_ORIGIN = process.env.NODE_ENVIRONMENT == "development" ? "*" : urls.__origin_web.url;
 
 // Inicializando o express
@@ -32,12 +33,17 @@ const io = new socket.Server(server, {
 app.use(bodyParser.json());
 
 // Middleware que adiciona os headers de CORS
-app.use((_, response, next) => {
+app.use((request, response, next) => {
 	response.setHeader("Access-Control-Allow-Origin", CORS_ORIGIN);
 
-	response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+	response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
 	response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
 	response.setHeader("Access-Control-Allow-Credentials", "true");
+
+	if (request.method === "OPTIONS") {
+		return response.status(200).end();
+	}
 
 	next();
 });
@@ -66,6 +72,7 @@ if (process.env.HTTP_WATCHER == 1) {
 	});
 }
 
+// Caso SOCKET_WATCHER seja 1, loga os eventos do socket
 if (process.env.SOCKET_WATCHER == 1) {
 	// Middleware para logar os eventos do socket
 	io.use((socket, next) => {
