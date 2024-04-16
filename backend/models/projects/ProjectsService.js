@@ -5,8 +5,10 @@ const Service = require("../__types/Service");
 const ProjectsDTO = require("./ProjectsDTO");
 const ProjectsEntity = require("./ProjectsEntity");
 
+// Repositório de projetos
 const projects = [];
 
+// Repositório de membros de projetos & convites
 const projectsMembers = [];
 const projectsInvitations = [];
 

@@ -52,24 +52,36 @@ module.exports = function (app, io, projectsController) {
 	const projectsIO = io.of("/projects");
 
 	// Garante que o socket só será acessado por usuários com um token de acesso válido
-	projectsIO.use(
-		SocketRoute.newSecureSocketRoute(projectsIO, projectsController, ["userId", "projectId"])
-	);
+	SocketRoute.newSecureSocketRoute(projectsIO, projectsController, ["userId", "projectId"]);
 
 	projectsIO.on("connection", (socket) => {
 		socket.on("subscribeToProject", (data) =>
-			projectsController.IOSubscribeToProject(socket, data)
+			projectsController.IOSubscribeToProject(projectsIO, socket, data)
 		);
 		socket.on("unsubscribeFromProject", (data) =>
-			projectsController.IOUnsubscribeFromProject(socket, data)
+			projectsController.IOUnsubscribeFromProject(projectsIO, socket, data)
 		);
 
-		socket.on("createCard", (data) => projectsController.IOCreateCard(socket, data));
-		socket.on("deleteCard", (data) => projectsController.IODeleteCard(socket, data));
-		socket.on("updateCard", (data) => projectsController.IOUpdateCard(socket, data));
+		// Rotas de manipulação de cards
+		socket.on("createCard", (data) =>
+			projectsController.IOCreateCard(projectsIO, socket, data)
+		);
+		socket.on("deleteCard", (data) =>
+			projectsController.IODeleteCard(projectsIO, socket, data)
+		);
+		socket.on("updateCard", (data) =>
+			projectsController.IOUpdateCard(projectsIO, socket, data)
+		);
 
-		socket.on("createPhase", (data) => projectsController.IOCreatePhase(socket, data));
-		socket.on("deletePhase", (data) => projectsController.IODeletePhase(socket, data));
-		socket.on("updatePhase", (data) => projectsController.IOUpdatePhase(socket, data));
+		// Rotas de manipulação de fases
+		socket.on("createPhase", (data) =>
+			projectsController.IOCreatePhase(projectsIO, socket, data)
+		);
+		socket.on("deletePhase", (data) =>
+			projectsController.IODeletePhase(projectsIO, socket, data)
+		);
+		socket.on("updatePhase", (data) =>
+			projectsController.IOUpdatePhase(projectsIO, socket, data)
+		);
 	});
 };

@@ -5,11 +5,11 @@ class CardFunctionality {
 		inject("IOUpdateCard", this.#IOUpdateCard);
 	}
 
-	#IOCreateCard(project, socket, data) {}
+	#IOCreateCard(projectsIO, project, socket, data) {}
 
-	#IODeleteCard(project, socket, data) {}
+	#IODeleteCard(projectsIO, project, socket, data) {}
 
-	#IOUpdateCard(project, socket, data) {}
+	#IOUpdateCard(projectsIO, project, socket, data) {}
 }
 
 module.exports = CardFunctionality;

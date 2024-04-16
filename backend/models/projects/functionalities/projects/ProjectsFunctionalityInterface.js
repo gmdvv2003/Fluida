@@ -1,3 +1,7 @@
+// Type linting
+const UserEntity = require("../../../users/UsersEntity");
+const { Socket, Namespace } = require("socket.io");
+
 const { jwt } = require("jsonwebtoken");
 
 const CardFunctionality = require("./modules/Card/CardFunctionality");
@@ -5,7 +9,7 @@ const PhaseFunctionality = require("./modules/Phase/PhaseFunctionality");
 const MembersFunctionality = require("./modules/Members/MembersFunctionality");
 const ChatFunctionality = require("./modules/Chat/ChatFunctionality");
 const ProjectFunctionality = require("./modules/Project/ProjectFunctionality");
-const UserEntity = require("../../../users/UsersEntity");
+
 const Session = require("../../../../context/session/Session");
 
 /**
@@ -123,12 +127,12 @@ class ProjectsFunctionalityInterface {
 		}
 
 		// Cria um token de participação do usuário no projeto
-		const participationToken = jwt.sign(
-			{ userId: user.userId, projectId: projectId },
-			process.env.JWT_PRIVATE_KEY,
+		const participationToken = Session.newSession(
 			{
-				algorithm: "RS256",
-			}
+				userId: user.userId,
+				projectId: projectId,
+			},
+			{ expiresIn: null }
 		);
 
 		// Adiciona o usuário ao projeto (mas ainda sem autorização de participação)
@@ -142,15 +146,12 @@ class ProjectsFunctionalityInterface {
 	/**
 	 * Realiza a inscrição de um usuário em um projeto.
 	 *
-	 * @param {*} socket
+	 * @param {Namespace} projectsIO
+	 * @param {Project} project
+	 * @param {Socket} socket
 	 * @param {*} data
 	 */
-	IOSubscribeToProject(project, socket, data) {
-		const { socketToken } = socket.handshake.auth;
-		if (!socketToken) {
-			return socket.emit("error", { message: "Dados insuficientes." });
-		}
-
+	IOSubscribeToProject(projectsIO, project, socket, data) {
 		// Realiza a validação para obter o userId
 		const [_, { userId }] = Session.validate(socketToken);
 
@@ -163,6 +164,9 @@ class ProjectsFunctionalityInterface {
 			return socket.emit("error", { message: "Usuário não encontrado." });
 		}
 
+		// Adiciona o socket a sala do projeto
+		socket.join(project.projectId);
+
 		// Atualiza o status de inscrição do usuário
 		user.subscribed = true;
 	}
@@ -170,10 +174,12 @@ class ProjectsFunctionalityInterface {
 	/**
 	 * Realiza a remoção de um usuário de um projeto, invalidando o token de participação.
 	 *
-	 * @param {*} socket
+	 * @param {Namespace} projectsIO
+	 * @param {Project} project
+	 * @param {Socket} socket
 	 * @param {*} data
 	 */
-	IOUnsubscribeFromProject(project, socket, data) {}
+	IOUnsubscribeFromProject(projectsIO, project, socket, data) {}
 }
 
 module.exports = ProjectsFunctionalityInterface;

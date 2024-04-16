@@ -1,6 +1,7 @@
 require("dotenv").config();
 
 const http = require("http");
+const cors = require("cors");
 const socket = require("socket.io");
 
 const admin = require("firebase-admin");
@@ -12,6 +13,8 @@ global.__URLS__ = urls;
 const express = require("express");
 const bodyParser = require("body-parser");
 
+const CORS_ORIGIN = process.env.NODE_ENVIRONMENT == "development" ? "*" : urls.__origin_web.url;
+
 // Inicializando o express
 const app = express();
 
@@ -20,26 +23,22 @@ const server = http.createServer(app);
 
 // Inicializando o socket.io
 const io = new socket.Server(server, {
-	allowRequest: (request, callback) => {
-		const noOriginHeader = request.headers.origin === undefined;
-		callback(null, noOriginHeader);
-	},
-
 	cors: {
-		origin: `http://localhost:${process.env.WEB_PORT}`,
-		methods: ["GET", "POST", "PUT", "DELETE"],
-		credentials: true,
+		origin: CORS_ORIGIN,
 	},
 });
 
+// Middleware que transforma o body da requisição em JSON
 app.use(bodyParser.json());
 
+// Middleware que adiciona os headers de CORS
 app.use((_, response, next) => {
-	// TODO: Trocar dominio caso o sistema esteja em produção
-	response.setHeader("Access-Control-Allow-Origin", `http://localhost:${process.env.WEB_PORT}`);
+	response.setHeader("Access-Control-Allow-Origin", CORS_ORIGIN);
+
 	response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
 	response.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 	response.setHeader("Access-Control-Allow-Credentials", "true");
+
 	next();
 });
 
@@ -47,7 +46,10 @@ app.use((_, response, next) => {
 if (process.env.HTTP_WATCHER == 1) {
 	// Middleware para logar as requisições
 	app.use((request, _, next) => {
-		console.log(`Requisição: [${request.method}] ${request.url}, Body: ${JSON.stringify(request.body)}`);
+		console.log(
+			`Requisição: [${request.method}] ${request.url}, Body: ${JSON.stringify(request.body)}`
+		);
+
 		next();
 	});
 
@@ -59,6 +61,27 @@ if (process.env.HTTP_WATCHER == 1) {
 			console.log(`Resposta: ${body}`);
 			originalSend.call(this, body);
 		};
+
+		next();
+	});
+}
+
+if (process.env.SOCKET_WATCHER == 1) {
+	// Middleware para logar os eventos do socket
+	io.use((socket, next) => {
+		socket.onAny((event, ...arguments) => {
+			console.log(
+				`
+				Evento: ${event},
+				Auth: ${socket.handshake?.auth},
+				Header: ${socket.handshake?.headers},
+				Argumentos: ${JSON.stringify(arguments)}
+				`
+			);
+		});
+
+		socket.on("connection", () => console.log(`${socket} Conectado`));
+		socket.on("disconnect", () => console.log(`${socket} Desconectado`));
 
 		next();
 	});
@@ -97,6 +120,6 @@ projectsRoutes(app, io, projectsController);
 
 const port = process.env.SERVER_PORT || 8080;
 
-app.listen(port, () => {
-	console.log(`Servidor rodando em http://localhost:${port}`);
+server.listen(port, () => {
+	console.log(`Servidor rodando em ${urls.__origin_server.url}`);
 });

@@ -33,9 +33,23 @@ class Session {
 	 * @param {Token} token
 	 * @returns Estrutura que diz se o token foi ou não validado + o token decodificado
 	 */
-	static validate(token) {
+	static validate(token, expectedToken = null) {
 		return jwt.verify(token, publicKey, JWT_OPTIONS, function (error, decoded) {
 			if (error) {
+				return [false, null];
+			}
+
+			if (decoded.iss !== ISSUER || !AUDIENCE.includes(decoded.aud)) {
+				return [false, null];
+			}
+
+			// Verifica se o token expirou
+			if (decoded.exp < Date.now()) {
+				return [false, null];
+			}
+
+			// Verifica se o token decoded é o esperado
+			if (!expectedToken || decoded.jti !== expectedToken) {
 				return [false, null];
 			}
 

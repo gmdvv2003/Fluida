@@ -8,16 +8,16 @@ if (process.env.NODE_ENVIRONMENT == "production") {
 } else {
 	OPTIONS.protocol = "http";
 	OPTIONS.hostname = "localhost";
-	OPTIONS.port = process.env.WEB_PORT;
 }
 
 class Url {
 	url;
 	path;
 
-	constructor(path) {
+	constructor(options = [], path = null) {
 		this.url = url.format({
 			...OPTIONS,
+			...options,
 			pathname: path,
 		});
 
@@ -38,11 +38,13 @@ Url.prototype.toString = function () {
 };
 
 module.exports = {
-	home: new Url("/home"),
-	login: new Url("/login"),
-	registration: new Url("/registration"),
-	resetPassword: new Url("/reset-password"),
-	sendPasswordReset: new Url("/send-password-reset"),
-	validateEmail: new Url("/validate-email"),
-	valitateInvitation: new Url("/validate-invitation"),
+	__origin_web: new Url((options = { port: process.env.WEB_PORT })),
+	__origin_server: new Url((options = { port: process.env.SERVER_PORT })),
+	home: new Url((path = "/home")),
+	login: new Url((path = "/login")),
+	registration: new Url((path = "/registration")),
+	resetPassword: new Url((path = "/reset-password")),
+	sendPasswordReset: new Url((path = "/send-password-reset")),
+	validateEmail: new Url((path = "/validate-email")),
+	valitateInvitation: new Url((path = "/validate-invitation")),
 };

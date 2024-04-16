@@ -5,11 +5,11 @@ class PhaseFunctionality {
 		inject("IOUpdatePhase", this.#IOUpdatePhase);
 	}
 
-	#IOCreatePhase(project, socket, data) {}
+	#IOCreatePhase(projectsIO, project, socket, data) {}
 
-	#IODeletePhase(project, socket, data) {}
+	#IODeletePhase(projectsIO, project, socket, data) {}
 
-	#IOUpdatePhase(project, socket, data) {}
+	#IOUpdatePhase(projectsIO, project, socket, data) {}
 }
 
 module.exports = PhaseFunctionality;

@@ -73,7 +73,7 @@ class ProjectMembersInterface {
 	}
 
 	/**
-	 *  Indica se o usuário é membro do projeto.
+	 * Indica se o usuário é membro do projeto.
 	 *
 	 * @param {number} userId
 	 * @param {number} projectId

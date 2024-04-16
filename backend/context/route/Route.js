@@ -11,7 +11,9 @@ class Route {
 	 * @returns Middleware
 	 */
 	static newRoute({ secure }, next, binder, decoder = []) {
-		return secure ? this.#secureRoute(next.bind(binder), decoder) : this.#unsecureRoute(next.bind(binder));
+		return secure
+			? this.#secureRoute(next.bind(binder), decoder)
+			: this.#unsecureRoute(next.bind(binder));
 	}
 
 	/**
@@ -23,12 +25,14 @@ class Route {
 	 */
 	static #secureRoute(next, decoder) {
 		return async (request, response) => {
-			const token = request.headers["authorization"];
-			if (!token) {
+			// Pega o token de autorização que está no header
+			const { authorization } = request.headers;
+			if (!authorization) {
 				return response.status(401).json({ message: "Não autorizado." });
 			}
 
-			const [validated, decoded] = Session.validate(token);
+			// Realiza a validação do token + a inserção dos dados no request
+			const [validated, decoded] = Session.validate(authorization);
 			if (validated) {
 				decoder.forEach((decode) => {
 					try {

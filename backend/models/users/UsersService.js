@@ -6,10 +6,18 @@ const Session = require("../../context/session/Session");
 const UsersDTO = require("./UsersDTO");
 const UserEntity = require("./UsersEntity");
 
+// Repositório de usuários
 const users = [];
+
+// Repositório de notificações dos usuários
+const usersNotifications = [];
 
 class UsersService extends Service {
 	// ==================================== Métodos Privados ==================================== //
+	get Notifications() {
+		return usersNotifications;
+	}
+
 	/**
 	 * Pega um usuário pelo email
 	 *
