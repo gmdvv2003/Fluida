@@ -88,7 +88,7 @@
                 
                 .HP-grid-container {
                     display: grid;
-                    grid-template-columns: 19.5% 19.5% 19.5% 19.5% 19.5%;
+                    grid-template-columns: 19.2% 19.2% 19.2% 19.2% 19.2%;
                     gap: 10px 10px;
                     padding: 10px;
                     width: 100%;
@@ -101,6 +101,7 @@
                         justify-content: center;
                         align-items: center;
                         cursor: pointer;
+                        box-shadow: rgba(0, 0, 0, 0.298) 0px 0px 6px;
                         border-radius: 8px;
                         background-color: #f2f2f2;
                         width: 100%;
@@ -141,12 +142,15 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    border: 1px solid #000000;
+    box-shadow: rgb(51, 51, 51) 0px 0px 6px;
+    border: 1px solid #00000034;
     border-radius: 8px;
-    background-color: #d1d1d1;
+    background-color: var(--background-color);
     padding: 16px;
     width: 30%;
-    height: 60%;
+    height: 20%;
+    min-height: 120px;
+    max-height: 120px;
 }
 
 .blur-background {

@@ -3,6 +3,7 @@ import "./HomeProjects.css";
 import React, { useState } from "react";
 
 import HeaderHome from "../../shared/login-registration/header-home/HeaderHome.js";
+import TextInputField from "../../shared/text-input-field/TextInputField"
 
 function HomeProjects() {
 	const username = "variableUserName";
@@ -18,11 +19,11 @@ function HomeProjects() {
         { projectName: "Projeto 4" },
     ];
 
-	const handleNewProjectClick = () => {
+	function handleNewProjectClick () {
         setIsDialogOpen(true);
     };
 
-	const handleCloseDialog = () => {
+	function handleCloseDialog() {
         setIsDialogOpen(false);
     };
 	
@@ -65,8 +66,22 @@ function HomeProjects() {
 			</div>
 			{isDialogOpen && (
                 <div className="HP-dialog-new-project-container">
-                   	<div>TESTANDO</div>
-                    <button onClick={handleCloseDialog}>Fechar</button>
+                    <div>
+						<button onClick={handleCloseDialog}>Fechar</button>
+					</div>
+					<div>			
+						<TextInputField 
+							style={{
+								marginTop: "10px",
+								marginBottom: "10px"
+							}}
+							name="email"
+							placeholder="usuário/email"
+						/>
+					</div>
+					<div>			
+						<button onClick={handleCloseDialog}>Fechar</button>
+					</div>
                 </div>
             )}
 		</div>
