@@ -1,7 +1,9 @@
 import "./HomeProjects.css";
 
 import React, { useState } from "react";
+import { faCircleXmark, faHippo } from '@fortawesome/free-solid-svg-icons';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import HeaderHome from "../../shared/login-registration/header-home/HeaderHome.js";
 import TextInputField from "../../shared/text-input-field/TextInputField"
 
@@ -80,7 +82,8 @@ function HomeProjects() {
 						/>
 					</div>
 					<div>			
-						<button onClick={handleCloseDialog}>Fechar</button>
+						<FontAwesomeIcon icon={faCircleXmark} />
+						<FontAwesomeIcon icon={faHippo} size="2xl" style={{color: "#f00000",}} />
 					</div>
                 </div>
             )}
