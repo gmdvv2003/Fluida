@@ -1,5 +1,5 @@
 :root {
-	--phase-background-width: 300px;
+	--phase-background-width: 320px;
 	--phase-header-height: 32px;
 	--phase-margin: 8px;
 }
@@ -22,6 +22,9 @@
 }
 
 .PP-cards-container {
+	display: flex;
+	flex-direction: column;
+	row-gap: var(--phase-margin);
 	width: calc(100% - var(--phase-margin) * 2);
 	height: calc(100% - var(--phase-header-height));
 	margin: var(--phase-margin);

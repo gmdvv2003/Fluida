@@ -1,5 +1,21 @@
+:root {
+	--label-width: 80px;
+	--label-height: 16px;
+}
+
 .PCL-label-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: var(--label-width);
+	height: var(--label-height);
+	border-radius: 6px;
 }
 
 .PCL-label-text {
+	color: white;
+	font-size: small;
+	font-weight: 500;
+	padding: 0;
+	margin: 0;
 }

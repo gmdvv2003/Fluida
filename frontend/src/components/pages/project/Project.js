@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { ReactComponent as AddButtonIcon } from "assets/action-icons/add-circle-unlined.svg";
 
 import HomeHeader from "../../shared/login-registration/header-home/HeaderHome";
 
@@ -15,7 +15,13 @@ function Project() {
 				<div className="P-phases-container-holder">
 					<div className="P-phases-container">
 						<Phase cards={[<Card />]} />
-						<Phase cards={[<Card />]} />
+						<Phase cards={[<Card />, <Card />]} />
+					</div>
+
+					<div className="P-add-new-phase-button-container">
+						<button className="P-add-new-phase-button">
+							<AddButtonIcon className="P-add-new-phase-button-icon" />
+						</button>
 					</div>
 				</div>
 			</div>
