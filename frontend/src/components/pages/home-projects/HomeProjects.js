@@ -1,11 +1,11 @@
 import "./HomeProjects.css";
 
 import React, { useState } from "react";
-import { faCircleXmark, faHippo } from '@fortawesome/free-solid-svg-icons';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import HeaderHome from "../../shared/login-registration/header-home/HeaderHome.js";
 import TextInputField from "../../shared/text-input-field/TextInputField"
+import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 
 function HomeProjects() {
 	const username = "variableUserName";
@@ -68,8 +68,8 @@ function HomeProjects() {
 			</div>
 			{isDialogOpen && (
                 <div className="HP-dialog-new-project-container">
-                    <div>
-						<button onClick={handleCloseDialog}>Fechar</button>
+                    <div className="HP-container-close-dialog">
+						<FontAwesomeIcon onClick={handleCloseDialog} icon={faCircleXmark} size="xl" style={{color: "#8c8c8c", cursor: "pointer", borderRadius: "50%"}} />
 					</div>
 					<div>			
 						<TextInputField 
@@ -77,13 +77,12 @@ function HomeProjects() {
 								marginTop: "10px",
 								marginBottom: "10px"
 							}}
-							name="email"
-							placeholder="usuário/email"
+							name="project"
+							placeholder="Nome do projeto"
 						/>
 					</div>
-					<div>			
-						<FontAwesomeIcon icon={faCircleXmark} />
-						<FontAwesomeIcon icon={faHippo} size="2xl" style={{color: "#f00000",}} />
+					<div className="HP-container-button-new-project">	
+						<button className="HP-button-new-project">Criar novo projeto</button>		
 					</div>
                 </div>
             )}

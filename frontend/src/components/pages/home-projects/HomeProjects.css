@@ -149,8 +149,31 @@
     padding: 16px;
     width: 30%;
     height: 20%;
-    min-height: 120px;
-    max-height: 120px;
+    min-height: 140px;
+    max-height: 140px;
+
+    .HP-container-close-dialog{
+        display: flex;
+        justify-content: right;
+    }
+
+    .HP-container-button-new-project{
+        display: flex;
+        justify-content: right;
+
+        .HP-button-new-project{
+            cursor: pointer;
+            border: none;
+            border-radius: var(--border-radius);
+            background-color: #fe8e04;
+            padding: 0px 10px;
+            width: 200px;
+            height: 40px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+    }
 }
 
 .blur-background {
