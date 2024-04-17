@@ -1,15 +1,16 @@
 import "./HomeProjects.css";
 
 import React, { useState } from "react";
+import { faCircleXmark, faUserPlus } from '@fortawesome/free-solid-svg-icons';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import HeaderHome from "../../shared/login-registration/header-home/HeaderHome.js";
 import TextInputField from "../../shared/text-input-field/TextInputField"
-import { faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 
 function HomeProjects() {
 	const username = "variableUserName";
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const [isDialogAddPhotoOpen, setAddPhotoDialogOpen] = useState(true);
 	const projects = [
         { projectName: "Projeto 1" },
         { projectName: "Projeto 2" },
@@ -21,21 +22,29 @@ function HomeProjects() {
         { projectName: "Projeto 4" },
     ];
 
-	function handleNewProjectClick () {
+	function handleNewProjectClick() {
         setIsDialogOpen(true);
     };
 
 	function handleCloseDialog() {
         setIsDialogOpen(false);
     };
+
+	function handleAddPhotoClick(){
+		setAddPhotoDialogOpen(true);
+	}
+
+	function handleCloseDialogAddPhoto() {
+        setAddPhotoDialogOpen(false);
+    };
 	
 	return (
 		<div>
 			<HeaderHome />
-			<div className={`HP-container-user-projects ${isDialogOpen ? 'blur-background' : ''}`}>
+			<div className={`HP-container-user-projects ${isDialogOpen || isDialogAddPhotoOpen ? 'blur-background' : ''}`}>
 				<div className="HP-container-user">
 					<div className="HP-container-image-label">
-						<i className="HP-user-image"></i>
+						<i className="HP-user-image" onClick={handleAddPhotoClick}></i>
 						<p className="HP-label">
                             <span className="username-style">{`@${username}`}</span>, bem-vindo de volta!
                         </p>
@@ -85,6 +94,34 @@ function HomeProjects() {
 						<button className="HP-button-new-project">Criar novo projeto</button>		
 					</div>
                 </div>
+            )}
+			{isDialogAddPhotoOpen && (
+				<div className="HP-container-user-photo">          
+					<div className="HP-container-close-user-photo">
+						<FontAwesomeIcon onClick={handleCloseDialogAddPhoto} icon={faCircleXmark} size="xl" style={{color: "#8c8c8c", cursor: "pointer", borderRadius: "50%"}} />
+					</div>
+					<div className="HP-container-username-label">			
+						<div className="HP-username-label">			
+							<span className="HP-hello">Olá,</span> <span className="username-style">{`@${username}`}</span>
+						</div>
+						<div className="HP-welcome">			
+							Seja bem-vindo ao Fluida.
+						</div>
+					</div>
+					<div className="HP-container-photo">			
+						<div className="HP-user-photo-container">			
+							<div className="HP-user-photo">
+								<FontAwesomeIcon icon={faUserPlus} size="2xl" style={{color: "#8c8c8c", width: "100%", display: "flex"}}/>
+							</div>
+						</div>
+						<div className="HP-label-new-photo">			
+							Adicione uma foto.
+						</div>
+					</div>
+					<div className="HP-container-button-add-photo">			
+						<button className="HP-button-add-photo">Continuar</button>
+					</div>
+				</div>
             )}
 		</div>
 	);

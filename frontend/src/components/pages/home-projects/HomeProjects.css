@@ -40,15 +40,10 @@
                 align-items: center;
                 margin-top: 5px;
 
-                .username-style {
-                    color: var(--action-button-selected-background-color);
-                    font-weight: bold;
-                }
+                
 
             }
-
         }
-
     }
 
     .HP-container-projects{
@@ -88,7 +83,7 @@
                 
                 .HP-grid-container {
                     display: grid;
-                    grid-template-columns: 19.2% 19.2% 19.2% 19.2% 19.2%;
+                    grid-template-columns: 19% 19% 19% 19% 19%;
                     gap: 10px 10px;
                     padding: 10px;
                     width: 100%;
@@ -96,45 +91,48 @@
                     overflow-y: auto;
                 }
 
-                    .HP-grid-item {
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        cursor: pointer;
-                        box-shadow: rgba(0, 0, 0, 0.298) 0px 0px 6px;
-                        border-radius: 8px;
-                        background-color: #f2f2f2;
+                @media screen and (max-width: 1350px) { 
+                    .HP-grid-container{
+                        grid-template-columns: 19% 19% 19% 19%;
+                        background-color: blue;
+                    }
+                }
+
+                .HP-grid-item {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    cursor: pointer;
+                    box-shadow: rgba(0, 0, 0, 0.298) 0px 0px 6px;
+                    border-radius: 8px;
+                    background-color: #f2f2f2;
+                    width: 100%;
+                    min-width: 60px;
+                    height: 100%;
+                    min-height: 60px;
+                    font-size: 30px;
+                    text-align: center;
+
+                    .HP-container-new-project{
                         width: 100%;
-                        min-width: 60px;
-                        height: 100%;
-                        min-height: 60px;
-                        font-size: 30px;
-                        text-align: center;
 
-                        .HP-container-new-project{
-                            width: 100%;
-
-                            .HP-add-new-project{
-                                cursor: pointer;
-                                border: 1px solid #c9c9c9;
-                                border-radius: 50%;
-                                padding: 0.5vh;
-                                height: 35px;
-                                content: url("./../../../assets/action-icons/add-circle-full.svg");
-                            }
-
-                            .HP-label-new-project{
-                                font-size: small;
-                            }
+                        .HP-add-new-project{
+                            cursor: pointer;
+                            border: 1px solid #c9c9c9;
+                            border-radius: 50%;
+                            padding: 0.5vh;
+                            height: 35px;
+                            content: url("./../../../assets/action-icons/add-circle-full.svg");
                         }
 
-                        
+                        .HP-label-new-project{
+                            font-size: small;
+                        }
                     }
+                }
             }
         }
-
     }
-
 }
 
 .HP-dialog-new-project-container {
@@ -176,7 +174,98 @@
     }
 }
 
+.HP-container-user-photo{
+    display: flex;
+    position: fixed;
+    top: 40%;
+    left: 50%;
+    flex-direction: column;
+    transform: translate(-50%, -50%);
+    box-shadow: rgb(51, 51, 51) 0px 0px 6px;
+    border: 1px solid #00000034;
+    border-radius: 8px;
+    background-color: var(--background-color);
+    padding: 16px;
+    width: 30%;
+    height: 50%;
+
+    .HP-container-close-user-photo{
+        display: flex;
+        justify-content: right;
+    }
+
+    .HP-container-username-label{
+
+        .HP-hello{
+            margin-right: 5px;
+        }
+
+        .HP-username-label{
+            display: flex;
+            justify-content: center;
+            background-color: violet;
+        }
+
+        .HP-welcome{
+            display: flex;
+            justify-content: center;
+            background-color: green;
+        }
+    }
+
+    .HP-container-photo{
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+
+        .HP-user-photo-container{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgb(169, 78, 78);
+            height: 85%;
+
+            .HP-user-photo{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-radius: 50%;
+                background-color: green;
+                
+            }
+        }
+
+        .HP-label-new-photo{
+            display: flex;
+            justify-content: center;
+            background-color: aqua;
+        }
+    }
+
+    .HP-container-button-add-photo{
+        display: flex;
+        justify-content: center;
+
+        .HP-button-add-photo{
+            cursor: pointer;
+            border: none;
+            border-radius: var(--border-radius);
+            background-color: #fe8e04;
+            padding: 0px 10px;
+            width: 200px;
+            height: 40px;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+    }
+}
+
 .blur-background {
     filter: blur(3px);
 }
 
+.username-style {
+    color: var(--action-button-selected-background-color);
+    font-weight: bold;
+}
