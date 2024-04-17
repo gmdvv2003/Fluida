@@ -52,9 +52,7 @@ app.use((request, response, next) => {
 if (process.env.HTTP_WATCHER == 1) {
 	// Middleware para logar as requisições
 	app.use((request, _, next) => {
-		console.log(
-			`Requisição: [${request.method}] ${request.url}, Body: ${JSON.stringify(request.body)}`
-		);
+		console.log(`Requisição: [${request.method}] ${request.url}, Body: ${JSON.stringify(request.body)}`);
 
 		next();
 	});
@@ -126,6 +124,21 @@ usersRoutes(app, io, usersController);
 projectsRoutes(app, io, projectsController);
 
 const port = process.env.SERVER_PORT || 8080;
+
+// Banner irado
+console.log(
+	`
+  ______  _         _      _        
+ |  ____|| |       (_)    | |       
+ | |__   | | _   _  _   __| |  __ _ 
+ |  __|  | || | | || | / _\` | / _\` |
+ | |     | || |_| || || (_| || (_| |
+ |_|     |_| \\__,_||_| \\__,_| \\__,_|
+ ===================================
+ 		v1.0.0
+ ===================================
+`
+);
 
 server.listen(port, () => {
 	console.log(`Servidor rodando em ${urls.__origin_server.url}`);

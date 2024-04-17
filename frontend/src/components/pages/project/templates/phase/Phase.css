@@ -1,0 +1,33 @@
+:root {
+	--phase-background-width: 300px;
+	--phase-header-height: 32px;
+	--phase-margin: 8px;
+}
+
+.PP-background {
+	width: var(--phase-background-width);
+	height: 100%;
+	border-radius: var(--border-radius);
+	border: 1px solid rgb(215, 215, 215);
+	background-color: rgb(236, 236, 236);
+}
+
+.PP-header {
+	display: flex;
+	align-items: center;
+	column-gap: 10px;
+	margin: var(--phase-margin);
+	width: calc(100% - var(--phase-margin) * 2);
+	height: var(--phase-header-height);
+}
+
+.PP-cards-container {
+	width: calc(100% - var(--phase-margin) * 2);
+	height: calc(100% - var(--phase-header-height));
+	margin: var(--phase-margin);
+}
+
+.PP-header-icon {
+	width: calc(var(--phase-header-height) - var(--phase-margin));
+	height: calc(var(--phase-header-height) - var(--phase-margin));
+}

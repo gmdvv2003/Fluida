@@ -1,0 +1,28 @@
+:root {
+	--cards-padding: 60px;
+	--cards-column-gap: 20px;
+}
+
+.P-background {
+	position: relative;
+	width: 100vw;
+	height: calc(100vh - var(--header-height));
+	background-color: var(--background-color);
+	z-index: -10;
+}
+
+.P-phases-container-holder {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.P-phases-container {
+	display: flex;
+	flex-wrap: wrap;
+	column-gap: var(--cards-column-gap);
+	width: calc(100% - var(--cards-padding));
+	height: calc(100% - var(--cards-padding));
+}

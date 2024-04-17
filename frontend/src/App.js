@@ -10,6 +10,7 @@ import ValidateEmail from "components/pages/validate-email/ValidateEmail";
 import HomeProjects from "components/pages/home-projects/HomeProjects";
 
 import PrivateRoute from "functionalities/PrivateRoute";
+import Project from "components/pages/project/Project";
 
 function App() {
 	return (
@@ -30,6 +31,15 @@ function App() {
 							<PrivateRoute>
 								<HomeProjects />
 							</PrivateRoute>
+						}
+					/>
+
+					<Route
+						path="/project"
+						element={
+							// <PrivateRoute>
+							<Project />
+							// </PrivateRoute>
 						}
 					/>
 				</Routes>

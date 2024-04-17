@@ -1,0 +1,29 @@
+:root {
+	--card-container-height: 120px;
+
+	--card-labels-container-height: 40px;
+	--card-labels-container-height: 0px;
+	--card-labels-container-height: 0px;
+}
+
+.PC-background {
+	width: 100%;
+	height: var(--card-container-height);
+	border-radius: var(--border-radius);
+	background-color: white;
+}
+
+.PC-card-labels-container {
+	width: 100%;
+	height: 100%;
+}
+
+.PC-card-title-label {
+	width: 100%;
+	height: 100%;
+}
+
+.PC-footer-container {
+	width: 100%;
+	height: 100%;
+}
