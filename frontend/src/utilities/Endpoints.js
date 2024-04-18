@@ -50,3 +50,9 @@ export const ResetPasswordEndpoint = Endpoint.new("/users/resetPassword");
 
 // Registration
 export const RegisterUserEndpoint = Endpoint.new("/users/register");
+
+// Participate
+export const ParticipateInProjectEndpoint = Endpoint.new("/projects/participate");
+
+// Projects Socket Endpoint
+export const ProjectsSocketEndpoint = Endpoint.new("/projects");

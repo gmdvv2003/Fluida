@@ -86,6 +86,7 @@ function Login() {
 							<div className="L-login-form-title-container">
 								<h1 className="L-login-form-title">Inicie sessão na sua conta</h1>
 							</div>
+							
 							<div className="L-google-icon-container">
 								<GoogleIcon className="L-google-icon" />
 								<div className="L-login-form-google-button-container">
@@ -94,6 +95,7 @@ function Login() {
 									</button>
 								</div>
 							</div>
+							
 							<div>
 								<h1 className="L-login-or-text">ou</h1>
 							</div>
@@ -102,6 +104,7 @@ function Login() {
 								<div className="L-left-icon-container">
 									<EmailIcon className="L-left-icon" />
 								</div>
+								
 								<TextInputField
 									ref={emailFieldReference}
 									style={{
@@ -119,7 +122,6 @@ function Login() {
 							<PasswordField ref={passwordFieldReference} />
 
 							{invalidPassword && !wrongCredentials && <InputFieldError error="Preencha este campo." />}
-
 							{wrongCredentials && <InputFieldError error="Email e usuário ou senha inválidos." />}
 
 							<div className="L-login-form-reset-container">

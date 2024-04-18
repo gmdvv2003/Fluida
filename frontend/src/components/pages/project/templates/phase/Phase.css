@@ -26,8 +26,10 @@
 	flex-direction: column;
 	row-gap: var(--phase-margin);
 	width: calc(100% - var(--phase-margin) * 2);
-	height: calc(100% - var(--phase-header-height));
+	height: calc(100% - var(--phase-header-height) - 28px);
 	margin: var(--phase-margin);
+	overflow: scroll;
+	scrollbar-width: none;
 }
 
 .PP-header-icon {

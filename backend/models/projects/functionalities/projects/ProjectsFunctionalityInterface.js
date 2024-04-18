@@ -86,9 +86,7 @@ class ProjectsFunctionalityInterface {
 			// Verifica se o usuário é membro do projeto
 			const isValidProjectMember = project.members.some((member) => {
 				// Procura por um usuário que tenha o mesmo token de socket e que esteja inscrito no projeto
-				return (
-					member.socketToken === socket.handshake.auth.socketToken && member.subscribed
-				);
+				return member.socketToken === socket.handshake.auth.socketToken && member.subscribed;
 			});
 			if (!isValidProjectMember) {
 				return socket.emit("error", { message: "Você não é membro deste projeto." });
@@ -170,6 +168,9 @@ class ProjectsFunctionalityInterface {
 
 		// Atualiza o status de inscrição do usuário
 		user.subscribed = true;
+
+		// Envia a confirmação de inscrição
+		socket.emit("subscribedToProject");
 	}
 
 	/**

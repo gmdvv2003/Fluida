@@ -1,22 +1,24 @@
 :root {
 	--cards-padding: 60px;
 	--cards-column-gap: 20px;
+	--add-new-phase-button-scale: 32px;
 }
 
 .P-background {
 	position: relative;
-	width: 100vw;
+	width: calc(100vw - var(--cards-column-gap));
 	height: calc(100vh - var(--header-height));
 	background-color: var(--background-color);
-	z-index: -10;
+	padding-left: var(--cards-column-gap);
 }
 
 .P-phases-container-holder {
-	width: max-content;
-	height: 100%;
 	display: flex;
-	justify-content: center;
+	justify-content: start;
 	align-items: center;
+	column-gap: var(--cards-column-gap);
+	width: fit-content;
+	height: 100%;
 }
 
 .P-phases-container {
@@ -27,18 +29,23 @@
 }
 
 .P-add-new-phase-button-container {
-	width: 40px;
-	height: 40px;
-	padding-bottom: 40px;
+	width: var(--add-new-phase-button-scale);
+	height: var(--add-new-phase-button-scale);
+	padding-bottom: var(--cards-padding);
 }
 
 .P-add-new-phase-button {
+	width: var(--add-new-phase-button-scale);
+	height: var(--add-new-phase-button-scale);
 	padding: 0;
 	margin: 0;
 	border: 0;
+	border: 2px solid rgb(215, 215, 215);
+	border-radius: 50%;
 }
 
 .P-add-new-phase-button-icon {
-	width: 40px;
-	height: 40px;
+	width: var(--add-new-phase-button-scale);
+	height: var(--add-new-phase-button-scale);
+	transform: translate(-2px, -2px);
 }
