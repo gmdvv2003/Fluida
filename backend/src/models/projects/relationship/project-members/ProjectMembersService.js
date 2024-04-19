@@ -1,12 +1,10 @@
-const ProjectMembersDTO = require("./ProjectMembersDTO");
+const Service = require("../../../__types/Service");
+
 const ProjectMembersEntity = require("./ProjectMembersEntity");
+const ProjectMembersRepository = require("./ProjectMembersRepository");
 
-class ProjectMembersInterface {
-	#controller;
-
-	constructor(controller) {
-		this.#controller = controller;
-	}
+class ProjectMembersService extends Service {
+	#ProjectMembersRepository = new ProjectMembersRepository();
 
 	/**
 	 * Adiciona um usuário como membro de um projeto.
@@ -18,7 +16,7 @@ class ProjectMembersInterface {
 		// Verifica se o usuário não é membro do projeto
 		if (!this.isUserMemberOfProject(userId, projectId)) {
 			// Adiciona um novo membro ao projeto
-			this.#controller.getService().Members.push(new ProjectMembersEntity(userId, projectId));
+			this.getController().getService().Members.push(new ProjectMembersEntity(userId, projectId));
 		}
 	}
 
@@ -32,11 +30,9 @@ class ProjectMembersInterface {
 		// Verifica se o usuário é membro do projeto
 		if (this.isUserMemberOfProject(userId, projectId)) {
 			// Filtra os membros que não contém o userId e projectId e atualiza a lista de membros com a lista filtrada
-			this.#controller.getService().Members = this.#controller
+			this.getController().getService().Members = this.getController()
 				.getService()
-				.Members.filter(
-					(member) => member.userId !== userId || member.projectId !== projectId
-				);
+				.Members.filter((member) => member.userId !== userId || member.projectId !== projectId);
 		}
 	}
 
@@ -48,7 +44,7 @@ class ProjectMembersInterface {
 	 */
 	getMembersOfProject(projectId) {
 		// Filtra os membros que contém o projectId
-		const members = this.#controller
+		const members = this.getController()
 			.getService()
 			.Members.filter((member) => member.projectId === projectId);
 
@@ -64,7 +60,7 @@ class ProjectMembersInterface {
 	 */
 	getProjectsOfUser(userId) {
 		// Filtra os projetos que contém o userId
-		const projects = this.#controller
+		const projects = this.getController()
 			.getService()
 			.Members.filter((member) => member.userId === userId);
 
@@ -81,10 +77,10 @@ class ProjectMembersInterface {
 	 */
 	isUserMemberOfProject(userId, projectId) {
 		// Roda o some para verificar se algum membro contém o userId e projectId
-		return this.#controller
+		return this.getController()
 			.getService()
 			.Members.some((member) => member.userId === userId && member.projectId === projectId);
 	}
 }
 
-module.exports = ProjectMembersInterface;
+module.exports = ProjectMembersService;

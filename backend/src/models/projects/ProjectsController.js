@@ -2,9 +2,9 @@ const Controller = require("../__types/Controller");
 
 const ProjectInvitationComponent = require("./components/ProjectInvitationComponent");
 
-const ProjectInvitationInterface = require("./relationship/project-invitations/ProjectInvitationsInterface");
-const ProjectMembersInterface = require("./relationship/project-members/ProjectMembersInterface");
-const ProjectChatsInterface = require("./relationship/project-chats/ProjectChatsInterface");
+const ProjectInvitationService = require("./relationship/project-invitations/ProjectInvitationsService");
+const ProjectMembersService = require("./relationship/project-members/ProjectMembersService");
+const ProjectChatsService = require("./relationship/project-chats/ProjectChatsService");
 
 const ProjectsService = require("./ProjectsService");
 
@@ -14,7 +14,7 @@ class ProjectsController extends Controller {
 	#ProjectInvitationComponent;
 
 	ProjectInvitationInterface;
-	ProjectMembersInterface;
+	ProjectMembersService;
 	ProjectChatsInterface;
 
 	ProjectsFunctionalityInterface;
@@ -28,9 +28,9 @@ class ProjectsController extends Controller {
 		this.#ProjectInvitationComponent = new ProjectInvitationComponent(this);
 
 		// Inicializa as interfaces do controller
-		this.ProjectInvitationInterface = new ProjectInvitationInterface(this);
-		this.ProjectMembersInterface = new ProjectMembersInterface(this);
-		this.ProjectChatsInterface = new ProjectChatsInterface(this);
+		this.ProjectInvitationService = new ProjectInvitationService(this);
+		this.ProjectMembersService = new ProjectMembersService(this);
+		this.ProjectChatsService = new ProjectChatsService(this);
 
 		// Inicializa as funcionalidades do controller
 		this.ProjectsFunctionalityInterface = new ProjectsFunctionalityInterface(this);
@@ -74,7 +74,7 @@ class ProjectsController extends Controller {
 		}
 
 		// Verifica se o usuário está no projeto
-		const isInProject = this.ProjectMembersInterface.isUserMemberOfProject(userId, projectId);
+		const isInProject = this.ProjectMembersService.isUserMemberOfProject(userId, projectId);
 		if (!isInProject) {
 			return response.status(400).json({ message: "Usuário não está no projeto." });
 		}

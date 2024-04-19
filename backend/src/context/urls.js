@@ -38,13 +38,13 @@ Url.prototype.toString = function () {
 };
 
 module.exports = {
-	__origin_web: new Url((options = { port: process.env.WEB_PORT })),
-	__origin_server: new Url((options = { port: process.env.SERVER_PORT })),
-	home: new Url((path = "/home")),
-	login: new Url((path = "/login")),
-	registration: new Url((path = "/registration")),
-	resetPassword: new Url((path = "/reset-password")),
-	sendPasswordReset: new Url((path = "/send-password-reset")),
-	validateEmail: new Url((path = "/validate-email")),
-	valitateInvitation: new Url((path = "/validate-invitation")),
+	__origin_web: new Url({ port: process.env.WEB_PORT }),
+	__origin_server: new Url({ port: process.env.SERVER_PORT }),
+	home: new Url(null, "/home"),
+	login: new Url(null, "/login"),
+	registration: new Url(null, "/registration"),
+	resetPassword: new Url(null, "/reset-password"),
+	sendPasswordReset: new Url(null, "/send-password-reset"),
+	validateEmail: new Url(null, "/validate-email"),
+	valitateInvitation: new Url(null, "/validate-invitation"),
 };

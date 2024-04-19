@@ -1,6 +1,10 @@
 class Service {
 	#controller;
 
+	constructor(controller = null) {
+		this.setController(controller);
+	}
+
 	setController(controller) {
 		this.#controller = controller;
 	}

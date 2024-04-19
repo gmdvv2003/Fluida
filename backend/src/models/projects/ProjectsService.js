@@ -2,8 +2,8 @@ const { v4 } = require("uuid");
 
 const Service = require("../__types/Service");
 
-const ProjectsDTO = require("./ProjectsDTO");
 const ProjectsEntity = require("./ProjectsEntity");
+const ProjectsRepository = require("./ProjectsRepository");
 
 // Repositório de projetos
 const projects = [];
@@ -13,6 +13,13 @@ const projectsMembers = [];
 const projectsInvitations = [];
 
 class ProjectsService extends Service {
+	#ProjectsRepository;
+
+	constructor() {
+		super();
+		this.#ProjectsRepository = new ProjectsRepository(this);
+	}
+
 	// ==================================== Métodos Privados ==================================== //
 	get Members() {
 		return projectsMembers;

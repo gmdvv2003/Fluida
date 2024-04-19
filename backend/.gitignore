@@ -64,3 +64,9 @@ node_modules/
 
 # dotenv environment variables file
 .env
+
+# Distribution directory
+dist
+
+# Migration files
+migrations

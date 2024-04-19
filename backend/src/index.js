@@ -1,7 +1,6 @@
 require("dotenv").config();
 
 const http = require("http");
-const cors = require("cors");
 const socket = require("socket.io");
 
 const admin = require("firebase-admin");
@@ -74,13 +73,13 @@ if (process.env.HTTP_WATCHER == 1) {
 if (process.env.SOCKET_WATCHER == 1) {
 	// Middleware para logar os eventos do socket
 	io.use((socket, next) => {
-		socket.onAny((event, ...arguments) => {
+		socket.onAny((event, ...data) => {
 			console.log(
 				`
 				Evento: ${event},
 				Auth: ${socket.handshake?.auth},
 				Header: ${socket.handshake?.headers},
-				Argumentos: ${JSON.stringify(arguments)}
+				Argumentos: ${JSON.stringify(data)}
 				`
 			);
 		});
@@ -128,15 +127,15 @@ const port = process.env.SERVER_PORT || 8080;
 // Banner irado
 console.log(
 	`
-  ______  _         _      _        
- |  ____|| |       (_)    | |       
- | |__   | | _   _  _   __| |  __ _ 
- |  __|  | || | | || | / _\` | / _\` |
- | |     | || |_| || || (_| || (_| |
- |_|     |_| \\__,_||_| \\__,_| \\__,_|
- ===================================
- 		v1.0.0
- ===================================
+ ______  _         _      _        
+|  ____|| |       (_)    | |       
+| |__   | | _   _  _   __| |  __ _ 
+|  __|  | || | | || | / _\` | / _\` |
+| |     | || |_| || || (_| || (_| |
+|_|     |_| \\__,_||_| \\__,_| \\__,_|
+===================================
+		v1.0.0
+===================================
 `
 );
 
