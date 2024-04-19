@@ -1,11 +1,14 @@
-const ProjectInvitationsDTO = require("./ProjectInvitationsDTO");
+const Service = require("../../../__types/Service");
+
 const ProjectInvitationsEntity = require("./ProjectInvitationsEntity");
+const ProjectInvitationsRepository = require("./ProjectInvitationsRepository");
 
-class ProjectInvitationsInterface {
-	#controller;
+class ProjectInvitationsService extends Service {
+	#ProjectInvitationsRepository;
 
-	constructor(controller) {
-		this.#controller = controller;
+	constructor() {
+		super();
+		this.#ProjectInvitationsRepository = new ProjectInvitationsRepository(this);
 	}
 
 	/**
@@ -16,9 +19,7 @@ class ProjectInvitationsInterface {
 	 */
 	addInvite(userId, projectId) {
 		if (!this.isUserInvitedToProject(userId, projectId)) {
-			this.#controller
-				.getService()
-				.Invitations.push(new ProjectInvitationsEntity(userId, projectId));
+			this.getController().getService().Invitations.push(new ProjectInvitationsEntity(userId, projectId));
 
 			return true;
 		}
@@ -42,12 +43,10 @@ class ProjectInvitationsInterface {
 	 * @returns {boolean}
 	 */
 	isUserInvitedToProject(userId, projectId) {
-		return this.#controller
+		return this.getController()
 			.getService()
-			.Invitations.some(
-				(invitation) => invitation.userId === userId && invitation.projectId === projectId
-			);
+			.Invitations.some((invitation) => invitation.userId === userId && invitation.projectId === projectId);
 	}
 }
 
-module.exports = ProjectInvitationsInterface;
+module.exports = ProjectInvitationsService;

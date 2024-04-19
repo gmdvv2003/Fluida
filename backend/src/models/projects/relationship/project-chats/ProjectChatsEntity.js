@@ -1,12 +1,6 @@
-class ProjectChatsEntity {
-	constructor(projectId, sourceId, targetId, messageId, content, sentAt) {
-		this.projectId = projectId;
-		this.sourceId = sourceId;
-		this.targetId = targetId;
-		this.messageId = messageId;
-		this.content = content;
-		this.sentAt = sentAt;
-	}
-}
+const { EntitySchema } = require("typeorm");
 
-module.exports = ProjectChatsEntity;
+module.exports = new EntitySchema({
+	name: "ProjectChats",
+	tableName: "ProjectChats",
+});

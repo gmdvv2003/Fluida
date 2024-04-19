@@ -1,6 +1,6 @@
 class UsersDTO {
 	constructor(user) {
-		this.userId = null;
+		this.userId = user?.userId;
 	}
 
 	toEntity() {

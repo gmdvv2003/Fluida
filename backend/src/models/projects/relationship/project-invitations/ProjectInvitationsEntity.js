@@ -1,8 +1,6 @@
-class ProjectInvitationsEntity {
-	constructor(projectId, userId) {
-		this.projectId = projectId;
-		this.userId = userId;
-	}
-}
+const { EntitySchema } = require("typeorm");
 
-module.exports = ProjectInvitationsEntity;
+module.exports = new EntitySchema({
+	name: "ProjectInvitations",
+	tableName: "ProjectInvitations",
+});

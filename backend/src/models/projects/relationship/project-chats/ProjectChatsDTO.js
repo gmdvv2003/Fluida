@@ -1,11 +1,26 @@
 class ProjectChatsDTO {
-	constructor({ projectId, sourceId, targetId, messageId, content, sentAt }) {
-		this.projectId = projectId;
-		this.sourceId = sourceId;
-		this.targetId = targetId;
-		this.messageId = messageId;
-		this.content = content;
-		this.sentAt = sentAt;
+	constructor(projectChat) {
+		this.projectId = projectChat?.projectId;
+		this.sourceId = projectChat?.sourceId;
+		this.targetId = projectChat?.targetId;
+		this.messageId = projectChat?.messageId;
+		this.content = projectChat?.content;
+		this.sentAt = projectChat?.sentAt;
+	}
+
+	toEntity() {
+		return {
+			projectId: this.projectId,
+			sourceId: this.sourceId,
+			targetId: this.targetId,
+			messageId: this.messageId,
+			content: this.content,
+			sentAt: this.sentAt,
+		};
+	}
+
+	static fromEntity(entity) {
+		return new ProjectChatsDTO(entity);
 	}
 }
 

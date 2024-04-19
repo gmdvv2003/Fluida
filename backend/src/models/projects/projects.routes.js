@@ -68,20 +68,20 @@ module.exports = function (app, io, projectsController) {
 		socket.on("unsubscribeFromProject", linkToMethod("unsubscribeFromProject"));
 
 		// Rotas de manipulação de cards
-		socket.on("createCard", linkToMethod("createCard"));
-		socket.on("deleteCard", linkToMethod("deleteCard"));
-		socket.on("updateCard", linkToMethod("updateCard"));
-		socket.on("moveCard", linkToMethod("moveCard"));
+		socket.on("createCard", linkToMethod("IOCreateCard"));
+		socket.on("deleteCard", linkToMethod("IODeleteCard"));
+		socket.on("updateCard", linkToMethod("IOUpdateCard"));
+		socket.on("moveCard", linkToMethod("IOMoveCard"));
 
 		// Rotas de manipulação de fases
-		socket.on("createPhase", linkToMethod("createPhase"));
-		socket.on("deletePhase", linkToMethod("deletePhase"));
-		socket.on("updatePhase", linkToMethod("updatePhase"));
-		socket.on("movePhase", linkToMethod("movePhase"));
+		socket.on("createPhase", linkToMethod("IOCreatePhase"));
+		socket.on("deletePhase", linkToMethod("IODeletePhase"));
+		socket.on("updatePhase", linkToMethod("IOUpdatePhase"));
+		socket.on("movePhase", linkToMethod("IOMovePhase"));
 
 		// Rotas do chat
-		socket.on("sendMessage", linkToMethod("sendMessage"));
-		socket.on("deleteMessage", linkToMethod("deleteMessage"));
-		socket.on("editMessage", linkToMethod("editMessage"));
+		socket.on("sendMessage", linkToMethod("IOSendMessage"));
+		socket.on("deleteMessage", linkToMethod("IODeleteMessage"));
+		socket.on("editMessage", linkToMethod("IOEditMessage"));
 	});
 };

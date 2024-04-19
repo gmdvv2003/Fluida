@@ -4,12 +4,14 @@
 	"description": "",
 	"main": "./dist/index.js",
 	"scripts": {
-		"start-dev": "npm run migrations:generate && npm run babel:build && npm run babel:run",
+		"start-dev": "npm run migration:generate && npm run babel:build && npm run babel:run",
 		"start-prod": "npm run babel:run",
 		"babel:build": "del /q /s .\\dist\\* > nul && babel src -d dist && node ./dist/index.js",
 		"babel:run": "node ./dist/index.js",
-		"migrations:generate": "del .\\src\\migrations\\*.js && typeorm migration:generate ./src/migrations/fluida -d ./src/database/Database.js -o",
-		"migrations:run": "typeorm migration:run -d ./src/database/Database.js"
+		"migration:generate": "del .\\src\\migrations\\*.js && typeorm migration:generate ./src/migrations/fluida -d ./src/database/Database.js -o",
+		"migration:run": "typeorm migration:run -d ./src/database/Database.js",
+		"migration:drop": "typeorm schema:drop -d ./src/database/Database.js",
+		"migration:sync": "npm run migration:generate && npm run migration:run"
 	},
 	"author": "",
 	"license": "ISC",

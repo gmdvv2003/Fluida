@@ -19,13 +19,16 @@ const Database = new DataSource({
 	synchronize: process.env.NODE_ENVIRONMENT == "development",
 	dropSchema: process.env.NODE_ENVIRONMENT == "development",
 
-	entities: [__dirname + "\\..\\models\\users\\UsersEntity.js", __dirname + "\\..\\models\\projects\\ProjectsEntity.js"],
+	entities: [
+		__dirname + "\\..\\models\\users\\UsersEntity.js",
+		__dirname + "\\..\\models\\projects\\ProjectsEntity.js",
+		__dirname + "\\..\\models\\projects\\relationship\\project-members\\ProjectMembersEntity.js",
+	],
 	migrations: [__dirname + "\\..\\migrations\\*.js"],
 });
 
-Database.initialize()
-	.catch((error) => {
-		console.error(`Erro ao inicializar o banco de dados: ${error}`);
-	});
+Database.initialize().catch((error) => {
+	console.error(`Erro ao inicializar o banco de dados: ${error}`);
+});
 
 module.exports = Database;

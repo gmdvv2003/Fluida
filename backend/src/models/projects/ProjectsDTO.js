@@ -1,8 +1,8 @@
 class ProjectsDTO {
 	constructor(project) {
-		this.projectId = null;
-		this.projectName = null;
-		this.createdBy = null;
+		this.projectId = project?.projectId;
+		this.projectName = project?.projectName;
+		this.createdBy = project?.createdBy;
 	}
 
 	toEntity() {

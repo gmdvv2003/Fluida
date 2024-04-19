@@ -2,21 +2,12 @@ const Controller = require("../__types/Controller");
 
 const ProjectInvitationComponent = require("./components/ProjectInvitationComponent");
 
-const ProjectInvitationService = require("./relationship/project-invitations/ProjectInvitationsService");
-const ProjectMembersService = require("./relationship/project-members/ProjectMembersService");
-const ProjectChatsService = require("./relationship/project-chats/ProjectChatsService");
-
 const ProjectsService = require("./ProjectsService");
 
 const ProjectsFunctionalityInterface = require("./functionalities/projects/ProjectsFunctionalityInterface");
 
 class ProjectsController extends Controller {
 	#ProjectInvitationComponent;
-
-	ProjectInvitationInterface;
-	ProjectMembersService;
-	ProjectChatsInterface;
-
 	ProjectsFunctionalityInterface;
 
 	constructor(servicesProvider) {
@@ -26,11 +17,6 @@ class ProjectsController extends Controller {
 
 		// Inicializa os componentes do controller
 		this.#ProjectInvitationComponent = new ProjectInvitationComponent(this);
-
-		// Inicializa as interfaces do controller
-		this.ProjectInvitationService = new ProjectInvitationService(this);
-		this.ProjectMembersService = new ProjectMembersService(this);
-		this.ProjectChatsService = new ProjectChatsService(this);
 
 		// Inicializa as funcionalidades do controller
 		this.ProjectsFunctionalityInterface = new ProjectsFunctionalityInterface(this);

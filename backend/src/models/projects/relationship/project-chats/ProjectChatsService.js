@@ -1,8 +1,14 @@
-class ProjectChatsInterface {
-	#controller;
+const Service = require("../../../__types/Service");
 
-	constructor(controller) {
-		this.#controller = controller;
+const ProjectChatsEntity = require("./ProjectChatsEntity");
+const ProjectChatsRepository = require("./ProjectChatsRepository");
+
+class ProjectChatsService {
+	#ProjectChatsRepository;
+
+	constructor() {
+		super();
+		this.#ProjectChatsRepository = new ProjectChatsRepository(this);
 	}
 
 	getMessagesOfProject(projectId) {}
@@ -19,4 +25,4 @@ class ProjectChatsInterface {
 	deleteMessage(messageId) {}
 }
 
-module.exports = ProjectChatsInterface;
+module.exports = ProjectChatsService;

@@ -1,7 +1,18 @@
 class ProjectMembersDTO {
-	constructor({ projectId, userId }) {
-		this.projectId = projectId;
-		this.userId = userId;
+	constructor(project) {
+		this.projectId = project?.projectId;
+		this.userId = project?.userId;
+	}
+
+	toEntity() {
+		return {
+			projectId: this.projectId,
+			userId: this.userId,
+		};
+	}
+
+	static fromEntity(entity) {
+		return new ProjectMembersDTO(entity);
 	}
 }
 

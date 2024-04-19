@@ -2,9 +2,17 @@ const { EntitySchema } = require("typeorm");
 
 module.exports = new EntitySchema({
 	name: "ProjectMembers",
+	tableName: "ProjectMembers",
 
 	// CREATE TABLE IF NOT EXISTS ProjectsMembers
 	columns: {
+		// log INT AUTO_INCREMENT PRIMARY_KEY
+		log: {
+			primary: true,
+			generated: "increment",
+			type: "int",
+		},
+
 		// project_id INT NOT NULL
 		projectId: {
 			nullable: false,
@@ -14,15 +22,14 @@ module.exports = new EntitySchema({
 		// user_id VARCHAR(36) NOT NULL
 		userId: {
 			nullable: false,
-			type: "varchar",
-			length: 36,
+			type: "int",
 		},
 	},
 
 	relations: {
 		// FOREIGN KEY(projectId) REFERENCES Projects(projectId) ON DELETE CASCADE,
 		project: {
-			cascade: "remove",
+			onDelete: "CASCADE",
 			type: "many-to-one",
 			target: "Projects",
 			joinColumn: {
@@ -32,7 +39,7 @@ module.exports = new EntitySchema({
 
 		// FOREIGN KEY(userId) REFERENCES Users(userId) ON DELETE CASCADE,
 		user: {
-			cascade: "remove",
+			onDelete: "CASCADE",
 			type: "many-to-one",
 			target: "Users",
 			joinColumn: {
@@ -56,4 +63,6 @@ module.exports = new EntitySchema({
 			columns: ["userId"],
 		},
 	],
+
+	target: require("./ProjectMembersDTO.js"),
 });

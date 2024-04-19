@@ -5,29 +5,28 @@ const Service = require("../__types/Service");
 const ProjectsEntity = require("./ProjectsEntity");
 const ProjectsRepository = require("./ProjectsRepository");
 
-// Repositório de projetos
-const projects = [];
-
-// Repositório de membros de projetos & convites
-const projectsMembers = [];
-const projectsInvitations = [];
+const ProjectInvitationService = require("./relationship/project-invitations/ProjectInvitationsService");
+const ProjectMembersService = require("./relationship/project-members/ProjectMembersService");
+const ProjectChatsService = require("./relationship/project-chats/ProjectChatsService");
 
 class ProjectsService extends Service {
 	#ProjectsRepository;
 
+	ProjectInvitationInterface;
+	ProjectMembersService;
+	ProjectChatsInterface;
+
 	constructor() {
 		super();
+
+		this.ProjectInvitationService = new ProjectInvitationService(this);
+		this.ProjectMembersService = new ProjectMembersService(this);
+		this.ProjectChatsService = new ProjectChatsService(this);
+
 		this.#ProjectsRepository = new ProjectsRepository(this);
 	}
 
 	// ==================================== Métodos Privados ==================================== //
-	get Members() {
-		return projectsMembers;
-	}
-
-	get Invitations() {
-		return projectsInvitations;
-	}
 	// ==================================== Métodos Abertos ==================================== //
 	// ==================================== Métodos Seguros ==================================== //
 	/**

@@ -4,7 +4,12 @@ const ProjectMembersEntity = require("./ProjectMembersEntity");
 const ProjectMembersRepository = require("./ProjectMembersRepository");
 
 class ProjectMembersService extends Service {
-	#ProjectMembersRepository = new ProjectMembersRepository();
+	#ProjectMembersRepository;
+
+	constructor() {
+		super();
+		this.#ProjectMembersRepository = new ProjectMembersRepository(this);
+	}
 
 	/**
 	 * Adiciona um usuário como membro de um projeto.
