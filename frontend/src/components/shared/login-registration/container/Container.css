@@ -34,3 +34,16 @@
 	align-items: center;
 	width: 100%;
 }
+
+.LR-C-forms-horizontal-lock {
+	--margin: 20px;
+	padding-top: calc(50vh - 220px - var(--header-height) * 2 + 18px - var(--margin));
+	margin-top: var(--margin);
+}
+
+.LR-C-forms-vertical-lock {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	z-index: 10;
+}

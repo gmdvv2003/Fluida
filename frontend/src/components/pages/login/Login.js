@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from "react";
 import { ReactComponent as EmailIcon } from "assets/action-icons/email.svg";
 import { ReactComponent as GoogleIcon } from "assets/action-icons/google-icon.svg";
 import Header from "components/shared/login-registration/header/Header";
+import Background from "components/shared/login-registration/background/Background";
 import InputFieldError from "components/shared/login-registration/error/InputFieldError";
 import Loading from "components/shared/loading/Loading";
 import PasswordField from "./input-types/PasswordField";
@@ -79,8 +80,9 @@ function Login() {
 	return (
 		<div>
 			<Header />
-			<div className="LR-C-forms-container-holder BG-fluida-background-waves-container">
-				<div className="LR-C-forms-container-holder BG-fluida-identity-fish-container">
+			<Background />
+			<div className="LR-C-forms-vertical-lock">
+				<div className="LR-C-forms-horizontal-lock">
 					<div className="LR-C-forms-container">
 						<form className="LR-C-forms" style={{ width: "80%" }}>
 							<div className="L-login-form-title-container">
