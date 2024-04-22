@@ -115,71 +115,71 @@ function HomeProjects() {
 				</div>
 			</div>
 			{isDialogOpen && (
-                <div className="HP-dialog-new-project-container">
-                    <div className="HP-container-close-dialog">
-						<FontAwesomeIcon onClick={handleCloseDialog} icon={faCircleXmark} size="xl" style={{color: "#8c8c8c", cursor: "pointer", borderRadius: "50%"}} />
-					</div>
-					<div>			
-						<TextInputField 
-							style={{
-								marginTop: "10px",
-								marginBottom: "10px",
-								borderRadius: "var(--border-radius)",
-								backgroundColor: "rgb(244, 244, 244)"
-							}}
-							
-							name="project"
-							placeholder="Nome do projeto"
-						/>
-					</div>
-					<div className="HP-container-button-new-project">	
-						<button className="HP-button-new-project">Criar novo projeto</button>		
-					</div>
-                </div>
-            )}
-			{isDialogAddPhotoOpen && (
-				<div className="HP-container-user-photo">          
-					<div className="HP-container-close-user-photo">
-						<FontAwesomeIcon onClick={handleCloseDialogAddPhoto} icon={faCircleXmark} size="xl" style={{color: "#8c8c8c", cursor: "pointer", borderRadius: "50%"}} />
-					</div>
-					<div className="HP-container-username-label">			
-						<div className="HP-username-label">			
-							<span className="HP-hello">Olá,</span> <span className="username-style">{`@${username}`}</span>
-						</div>
-						<div className="HP-welcome">			
-							Seja bem-vindo ao Fluida.
-						</div>
-					</div>
-					<div className="HP-container-photo">			
-						<div className="HP-user-photo-container">			
-							<div className="HP-user-photo"  onClick={handleDivClick}>
-								{selectedImage ? (
-									<img src={selectedImage} alt="Selected" className="photoSelected" />
-								) : (
-									<FontAwesomeIcon icon={faUserLarge} style={{ color: "#e4e4e4" }} className="photo" />
-								)}
-							</div>
-							<input
-								type="file"
-								accept="image/*"
-								onChange={handleImageChange}
-								style={{ display: 'none' }}
-								ref={fileInputRef}
-							/>
-						</div>
-						<div className="HP-label-new-photo">			
-							Adicione uma foto.
-						</div>
-					</div>
-					<div className="HP-container-button-add-photo">			
-						<button className="HP-button-add-photo">Continuar</button>
+                <div className="HP-dialog-overlay">
+					<div className="HP-dialog-new-project-container">
+						<div className="HP-container-close-dialog">
+											<FontAwesomeIcon onClick={handleCloseDialog} icon={faCircleXmark} size="xl" style={{color: "#8c8c8c", cursor: "pointer", borderRadius: "50%"}} />
+										</div>
+										<div>			
+											<TextInputField 
+												style={{
+													marginTop: "10px",
+													marginBottom: "10px",
+													borderRadius: "var(--border-radius)",
+													backgroundColor: "rgb(244, 244, 244)"
+												}}
+												
+												name="project"
+												placeholder="Nome do projeto"
+											/>
+										</div>
+										<div className="HP-container-button-new-project">	
+											<button className="HP-button-new-project">Criar novo projeto</button>		
+										</div>
 					</div>
 				</div>
-
-				
             )}
-
-			
+			{isDialogAddPhotoOpen && (
+				<div className="HP-dialog-overlay"> 
+					<div className="HP-container-user-photo">
+						<div className="HP-container-close-user-photo">
+							<FontAwesomeIcon onClick={handleCloseDialogAddPhoto} icon={faCircleXmark} size="xl" style={{color: "#8c8c8c", cursor: "pointer", borderRadius: "50%"}} />
+						</div>
+						<div className="HP-container-username-label">
+							<div className="HP-username-label">
+								<span className="HP-hello">Olá,</span> <span className="username-style">{`@${username}`}</span>
+							</div>
+							<div className="HP-welcome">
+								Seja bem-vindo ao Fluida.
+							</div>
+						</div>
+						<div className="HP-container-photo">
+							<div className="HP-user-photo-container">
+								<div className="HP-user-photo"  onClick={handleDivClick}>
+									{selectedImage ? (
+										<img src={selectedImage} alt="Selected" className="photoSelected" />
+									) : (
+										<FontAwesomeIcon icon={faUserLarge} style={{ color: "#e4e4e4" }} className="photo" />
+									)}
+								</div>
+								<input
+									type="file"
+									accept="image/*"
+									onChange={handleImageChange}
+									style={{ display: 'none' }}
+									ref={fileInputRef}
+								/>
+							</div>
+							<div className="HP-label-new-photo">
+								Adicione uma foto.
+							</div>
+						</div>
+						<div className="HP-container-button-add-photo">
+							<button className="HP-button-add-photo">Continuar</button>
+						</div>
+					</div>
+				</div>
+            )}
 		</div>
 	);
 }
