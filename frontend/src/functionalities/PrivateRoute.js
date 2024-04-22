@@ -3,9 +3,9 @@ import { useAuthentication } from "context/AuthenticationContext";
 
 function PrivateRoute({ children }) {
 	const { currentUser } = useAuthentication();
-	if (!currentUser) {
-		return <Navigate to="/login" />;
-	}
+	// if (!currentUser) {
+	// 	return <Navigate to="/login" />;
+	// }
 
 	return children;
 }
