@@ -91,54 +91,62 @@ if (process.env.SOCKET_WATCHER == 1) {
 	});
 }
 
-const UsersController = require("./models/users/UsersController");
-const ProjectsController = require("./models/projects/ProjectsController");
+const Database = require("./database/Database");
 
-// Singletons que inicializam as rotas
-const usersRoutes = require("./models/users/users.routes");
-const projectsRoutes = require("./models/projects/projects.routes");
+Database.initialize()
+	.then(() => {
+		// Banner irado
+		console.log(
+			`
+			 ______  _         _      _        
+			|  ____|| |       (_)    | |       
+			| |__   | | _   _  _   __| |  __ _ 
+			|  __|  | || | | || | / _\` | / _\` |
+			| |     | || |_| || || (_| || (_| |
+			|_|     |_| \\__,_||_| \\__,_| \\__,_|
+			===================================
+					v1.0.0
+			===================================
+			`
+		);
 
-// Serviços inicializados
-const INSTANTIATED_SERVICES = {};
+		const UsersController = require("./models/users/UsersController");
+		const ProjectsController = require("./models/projects/ProjectsController");
 
-// Provider de serviços para garantir que os controllers tenham acesso a todos os serviços
-const servicesProvider = {
-	register(identifier, controller) {
-		INSTANTIATED_SERVICES[identifier] = controller.getService();
-	},
+		// Singletons que inicializam as rotas
+		const usersRoutes = require("./models/users/users.routes");
+		const projectsRoutes = require("./models/projects/projects.routes");
 
-	get(identifier) {
-		return INSTANTIATED_SERVICES[identifier];
-	},
-};
+		// Serviços inicializados
+		const INSTANTIATED_SERVICES = {};
 
-const usersController = new UsersController(servicesProvider);
-const projectsController = new ProjectsController(servicesProvider);
+		// Provider de serviços para garantir que os controllers tenham acesso a todos os serviços
+		const servicesProvider = {
+			register(identifier, controller) {
+				INSTANTIATED_SERVICES[identifier] = controller.getService();
+			},
 
-// Registrando os serviços de cada controller
-servicesProvider.register("users", usersController);
-servicesProvider.register("projects", projectsController);
+			get(identifier) {
+				return INSTANTIATED_SERVICES[identifier];
+			},
+		};
 
-usersRoutes(app, io, usersController);
-projectsRoutes(app, io, projectsController);
+		const usersController = new UsersController(servicesProvider);
+		const projectsController = new ProjectsController(servicesProvider);
 
-const port = process.env.SERVER_PORT || 8080;
+		// Registrando os serviços de cada controller
+		servicesProvider.register("users", usersController);
+		servicesProvider.register("projects", projectsController);
 
-// Banner irado
-console.log(
-	`
- ______  _         _      _        
-|  ____|| |       (_)    | |       
-| |__   | | _   _  _   __| |  __ _ 
-|  __|  | || | | || | / _\` | / _\` |
-| |     | || |_| || || (_| || (_| |
-|_|     |_| \\__,_||_| \\__,_| \\__,_|
-===================================
-		v1.0.0
-===================================
-`
-);
+		usersRoutes(app, io, usersController);
+		projectsRoutes(app, io, projectsController);
 
-server.listen(port, () => {
-	console.log(`Servidor rodando em ${urls.__origin_server.url}`);
-});
+		const port = process.env.SERVER_PORT || 8080;
+
+		server.listen(port, () => {
+			console.log(`Servidor rodando em ${urls.__origin_server.url}`);
+		});
+	})
+	.catch((error) => {
+		console.error(`Erro ao inicializar o banco de dados: ${error}`);
+	});

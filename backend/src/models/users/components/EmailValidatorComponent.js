@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 
 const EmailTransporter = require("../../../context/nodemailer/EmailTransporter");
-const UserEntity = require("../UsersEntity");
+const UserDTO = require("../UsersDTO");
 
 const Session = require("../../../context/session/Session");
 
@@ -15,7 +15,7 @@ class EmailValidatorComponent {
 	/**
 	 * Envia um email de validação para o usuário
 	 *
-	 * @param {UserEntity} user
+	 * @param {UserDTO} user
 	 * @returns Promise contendo informação sobre se o email foi enviado com sucesso
 	 */
 	async sendValidationEmail(user) {
@@ -42,7 +42,7 @@ class EmailValidatorComponent {
 	/**
 	 * Valida um token de validação de email para um usuário
 	 *
-	 * @param {UserEntity} validationToken
+	 * @param {UserDTO} validationToken
 	 * @returns Estrutura que diz se a ação foi bem sucedida ou não
 	 */
 	validateValidationEmail(validationToken) {

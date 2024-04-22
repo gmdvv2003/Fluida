@@ -4,14 +4,12 @@
 	"description": "",
 	"main": "./dist/index.js",
 	"scripts": {
-		"start-dev": "npm run migration:generate && npm run babel:build && npm run babel:run",
-		"start-prod": "npm run babel:run",
-		"babel:build": "del /q /s .\\dist\\* > nul && babel src -d dist && node ./dist/index.js",
+		"start": "npm run babel:build && npm run babel:run",
+		"babel:build": "rimraf dist && mkdir dist && babel src -d dist",
 		"babel:run": "node ./dist/index.js",
-		"migration:generate": "del .\\src\\migrations\\*.js && typeorm migration:generate ./src/migrations/fluida -d ./src/database/Database.js -o",
-		"migration:run": "typeorm migration:run -d ./src/database/Database.js",
+		"migration:generate": "rimraf src\\migrations && mkdir src\\migrations && typeorm migration:generate ./src/migrations/fluida -d ./src/database/Database.js -o",
 		"migration:drop": "typeorm schema:drop -d ./src/database/Database.js",
-		"migration:sync": "npm run migration:generate && npm run migration:run"
+		"migration:run": "typeorm migration:run -d ./src/database/Database.js"
 	},
 	"author": "",
 	"license": "ISC",
@@ -31,6 +29,7 @@
 		"uuid": "^9.0.1"
 	},
 	"devDependencies": {
+		"rimraf": "^3.0.2",
 		"@babel/cli": "^7.24.1",
 		"@babel/core": "^7.24.4",
 		"@babel/plugin-proposal-decorators": "^7.24.1",

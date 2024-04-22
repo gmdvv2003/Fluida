@@ -48,5 +48,5 @@ module.exports = new EntitySchema({
 		},
 	],
 
-	target: require("./ProjectsDTO.js"),
+	target: require("./ProjectsDTO"),
 });

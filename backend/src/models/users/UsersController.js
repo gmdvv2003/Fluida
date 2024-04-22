@@ -22,7 +22,7 @@ class UsersController extends Controller {
 		this.#UserSettingsComponent = new UserSettingsComponent(this);
 	}
 
-	// ==================================== Métodos publicos ==================================== //
+	// ==================================== Métodos Publicos ==================================== //
 	/**
 	 * Retorna todos os usuários ao requisitante
 	 *
@@ -74,7 +74,7 @@ class UsersController extends Controller {
 				console.error(`Falha ao enviar email de validação. Erro: ${error}`);
 			});
 
-		response.status(201).json({ message: "Usuário cadastrado com sucesso.", successfullyRegistered: true });
+		response.status(201).json({ successfullyRegistered: true, message: "Usuário cadastrado com sucesso." });
 	}
 
 	/**

@@ -1,14 +1,60 @@
 const Repository = require("../__types/Repository");
 
+const ProjectsDTO = require("./ProjectsDTO");
 const ProjectsEntity = require("./ProjectsEntity");
 
+const { Subscribe } = require("../../context/typeorm/subscriber/Subscriber");
+const { Validate } = require("../../context/typeorm/decorators/repository-input-validator/RepositoryInputValidator");
+
+const { InsertResult, DeleteResult } = require("typeorm");
+
 class ProjectsRepository extends Repository {
-	constructor(service) {
-		super(service, ProjectsEntity);
+	// ==================================== Triggers ==================================== //
+	/**
+	 * Trigger que adiciona o criador do projeto como membro do projeto.
+	 */
+	async afterInsert_addProjectManagerAsMember({ entity }) {
+		await this.Service.ProjectsPhasesService.add(entity.createdBy, entity.projectId);
 	}
 
-	getProjectById(projectId) {
-		return this.createQueryBuilder("projects").where(`projects.projectId =:projectId`).getOne({ projectId });
+	constructor(service) {
+		super(service, ProjectsDTO);
+		Subscribe(ProjectsDTO, this);
+	}
+
+	/**
+	 * Retorna um projeto pelo id
+	 *
+	 * @param {number} projectId
+	 * @returns {ProjectsDTO}
+	 */
+	async getProjectById(projectId) {
+		return await this.Repository.createQueryBuilder("Projects").where(`projectId = :projectId`, { projectId }).getOne();
+	}
+
+	/**
+	 * Insere um projeto no banco de dados.
+	 *
+	 * @param {ProjectsDTO} projectsDTO
+	 * @returns {InsertResult}
+	 */
+	@Validate({ NAME: "projectName", TYPE: "string", LENGTH: 100 })
+	async createProject(projectsDTO) {
+		return await this.Repository.createQueryBuilder("Projects").insert().into("Projects").values(projectsDTO).execute();
+	}
+
+	/**
+	 * Deleta um projeto do banco de dados.
+	 *
+	 * @param {ProjectsDTO} projectsDTO
+	 * @returns {DeleteResult}
+	 */
+	async deleteProject(projectsDTO) {
+		return await this.Repository.createQueryBuilder("Projects")
+			.delete()
+			.from("Projects")
+			.where(`projectId = :projectId`, projectsDTO)
+			.execute();
 	}
 }
 
