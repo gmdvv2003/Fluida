@@ -41,7 +41,7 @@ module.exports = new EntitySchema({
 
 		// creationDate DATETIME DEFAULT CURRENT_TIMESTAMP
 		creationDate: {
-			default: "CURRENT_TIMESTAMP",
+			default: () => "CURRENT_TIMESTAMP",
 			nullable: false,
 			type: "datetime",
 		},
