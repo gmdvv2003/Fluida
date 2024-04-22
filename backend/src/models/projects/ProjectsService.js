@@ -1,54 +1,73 @@
-const { v4 } = require("uuid");
-
 const Service = require("../__types/Service");
 
-const ProjectsEntity = require("./ProjectsEntity");
+const ProjectsDTO = require("./ProjectsDTO");
 const ProjectsRepository = require("./ProjectsRepository");
 
-const ProjectInvitationService = require("./relationship/project-invitations/ProjectInvitationsService");
-const ProjectMembersService = require("./relationship/project-members/ProjectMembersService");
-const ProjectChatsService = require("./relationship/project-chats/ProjectChatsService");
+const ProjectsInvitationService = require("./relationship/projects-invitations/ProjectsInvitationsService");
+const ProjectsMembersService = require("./relationship/projects-members/ProjectsMembersService");
+const ProjectsChatsService = require("./relationship/projects-chats/ProjectsChatsService");
+const ProjectsPhasesService = require("./relationship/projects-phases/ProjectsPhasesService");
+
+const PhasesService = require("../phases/PhasesService");
+const CardsService = require("../cards/CardsService");
 
 class ProjectsService extends Service {
-	#ProjectsRepository;
+	ProjectsRepository;
 
-	ProjectInvitationInterface;
-	ProjectMembersService;
-	ProjectChatsInterface;
+	ProjectsInvitationService;
+	ProjectsMembersService;
+	ProjectsChatsService;
+	ProjectsPhasesService;
+
+	PhasesService;
+	CardsService;
 
 	constructor() {
 		super();
+		this.ProjectsRepository = new ProjectsRepository(this);
 
-		this.ProjectInvitationService = new ProjectInvitationService(this);
-		this.ProjectMembersService = new ProjectMembersService(this);
-		this.ProjectChatsService = new ProjectChatsService(this);
+		this.ProjectsInvitationService = new ProjectsInvitationService(this);
+		this.ProjectsMembersService = new ProjectsMembersService(this);
+		this.ProjectsChatsService = new ProjectsChatsService(this);
+		this.ProjectsPhasesService = new ProjectsPhasesService(this);
 
-		this.#ProjectsRepository = new ProjectsRepository(this);
+		this.PhasesService = new PhasesService(this);
+		this.CardsService = new CardsService(this);
 	}
 
-	// ==================================== Métodos Privados ==================================== //
-	// ==================================== Métodos Abertos ==================================== //
 	// ==================================== Métodos Seguros ==================================== //
 	/**
-	 * Criação de um novo projeto.
+	 * Retorna um projeto pelo id.
+	 *
+	 * @param {string} projectId
+	 * @returns {ProjectChatsDTO}
+	 */
+	async getProjectById(projectId) {
+		return await this.ProjectsRepository.getProjectById(projectId);
+	}
+
+	/**
+	 * Realiza a criação de um projeto.
 	 *
 	 * @param {number} createdBy
 	 * @param {string} projectName
-	 * @returns Criação de um novo projeto para o usuário.
+	 * @returns {ProjectsDTO}
 	 */
-	createProjectAuthenticated(createdBy, projectName) {
-		try {
-			const project = new ProjectsEntity(v4(), createdBy, projectName);
-			projects.push(project);
-			return { success: true, project: project };
-		} catch (error) {
-			return { success: false, message: error.message };
-		}
+	async createProject(createdBy, projectName) {
+		return await this.ProjectsRepository.createProject(new ProjectsDTO({ createdBy, projectName }));
 	}
 
-	deleteProjectAuthenticated(userId, projectId) {}
+	/**
+	 * Realiza a exclusão de um projeto.
+	 *
+	 * @param {number} projectId
+	 * @returns {boolean}
+	 */
+	async deleteProject(projectId) {
+		return await this.ProjectsRepository.deleteProject(new ProjectsDTO({ projectId }));
+	}
 
-	participateAuthenticated(userId, projectId) {}
+	async participate(userId, projectId) {}
 }
 
 module.exports = ProjectsService;

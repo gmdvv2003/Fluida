@@ -18,7 +18,7 @@ class UserSettingsComponent {
 	 *
 	 * @param {number} userId
 	 * @param {Map} toAlter
-	 * @returns Estrutura que diz se a ação foi bem sucedida ou não
+	 * @returns {Object} Estrutura que diz se a ação foi bem sucedida ou não
 	 */
 	alterUserSettings(userId, toAlter) {
 		const user = this.controller.getService().getUserById(userId);

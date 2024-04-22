@@ -25,7 +25,7 @@ function Login() {
 	const [invalidEmail, setInvalidEmail] = useState(false);
 	const [invalidPassword, setInvalidPassword] = useState(false);
 
-	const [waitingForValidation, setWaitingForValidation] = useState(false);
+	const [waitingForValidation, setWaitingForValidation] = useState(true);
 	const [wrongCredentials, setWrongCredentials] = useState(false);
 	const [somethingWentWrong, setSomethingWentWrong] = useState(false);
 
@@ -86,7 +86,7 @@ function Login() {
 							<div className="L-login-form-title-container">
 								<h1 className="L-login-form-title">Inicie sessão na sua conta</h1>
 							</div>
-							
+
 							<div className="L-google-icon-container">
 								<GoogleIcon className="L-google-icon" />
 								<div className="L-login-form-google-button-container">
@@ -95,7 +95,7 @@ function Login() {
 									</button>
 								</div>
 							</div>
-							
+
 							<div>
 								<h1 className="L-login-or-text">ou</h1>
 							</div>
@@ -104,7 +104,7 @@ function Login() {
 								<div className="L-left-icon-container">
 									<EmailIcon className="L-left-icon" />
 								</div>
-								
+
 								<TextInputField
 									ref={emailFieldReference}
 									style={{

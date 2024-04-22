@@ -1,16 +1,13 @@
 const Database = require("../../database/Database");
-// if (Database.isInitialized) {
-// 	throw new Error("Database is not initialized");
-// }
 
-const { Repository: BaseRepository } = require("typeorm");
+const { Repository: TypeormRepository } = require("typeorm");
 
-class Repository extends BaseRepository {
+class Repository extends TypeormRepository {
 	#service;
 	#repository;
 
 	constructor(service, entity) {
-		super(entity)
+		super(entity);
 
 		const repository = Database.getRepository(entity);
 

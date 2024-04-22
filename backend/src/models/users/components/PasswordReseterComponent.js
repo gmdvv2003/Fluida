@@ -13,7 +13,7 @@ class PasswordReseterComponent {
 	 * Envia um email de reset de senha para o usuário
 	 *
 	 * @param {string} email
-	 * @returns Promise contendo informação sobre se o email foi enviado com sucesso
+	 * @returns {Promise} Promise contendo informação sobre se o email foi enviado com sucesso
 	 */
 	async requestPasswordReset(email) {
 		const user = this.controller.UsersService.getUserByEmail(email);
@@ -42,7 +42,7 @@ class PasswordReseterComponent {
 	 *
 	 * @param {string} resetPasswordToken
 	 * @param {string} newPassword
-	 * @returns Estrutura que diz se a ação foi bem sucedida ou não
+	 * @returns {Object} Estrutura que diz se a ação foi bem sucedida ou não
 	 */
 	resetPassword(resetPasswordToken, newPassword) {
 		return jwt.verify(
