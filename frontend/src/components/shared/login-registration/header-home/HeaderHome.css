@@ -1,18 +1,26 @@
 .HH-header-home-container {
 	display: flex;
-	justify-content: space-between;
 	align-items: center;
 	box-shadow: rgb(211, 211, 211) 0px 0px 6px;
 	background-color: #ffffff;
 	width: 100%;
 	height: var(--header-height);
+	overflow-x: hidden;
+	overflow-y: hidden;
+}
+
+.HH-container-logo-buttons{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
 }
 
 .HH-container-logo {
 	display: flex;
 	justify-content: left;
 	align-items: center;
-	width: 25%;
+	width: 30%;
 	height: 100%;
 }
 
@@ -27,7 +35,7 @@
 	position: relative;
 	justify-content: center;
 	align-items: center;
-	width: 50%;
+	width: 100%;
 	height: 100%;
 }
 
@@ -58,7 +66,7 @@
 	display: flex;
 	justify-content: right;
 	align-items: center;
-	width: 25%;
+	width: 45%;
 	height: 100%;
 }
 
@@ -87,4 +95,40 @@
 	padding: 2px;
 	height: 35px;
 	content: url("./../../../../assets/action-icons/add-circle-full.svg");
+}
+
+.HH-input-buttons{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+}
+
+@media screen and (max-width: 600px) {
+
+	.HH-header-home-container{
+		flex-direction: column;
+		width: 100%;
+		height: 100%;
+	}
+
+	.HH-header-home-logo{
+		height: 50px;
+	}
+
+	.HH-container-logo{
+		display: flex;
+		justify-content: center;
+		width: 100%;
+		height: 70px;
+	}
+
+	.HH-input-buttons{
+		padding-left: 15px;
+		height: 50px;
+	}
+
+	.HH-buttons-container{
+		width: 250px;
+	}
 }
