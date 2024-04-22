@@ -1,10 +1,10 @@
 .L-login-form-title-container {
-	padding-top: 0rem;
+	position: relative;
 }
 .L-login-form-title {
 	color: #3e3e3e;
 	font-weight: lighter;
-	font-size: 30px;
+	font-size: var(--login-registration-header-font-size);
 	text-align: center;
 }
 
@@ -15,16 +15,8 @@
 	align-items: center !important;
 	border: 1px solid #d1d1d1;
 	border-radius: 5px;
-	border-top-left-radius: 0px;
-	border-bottom-left-radius: 0px;
 	width: 100% !important;
 }
-
-.L-google-icon {
-	width: 30px;
-	height: 30px;
-}
-
 .L-left-icon-container,
 .L-reveal-password-icon-container {
 	display: flex;
@@ -77,13 +69,11 @@
 	border: none;
 	background-color: transparent;
 	padding: 0px 10px;
-	width: 100%;
 	height: 60px;
 	font-size: 15px;
 }
 
 .L-login-or-text {
-	margin: 30px;
 	color: #3e3e3e;
 	font-weight: lighter;
 	font-size: 17px;
@@ -96,7 +86,7 @@
 	width: 100%;
 	color: #467ef7;
 	font-weight: bold;
-	font-size: 17px;
+	font-size: 15px;
 	text-align: center;
 	text-decoration: none;
 }
@@ -139,7 +129,6 @@
 }
 
 .L-start-session-button {
-	margin-top: 40px;
 	border: none;
 	border-radius: var(--border-radius);
 	background-color: #fe8e04;

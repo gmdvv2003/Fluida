@@ -4,16 +4,14 @@ import "./Login.css";
 
 import { useEffect, useRef, useState } from "react";
 
-import { useAuthentication } from "context/AuthenticationContext";
-
 import { ReactComponent as EmailIcon } from "assets/action-icons/email.svg";
 import { ReactComponent as GoogleIcon } from "assets/action-icons/google-icon.svg";
-
 import Header from "components/shared/login-registration/header/Header";
 import InputFieldError from "components/shared/login-registration/error/InputFieldError";
+import Loading from "components/shared/loading/Loading";
 import PasswordField from "./input-types/PasswordField";
 import TextInputField from "components/shared/text-input-field/TextInputField";
-import Loading from "components/shared/loading/Loading";
+import { useAuthentication } from "context/AuthenticationContext";
 
 function Login() {
 	const emailFieldReference = useRef(null);
@@ -67,8 +65,10 @@ function Login() {
 	}
 
 	useEffect(() => {
-		const unbindEmailChangeSubscription = emailFieldReference.current.onTextChange(handleOnEmailChange);
-		const unbindPasswordChangeSubscription = passwordFieldReference.current.onPasswordChange(handleOnPasswordChange);
+		const unbindEmailChangeSubscription =
+			emailFieldReference.current.onTextChange(handleOnEmailChange);
+		const unbindPasswordChangeSubscription =
+			passwordFieldReference.current.onPasswordChange(handleOnPasswordChange);
 
 		return () => {
 			unbindEmailChangeSubscription();
@@ -117,12 +117,18 @@ function Login() {
 								/>
 							</div>
 
-							{invalidEmail && !wrongCredentials && <InputFieldError error="Preencha este campo." />}
+							{invalidEmail && !wrongCredentials && (
+								<InputFieldError error="Preencha este campo." />
+							)}
 
 							<PasswordField ref={passwordFieldReference} />
 
-							{invalidPassword && !wrongCredentials && <InputFieldError error="Preencha este campo." />}
-							{wrongCredentials && <InputFieldError error="Email e usuário ou senha inválidos." />}
+							{invalidPassword && !wrongCredentials && (
+								<InputFieldError error="Preencha este campo." />
+							)}
+							{wrongCredentials && (
+								<InputFieldError error="Email e usuário ou senha inválidos." />
+							)}
 
 							<div className="L-login-form-reset-container">
 								<a href="/send-password-reset" className="L-login-form-reset">
@@ -136,7 +142,11 @@ function Login() {
 								</div>
 							) : (
 								<div className="L-start-session-button-container">
-									<button onClick={handleOnLoginButton} type="button" className="L-start-session-button">
+									<button
+										onClick={handleOnLoginButton}
+										type="button"
+										className="L-start-session-button"
+									>
 										Iniciar sessão
 									</button>
 
