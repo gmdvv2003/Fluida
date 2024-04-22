@@ -1,18 +1,38 @@
 import "./HomeProjects.css";
 
-import React, { useState } from "react";
-import { faCircleXmark, faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import React, { useRef, useState } from "react";
+import { faCircleXmark, faUserLarge } from '@fortawesome/free-solid-svg-icons';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import HeaderHome from "../../shared/login-registration/header-home/HeaderHome.js";
 import TextInputField from "../../shared/text-input-field/TextInputField"
 
 function HomeProjects() {
+	
 	const username = "variableUserName";
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [isDialogAddPhotoOpen, setAddPhotoDialogOpen] = useState(true);
+	const [selectedImage, setSelectedImage] = useState(null);
+	const fileInputRef = useRef(null);
+
 	const projects = [
         { projectName: "Projeto 1" },
+        { projectName: "Projeto 2" },
+        { projectName: "Projeto 3" },
+        { projectName: "Projeto 4" },
+        { projectName: "Projeto 1" },
+        { projectName: "Projeto 2" },
+        { projectName: "Projeto 3" },
+        { projectName: "Projeto 4" },
+		{ projectName: "Projeto 1" },
+        { projectName: "Projeto 2" },
+        { projectName: "Projeto 3" },
+        { projectName: "Projeto 4" },
+        { projectName: "Projeto 1" },
+        { projectName: "Projeto 2" },
+        { projectName: "Projeto 3" },
+        { projectName: "Projeto 4" },
+		{ projectName: "Projeto 1" },
         { projectName: "Projeto 2" },
         { projectName: "Projeto 3" },
         { projectName: "Projeto 4" },
@@ -37,7 +57,23 @@ function HomeProjects() {
 	function handleCloseDialogAddPhoto() {
         setAddPhotoDialogOpen(false);
     };
-	
+
+	const handleImageChange = (event) => {
+		const file = event.target.files[0];
+		if (file) {
+		const reader = new FileReader();
+		reader.onloadend = () => {
+			setSelectedImage(reader.result);
+		};
+		reader.readAsDataURL(file);
+		}
+	};
+
+	const handleDivClick = () => {
+		// Simulate click on file input when the div is clicked
+		fileInputRef.current.click();
+	};
+
 	return (
 		<div>
 			<HeaderHome />
@@ -55,14 +91,17 @@ function HomeProjects() {
 						<div className="HP-label">Seus projetos</div>
 					</div>
 					<div className="HP-container-project">
+
 						<div className="HP-project">
 							<div className="HP-grid-container">
 								{projects.map((project) => (
                                     <div key={project} className="HP-grid-item">
-                                        {project.projectName}
+                                        <div className="HP-project-name">
+											{project.projectName}
+										</div>
                                     </div>
                                 ))}
-								<div className="HP-grid-item" onClick={handleNewProjectClick}>
+								<div className="HP-grid-item-new-project" onClick={handleNewProjectClick}>
 									<div className="HP-container-new-project">
 										<i className="HP-add-new-project"></i>
 										<div className="HP-label-new-project">
@@ -84,8 +123,11 @@ function HomeProjects() {
 						<TextInputField 
 							style={{
 								marginTop: "10px",
-								marginBottom: "10px"
+								marginBottom: "10px",
+								borderRadius: "var(--border-radius)",
+								backgroundColor: "rgb(244, 244, 244)"
 							}}
+							
 							name="project"
 							placeholder="Nome do projeto"
 						/>
@@ -110,9 +152,20 @@ function HomeProjects() {
 					</div>
 					<div className="HP-container-photo">			
 						<div className="HP-user-photo-container">			
-							<div className="HP-user-photo">
-								<FontAwesomeIcon icon={faUserPlus} size="2xl" style={{color: "#8c8c8c", width: "100%", display: "flex"}}/>
+							<div className="HP-user-photo"  onClick={handleDivClick}>
+								{selectedImage ? (
+									<img src={selectedImage} alt="Selected" className="photoSelected" />
+								) : (
+									<FontAwesomeIcon icon={faUserLarge} style={{ color: "#e4e4e4" }} className="photo" />
+								)}
 							</div>
+							<input
+								type="file"
+								accept="image/*"
+								onChange={handleImageChange}
+								style={{ display: 'none' }}
+								ref={fileInputRef}
+							/>
 						</div>
 						<div className="HP-label-new-photo">			
 							Adicione uma foto.
@@ -122,7 +175,11 @@ function HomeProjects() {
 						<button className="HP-button-add-photo">Continuar</button>
 					</div>
 				</div>
+
+				
             )}
+
+			
 		</div>
 	);
 }

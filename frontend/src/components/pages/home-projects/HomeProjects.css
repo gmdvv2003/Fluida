@@ -5,14 +5,14 @@
     height: calc(100vh - var(--header-height));
 
     .HP-container-user{
-    display: flex;  
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    height: 20%;
-    min-height: 150px;
-    max-height: 150px;
+        display: flex;  
+        flex-direction: column;
+        justify-content: center;
+        align-items: center; 
+        width: 100%;
+        height: 20%;
+        min-height: 150px;
+        max-height: 150px;
 
         .HP-container-image-label{
             display: flex;
@@ -39,9 +39,6 @@
                 justify-content: center;
                 align-items: center;
                 margin-top: 5px;
-
-                
-
             }
         }
     }
@@ -52,13 +49,13 @@
         justify-content: center;
         align-items: center;
         width: 100%;
-        height: 100%;
+        height: calc(100% - var(--header-height) - 15%);
 
         .HP-container-label-your-projects{
             width: 70%;
 
             .HP-label{
-                padding-left: 65px;
+                padding-left: 105px;
                 color: var(--action-button-background-color);
                 font-weight: bold;
                 font-size: x-large;
@@ -71,46 +68,77 @@
             margin-bottom: 15px;
             border: 3px #f2f2f2 solid;
             border-radius: 8px;
-            width: 70%;
-            height: 100%;
-            overflow-y: hidden;
+            width: 65%;
+            height: 85%;
 
             .HP-project{
                 display: flex;
-                padding: 55px;
+                padding-top: 55px;
                 width: 100%;
-                overflow-x: auto;
                 
                 .HP-grid-container {
                     display: grid;
                     grid-template-columns: 19% 19% 19% 19% 19%;
                     gap: 10px 10px;
-                    padding: 10px;
+                    padding-right: 55px;
+                    padding-bottom: 55px;
+                    padding-left: 55px;
                     width: 100%;
+                    overflow: auto;
                     overflow-x: hidden;
-                    overflow-y: auto;
+                }
+
+                ::-webkit-scrollbar {
+                    width: 8px; /* Largura da barra de rolagem */
+                }
+
+                ::-webkit-scrollbar-thumb {
+                    border-radius: 32px; /* Raio da borda da parte deslizante */
+                    background-color: #ebebeb; /* Cor da parte deslizante da barra de rolagem */
                 }
 
                 @media screen and (max-width: 1350px) { 
                     .HP-grid-container{
-                        grid-template-columns: 19% 19% 19% 19%;
-                        background-color: blue;
+                        grid-template-columns: 24% 24% 24% 24%;
                     }
                 }
 
                 .HP-grid-item {
                     display: flex;
-                    justify-content: center;
-                    align-items: center;
+                    flex-direction: column;
                     cursor: pointer;
-                    box-shadow: rgba(0, 0, 0, 0.298) 0px 0px 6px;
+                    margin: 10px;
+                    border: 1px solid #e4e4e4;
                     border-radius: 8px;
                     background-color: #f2f2f2;
                     width: 100%;
                     min-width: 60px;
                     height: 100%;
-                    min-height: 60px;
-                    font-size: 30px;
+                    min-height: 200px;
+                    font-weight: bold;
+                    font-size: 18px;
+                    text-align: center;
+
+                    .HP-project-name{
+                        display: flex;
+                        padding: 15px;
+                    }
+                }
+
+                .HP-grid-item-new-project{
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    cursor: pointer;
+                    margin: 10px;
+                    border: 1px solid #e4e4e4;
+                    border-radius: 8px;
+                    background-color: #f2f2f2;
+                    width: 100%;
+                    min-width: 60px;
+                    height: 100%;
+                    min-height: 200px;
+                    font-size: 18px;
                     text-align: center;
 
                     .HP-container-new-project{
@@ -126,6 +154,7 @@
                         }
 
                         .HP-label-new-project{
+                            font-weight: bold;
                             font-size: small;
                         }
                     }
@@ -140,10 +169,9 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    box-shadow: rgb(51, 51, 51) 0px 0px 6px;
-    border: 1px solid #00000034;
+    box-shadow: rgb(174, 174, 174) 0px 0px 5px;
     border-radius: 8px;
-    background-color: var(--background-color);
+    background-color: #ffffff;
     padding: 16px;
     width: 30%;
     height: 20%;
@@ -181,13 +209,14 @@
     left: 50%;
     flex-direction: column;
     transform: translate(-50%, -50%);
-    box-shadow: rgb(51, 51, 51) 0px 0px 6px;
-    border: 1px solid #00000034;
+    box-shadow: rgb(174, 174, 174) 0px 0px 5px;
     border-radius: 8px;
-    background-color: var(--background-color);
+    background-color: #ffffff;
     padding: 16px;
-    width: 30%;
+    width: 20%;
+    max-width: 500px;
     height: 50%;
+    max-height: 350px;
 
     .HP-container-close-user-photo{
         display: flex;
@@ -203,13 +232,11 @@
         .HP-username-label{
             display: flex;
             justify-content: center;
-            background-color: violet;
         }
 
         .HP-welcome{
             display: flex;
             justify-content: center;
-            background-color: green;
         }
     }
 
@@ -222,23 +249,41 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: rgb(169, 78, 78);
             height: 85%;
 
             .HP-user-photo{
                 display: flex;
                 justify-content: center;
                 align-items: center;
+                cursor: pointer;
                 border-radius: 50%;
-                background-color: green;
-                
+                background-color: #f4f4f4;
+                width: 180px;
+                height: 180px;
+
+                .photo{
+                    border: 8px solid #e4e4e4;
+                    border-radius: 50%;
+                    background-color: #f4f4f4;
+                    padding: 18px;
+                    width: 60%;
+                    height: 60%;
+                }
+
+                .photoSelected{
+                    display: flex;
+                    border-radius: 50%;
+                    background-color: #f4f4f4;
+                    width: 90%;
+                    height: 90%;
+                }
+
             }
         }
 
         .HP-label-new-photo{
             display: flex;
             justify-content: center;
-            background-color: aqua;
         }
     }
 
@@ -269,3 +314,5 @@
     color: var(--action-button-selected-background-color);
     font-weight: bold;
 }
+
+
