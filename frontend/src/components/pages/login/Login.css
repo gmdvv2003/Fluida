@@ -129,21 +129,6 @@
 	text-decoration: underline;
 }
 
-.L-start-session-button {
-	border: none;
-	border-radius: var(--border-radius);
-	background-color: #fe8e04;
-	padding: 0px 10px;
-	width: 100%;
-	height: 60px;
-	color: white;
-	font-weight: bold;
-	font-size: 20px;
-}
-
-.L-start-session-button:hover {
-	cursor: pointer;
-}
 .L-google-icon-container,
 .L-left-email-icon-container,
 .L-left-password-icon-container,
