@@ -43,8 +43,28 @@ class ProjectsController extends Controller {
 		response.status(201).json({ message: "Projeto criado com sucesso.", successfullyCreated: true });
 	}
 
+	/**
+	 * Faz a exclusão do projeto pelo ID
+	 * 
+	 * @param {Request} request 
+	 * @param {Reponse} response 
+	 */
 	async deleteProjectAuthenticated(request, response) {
-		console.log("deleteProject");
+		
+		const { projectId } = request.params;
+		if(!projectId) {
+			return response.status(400).json({ message: "ID de projeto não informado." });
+		}
+
+		const projectExist = await this.getService().getProjectById(projectId);
+
+		if(!projectExist) {
+			return response.status(400).json({ message: "Não existe projeto para esse ID." });
+		}
+
+		await this.getService().deleteProject(projectId) 		
+			? response.status(200).json({ message: "Projeto deletado com sucesso" })
+			: response.status(400).json({ message: "Erro ao deletar o projeto" });
 	}
 
 	/**
