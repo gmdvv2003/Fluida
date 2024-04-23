@@ -6,7 +6,7 @@
 .TIF-text-input-field {
 	box-sizing: border-box;
 	border: #d1d1d1 1px solid;
-	border-radius: 4px;
+	border-radius: 8px;
 	background-color: transparent;
 	padding-top: 0.5rem;
 	padding-bottom: 0.5rem;
@@ -19,8 +19,4 @@
 
 .TIF-text-input-field:focus {
 	outline: none;
-}
-
-.TIF-text-input-field:hover {
-	border: #a1a1a1 1px solid;
 }

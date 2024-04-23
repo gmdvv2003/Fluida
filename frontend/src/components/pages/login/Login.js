@@ -12,6 +12,7 @@ import InputFieldError from "components/shared/login-registration/error/InputFie
 import Loading from "components/shared/loading/Loading";
 import PasswordField from "./input-types/PasswordField";
 import TextInputField from "components/shared/text-input-field/TextInputField";
+import ActionButton from "components/shared/action-button/ActionButton";
 import { useAuthentication } from "context/AuthenticationContext";
 
 function Login() {
@@ -27,6 +28,9 @@ function Login() {
 	const [waitingForValidation, setWaitingForValidation] = useState(true);
 	const [wrongCredentials, setWrongCredentials] = useState(false);
 	const [somethingWentWrong, setSomethingWentWrong] = useState(false);
+
+	const [emailFilled, setEmailFilled] = useState(false);
+	const [passwordFilled, setPasswordFilled] = useState(false);
 
 	const { login } = useAuthentication();
 
@@ -59,10 +63,12 @@ function Login() {
 
 	function handleOnEmailChange(event) {
 		setEnteredEmail(event.target.value);
+		setEmailFilled(event.target.value.length > 0);
 	}
 
 	function handleOnPasswordChange(event) {
 		setEnteredPassword(event.target.value);
+		setPasswordFilled(event.target.value.length > 0);
 	}
 
 	useEffect(() => {
@@ -144,13 +150,11 @@ function Login() {
 								</div>
 							) : (
 								<div className="L-start-session-button-container">
-									<button
-										onClick={handleOnLoginButton}
-										type="button"
-										className="L-start-session-button"
-									>
-										Iniciar sessão
-									</button>
+									<ActionButton
+										title="Iniciar sessão"
+										is_active={emailFilled && passwordFilled}
+										on_click={handleOnLoginButton}
+									/>
 
 									{somethingWentWrong ? (
 										<InputFieldError error="Algo de errado ocorreu enquanto seu login era processado." />

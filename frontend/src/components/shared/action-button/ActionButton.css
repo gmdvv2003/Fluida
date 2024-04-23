@@ -1,0 +1,24 @@
+.L-start-session-button {
+	border: none;
+	border-radius: var(--border-radius);
+	background-color: var(--action-button-background-color-inactive);
+	padding: 0px 10px;
+	width: 100%;
+	height: 60px;
+	color: white;
+	font-weight: bold;
+	font-size: 20px;
+}
+
+.active {
+	background-color: var(--action-button-background-color) !important;
+}
+
+.active:hover {
+	background-color: var(--action-button-selected-background-color) !important;
+	cursor: pointer;
+}
+
+.L-start-session-button:focus {
+	outline: none;
+}
