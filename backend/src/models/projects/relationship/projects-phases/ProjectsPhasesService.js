@@ -1,6 +1,6 @@
 const { InsertResult, DeleteResult } = require("typeorm");
 
-const { Page } = require("../../../../context/typeorm/decorators/pagination/Pagination");
+const { Page } = require("../../../../context/decorators/typeorm/pagination/Pagination");
 
 const Service = require("../../../__types/Service");
 

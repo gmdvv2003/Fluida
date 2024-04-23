@@ -5,7 +5,7 @@ const Repository = require("../../../__types/Repository");
 const ProjectsPhasesDTO = require("./ProjectsPhasesDTO");
 const ProjectsPhasesEntity = require("./ProjectsPhasesEntity");
 
-const { Paginate, Page } = require("../../../../context/typeorm/decorators/pagination/Pagination");
+const { Paginate, Page } = require("../../../../context/decorators/typeorm/pagination/Pagination");
 
 class ProjectsPhasesRepository extends Repository {
 	constructor(service) {

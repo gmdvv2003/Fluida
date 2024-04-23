@@ -4,7 +4,7 @@ const ProjectsDTO = require("./ProjectsDTO");
 const ProjectsEntity = require("./ProjectsEntity");
 
 const { Subscribe } = require("../../context/typeorm/subscriber/Subscriber");
-const { Validate } = require("../../context/typeorm/decorators/repository-input-validator/RepositoryInputValidator");
+const { Validate } = require("../../context/decorators/input-validator/InputValidator");
 
 const { InsertResult, DeleteResult } = require("typeorm");
 

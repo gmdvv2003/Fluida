@@ -1,3 +1,5 @@
+const { Socket, Namespace } = require("socket.io");
+
 class CardFunctionality {
 	constructor(_, inject) {
 		inject("IOCreateCard", this.#IOCreateCard);
@@ -6,6 +8,13 @@ class CardFunctionality {
 		inject("IOMoveCard", this.#IOMoveCard);
 	}
 
+	/**
+	 *
+	 * @param {Namespace} projectsIO
+	 * @param {Socket} socket
+	 * @param {Projec} project
+	 * @param {Object} data
+	 */
 	#IOCreateCard(projectsIO, socket, project, data) {}
 
 	#IODeleteCard(projectsIO, socket, project, data) {}

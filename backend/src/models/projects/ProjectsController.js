@@ -4,7 +4,7 @@ const ProjectInvitationComponent = require("./components/ProjectInvitationCompon
 
 const ProjectsService = require("./ProjectsService");
 
-const ProjectsFunctionalityInterface = require("./functionalities/projects/ProjectsFunctionalityInterface");
+const { ProjectsFunctionalityInterface } = require("./functionalities/projects/ProjectsFunctionalityInterface");
 
 class ProjectsController extends Controller {
 	#ProjectInvitationComponent;
