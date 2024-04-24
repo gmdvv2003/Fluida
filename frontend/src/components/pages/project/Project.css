@@ -5,6 +5,7 @@
 }
 
 .P-background {
+	overflow: auto;
 	position: relative;
 	width: calc(100vw - var(--cards-column-gap));
 	height: calc(100vh - var(--header-height));
@@ -48,4 +49,10 @@
 	width: var(--add-new-phase-button-scale);
 	height: var(--add-new-phase-button-scale);
 	transform: translate(-2px, -2px);
+}
+
+@media screen and (max-width: 600px) {
+	.P-background {
+		height: calc(100vh - 120px);
+	}
 }
