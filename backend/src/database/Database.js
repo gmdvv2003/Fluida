@@ -50,6 +50,7 @@ const Database = new DataSource({
 		// Relacionamentos das Fases
 		__dirname + "\\..\\models\\phases\\relationship\\phases-cards\\PhasesCardsEntity.js",
 
+		// (Não implementado ainda)
 		// Relacionamentos dos Cards
 		// __dirname + "\\..\\models\\cards\\relationship\\cards-comments\\CardsComments.js",
 
