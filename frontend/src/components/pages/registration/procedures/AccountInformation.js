@@ -5,6 +5,7 @@ import "./AccountInformation.css";
 
 import React, { useEffect, useRef, useState } from "react";
 
+import Background from "components/shared/login-registration/background/Background";
 import EmailInputTypeValidator from "utilities/inputs-validators/models/EmailInputTypeValidator";
 import InputFieldContainer from "../../../shared/text-input-field/InputFieldContainer";
 import InputFieldError from "components/shared/login-registration/error/InputFieldError";
@@ -20,15 +21,15 @@ const AccountInformation = React.forwardRef(
 		const lastNameFieldReference = useRef(null);
 		const phoneNumberReference = useRef(null);
 
-		const [enteredEmail, setEnteredEmail] = useState();
-		const [enteredFirstName, setEnteredFirstName] = useState();
-		const [enteredLastName, setEnteredLastName] = useState();
-		const [enteredPhoneNumber, setEnteredPhoneNumber] = useState();
+		const [enteredEmail, setEnteredEmail] = useState("");
+		const [enteredFirstName, setEnteredFirstName] = useState("");
+		const [enteredLastName, setEnteredLastName] = useState("");
+		const [enteredPhoneNumber, setEnteredPhoneNumber] = useState("");
 
-		const [invalidEmail, setInvalidEmail] = useState(true);
+		const [invalidEmail, setInvalidEmail] = useState(false);
 		const [invalidFirstName, setInvalidFirstName] = useState(true);
 		const [invalidLastName, setInvalidLastName] = useState(true);
-		const [invalidPhoneNumber, setInvalidPhoneNumber] = useState(true);
+		const [invalidPhoneNumber, setInvalidPhoneNumber] = useState(false);
 
 		const [hasInvalidFields, setHasInvalidFields] = useState(false);
 
@@ -51,13 +52,28 @@ const AccountInformation = React.forwardRef(
 		}
 
 		function handleOnPhoneNumberChange(event) {
-			setInvalidPhoneNumber(!PhoneNumberInputTypeValidator.validate(event.target.value));
+			const [isValid, formattedPhoneNumber] = PhoneNumberInputTypeValidator.validate(
+				event.target.value
+			);
+
+			setInvalidPhoneNumber(!isValid);
 			setEnteredPhoneNumber(event.target.value);
 			setHasInvalidFields(false);
+
+			phoneNumberReference.current.ref.current.value = formattedPhoneNumber;
 		}
 
 		function handleOnContinueButton() {
-			if (!invalidEmail && !invalidFirstName && !invalidLastName && !invalidPhoneNumber) {
+			if (
+				!invalidEmail &&
+				!invalidFirstName &&
+				!invalidLastName &&
+				!invalidPhoneNumber &&
+				enteredEmail.length > 0 &&
+				enteredFirstName.length > 0 &&
+				enteredLastName.length > 0 &&
+				enteredPhoneNumber.length > 0
+			) {
 				setState("email", enteredEmail);
 				setState("firstName", enteredFirstName);
 				setState("lastName", enteredLastName);
@@ -88,8 +104,9 @@ const AccountInformation = React.forwardRef(
 
 		return (
 			<div>
-				<div className="LR-C-forms-container-holder BG-fluida-background-waves-container">
-					<div className="LR-C-forms-container-holder BG-fluida-identity-fish-container">
+				<Background />
+				<div className="LR-C-forms-vertical-lock">
+					<div className="LR-C-forms-horizontal-lock">
 						<div className="LR-C-forms-container">
 							<div className="LR-C-forms" style={{ width: "80%" }}>
 								<div>
@@ -112,7 +129,9 @@ const AccountInformation = React.forwardRef(
 									</InputFieldContainer>
 								</div>
 
-								{invalidEmail && <InputFieldError error="Email inválido." />}
+								{invalidEmail && enteredEmail.length > 0 && (
+									<InputFieldError error="Email inválido." />
+								)}
 
 								<div>
 									<InputFieldContainer
@@ -134,7 +153,8 @@ const AccountInformation = React.forwardRef(
 									</InputFieldContainer>
 								</div>
 
-								{(invalidFirstName || invalidLastName) && (
+								{((invalidFirstName && enteredFirstName.length > 0) ||
+									(invalidLastName && enteredLastName.length > 0)) && (
 									<InputFieldError error="Nome inválido." />
 								)}
 
@@ -144,13 +164,13 @@ const AccountInformation = React.forwardRef(
 									</InputFieldContainer>
 								</div>
 
-								{invalidPhoneNumber && (
+								{invalidPhoneNumber && enteredPhoneNumber.length > 0 && (
 									<InputFieldError error="Número de telefone inválido." />
 								)}
 
 								<div style={{ width: "100%" }}>
 									{hasInvalidFields && (
-										<InputFieldError error="Todos os campos devem ser preenchidos corretamente." />
+										<InputFieldError error="Por favor, preencha todos os campos." />
 									)}
 									<div className="R-registration-button">
 										<button type="button" onClick={handleOnContinueButton}>

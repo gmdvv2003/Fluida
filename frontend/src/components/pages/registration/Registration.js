@@ -9,6 +9,7 @@ import PasswordCreation from "./procedures/PasswordCreation";
 import ActionFeedback from "components/shared/action-feedback/ActionFeedback";
 
 import { RegisterUserEndpoint } from "utilities/Endpoints";
+import Background from "components/shared/login-registration/background/Background";
 
 function Registration() {
 	const [currentProcedure, setCurrentProcedure] = useState(0);

@@ -151,8 +151,8 @@
 
 	.S-L-logo-container {
 		width: 100%;
-		height: 60px;
-		top: calc(75% - 30px);
+		height: 70px;
+		top: calc(85% - 30px);
 	}
 
 	.S-L-logo-container > img {

@@ -14,7 +14,7 @@ const PhoneNumberField = React.forwardRef(({}, ref) => {
 			</div>
 
 			<div className="R-PNF-phone-number-input-field">
-				<TextInputField ref={ref} placeholder="Número de telefone" />
+				<TextInputField ref={ref} placeholder="(99) 99999-9999" />
 			</div>
 		</div>
 	);
