@@ -1,5 +1,7 @@
 const Database = require("../../database/Database");
 
+const Service = require("./Service");
+
 const { Repository: TypeormRepository } = require("typeorm");
 
 class Repository extends TypeormRepository {
@@ -15,10 +17,16 @@ class Repository extends TypeormRepository {
 		this.#repository = repository;
 	}
 
+	/**
+	 * @returns {Service}
+	 */
 	get Service() {
 		return this.#service;
 	}
 
+	/**
+	 * @returns {TypeormRepository}
+	 */
 	get Repository() {
 		return this.#repository;
 	}

@@ -3,7 +3,7 @@ const Repository = require("../__types/Repository");
 const PhasesDTO = require("./PhasesDTO");
 const PhasesEntity = require("./PhasesEntity");
 
-const { Subscribe } = require("../../context/typeorm/subscriber/Subscriber");
+const { Subscribe } = require("../../context/decorators/typeorm/subscriber/Subscriber");
 const { InsertResult, DeleteResult } = require("typeorm");
 
 class PhasesRepository extends Repository {

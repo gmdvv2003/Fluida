@@ -29,8 +29,10 @@ class Endpoint {
 					method: method,
 					body: body,
 				})
-					.then((result) => result.json())
-					.then((result) => resolve({ success: true, data: result }))
+					.then(async (result) => {
+						const { ok, status } = result;
+						return resolve({ success: ok, status: status, data: await result.json() });
+					})
 					.catch((error) => resolve({ success: false, error: error }));
 			});
 		};

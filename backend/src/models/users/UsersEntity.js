@@ -47,14 +47,14 @@ module.exports = new EntitySchema({
 			length: 255,
 		},
 
-		// sessionToken VARCHAR(255)
-		sessionToken: { type: "varchar", length: 255, nullable: true },
+		// sessionToken TEXT
+		sessionToken: { type: "text", nullable: true },
 
-		// emailValidationToken VARCHAR(255)
-		emailValidationToken: { type: "varchar", length: 255, nullable: true },
+		// emailValidationToken TEXT
+		emailValidationToken: { type: "text", nullable: true },
 
-		// passwordResetToken VARCHAR(255)
-		passwordResetToken: { type: "varchar", length: 255, nullable: true },
+		// passwordResetToken TEXT
+		passwordResetToken: { type: "text", nullable: true },
 
 		// emailVerified BOOLEAN DEFAULT FALSE
 		emailVerified: { type: "boolean", default: false },

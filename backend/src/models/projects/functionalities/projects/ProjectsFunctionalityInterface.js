@@ -1,7 +1,7 @@
 // Type linting
 const UsersDTO = require("../../../users/UsersDTO");
 
-const { Socket, Namespace } = require("socket.io");
+const { Socket, Namespace, Server } = require("socket.io");
 
 const CardFunctionality = require("./modules/Card/CardFunctionality");
 const PhaseFunctionality = require("./modules/Phase/PhaseFunctionality");

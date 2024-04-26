@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 
 import { useProjectAuthentication } from "context/ProjectAuthenticationContext";
 
@@ -11,6 +11,9 @@ import Phase from "./templates/phase/Phase";
 import Card from "./templates/card/Card";
 
 import LazyLoader from "utilities/lazy-loader/LazyLoader";
+import Loading from "components/shared/loading/Loading";
+
+import { useAuthentication } from "context/AuthenticationContext";
 
 import "./Project.css";
 
@@ -49,6 +52,7 @@ class ProjectState {
 }
 
 function Project() {
+	const [waitingForProjectSocket, setWaitingForProjectSocket] = useState(true);
 	const [currentProjectSocket, setCurrentProjectSocket] = useState(null);
 
 	const { projectId, cardId } = useParams();
@@ -59,9 +63,13 @@ function Project() {
 	const phasesContainerRef = useRef(null);
 	const phasesContainerScrollBarRef = useRef(null);
 
+	const lazyLoaderTopOffsetRef = useRef(null);
+	const lazyLoaderBottomOffsetRef = useRef(null);
+
 	useEffect(() => {
-		const socket = null; // const { socket } = getProjectSession(projectId);
+		const socket = getProjectSession(projectId)?.socket;
 		setCurrentProjectSocket(socket);
+		setWaitingForProjectSocket(false);
 
 		if (!socket) {
 			return undefined;
@@ -70,50 +78,53 @@ function Project() {
 		const newProjectState = new ProjectState();
 		setProjectState(newProjectState);
 
-		// socket.on("disconnect", () => {
-		// 	setCurrentProjectSocket(null);
-		// });
+		socket.on("disconnect", () => {
+			setCurrentProjectSocket(null);
+		});
 
-		// const phaseCreated = (...data) => newProjectState.phaseCreated;
-		// const phaseUpdated = (...data) => newProjectState.phaseUpdated;
-		// const phaseDeleted = (...data) => newProjectState.phaseDeleted;
-		// const phaseMoved = (...data) => newProjectState.phaseMoved;
+		const phaseCreated = (...data) => newProjectState.phaseCreated;
+		const phaseUpdated = (...data) => newProjectState.phaseUpdated;
+		const phaseDeleted = (...data) => newProjectState.phaseDeleted;
+		const phaseMoved = (...data) => newProjectState.phaseMoved;
 
-		// const cardCreated = (...data) => newProjectState.cardCreated;
-		// const cardUpdated = (...data) => newProjectState.cardUpdated;
-		// const cardDeleted = (...data) => newProjectState.cardDeleted;
-		// const cardMoved = (...data) => newProjectState.cardMoved;
+		const cardCreated = (...data) => newProjectState.cardCreated;
+		const cardUpdated = (...data) => newProjectState.cardUpdated;
+		const cardDeleted = (...data) => newProjectState.cardDeleted;
+		const cardMoved = (...data) => newProjectState.cardMoved;
 
-		// socket.on("phaseCreated", (phaseDTO) => {});
-		// socket.on("phaseUpdated", (phaseId, updatedPhaseDTOFields) => {});
-		// socket.on("phaseDeleted", (phaseId) => {});
-		// socket.on("phaseMoved", (phaseId, targetPositionIndex) => {});
+		socket.on("phaseCreated", (phaseDTO) => {});
+		socket.on("phaseUpdated", (phaseId, updatedPhaseDTOFields) => {});
+		socket.on("phaseDeleted", (phaseId) => {});
+		socket.on("phaseMoved", (phaseId, targetPositionIndex) => {});
 
-		// socket.on("cardCreated", (cardDTO) => {});
-		// socket.on("cardUpdated", (cardId, updatedCardDTOFields) => {});
-		// socket.on("cardDeleted", (cardId) => {});
-		// socket.on("cardMoved", (cardId, targetPhaseIndex, targetPositionIndex) => {});
+		socket.on("cardCreated", (cardDTO) => {});
+		socket.on("cardUpdated", (cardId, updatedCardDTOFields) => {});
+		socket.on("cardDeleted", (cardId) => {});
+		socket.on("cardMoved", (cardId, targetPhaseIndex, targetPositionIndex) => {});
 
-		// return () => {
-		// 	socket.off("phaseCreated", phaseCreated);
-		// 	socket.off("phaseUpdated", phaseUpdated);
-		// 	socket.off("phaseDeleted", phaseDeleted);
-		// 	socket.off("phaseMoved", phaseMoved);
+		return () => {
+			socket.off("phaseCreated", phaseCreated);
+			socket.off("phaseUpdated", phaseUpdated);
+			socket.off("phaseDeleted", phaseDeleted);
+			socket.off("phaseMoved", phaseMoved);
 
-		// 	socket.off("cardCreated", cardCreated);
-		// 	socket.off("cardUpdated", cardUpdated);
-		// 	socket.off("cardDeleted", cardDeleted);
-		// 	socket.off("cardMoved", cardMoved);
+			socket.off("cardCreated", cardCreated);
+			socket.off("cardUpdated", cardUpdated);
+			socket.off("cardDeleted", cardDeleted);
+			socket.off("cardMoved", cardMoved);
 
-		// 	setCurrentProjectSocket(null);
-		// };
+			setCurrentProjectSocket(null);
+		};
 	}, [projectId, getProjectSession]);
 
-	useEffect(() => {}, [cardId]);
+	useEffect(() => {}, [cardId, getProjectSession]);
 
-	const x = [];
-	for (let i = 0; i < 1000; i++) {
-		x.push(<Phase cards={[]} />);
+	if (waitingForProjectSocket) {
+		return <Loading />;
+	}
+
+	if (!currentProjectSocket) {
+		return <Navigate to="/home" />;
 	}
 
 	return (
@@ -121,18 +132,7 @@ function Project() {
 			<HomeHeader />
 			<div className="P-background" ref={phasesContainerScrollBarRef}>
 				<div className="P-phases-container-holder">
-					<div className="P-phases-container" ref={phasesContainerRef}>
-						<LazyLoader
-							container={phasesContainerRef}
-							scrollBar={phasesContainerScrollBarRef}
-							direction="horizontal"
-							width={320}
-							margin={8}
-							padding={20}
-							getContent={() => x}
-						/>
-						{x.map((item) => item)}
-					</div>
+					<div className="P-phases-container" ref={phasesContainerRef}></div>
 
 					<div className="P-add-new-phase-button-container">
 						<button className="P-add-new-phase-button">

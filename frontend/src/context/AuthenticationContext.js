@@ -49,11 +49,7 @@ export function AuthenticationProvider({ children }) {
 		// Limpa a sessão do usuário
 		setCurrentUserSession(null);
 
-		return await performAuthenticatedRequest(
-			PerformLogoutEndpoint,
-			"POST",
-			JSON.stringify({ userId: currentUserSession.userId })
-		);
+		return await performAuthenticatedRequest(PerformLogoutEndpoint, "POST", JSON.stringify({ userId: currentUserSession.userId }));
 	}
 
 	/**
@@ -75,9 +71,7 @@ export function AuthenticationProvider({ children }) {
 	useEffect(() => {}, []);
 
 	return (
-		<AuthenticationContext.Provider
-			value={{ currentUserSession, login, logout, performAuthenticatedRequest }}
-		>
+		<AuthenticationContext.Provider value={{ currentUserSession, login, logout, performAuthenticatedRequest }}>
 			{!loadingUser && children}
 		</AuthenticationContext.Provider>
 	);

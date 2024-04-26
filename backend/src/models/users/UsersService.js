@@ -91,13 +91,13 @@ class UsersService extends Service {
 	 *
 	 * @param {string} email
 	 * @param {string} password
-	 * @returns {UsersDTO}
+	 * @returns {Object}
 	 */
 	async login(email, password) {
 		try {
 			const user = await this.#UsersRepository.login(new UsersDTO({ email, password }));
 			ACTIVE_SESSIONS.set(user.userId, user.sessionToken);
-			return { success: true };
+			return { success: true, sessionToken: user.sessionToken };
 		} catch (error) {
 			if (error instanceof UserNotFound || error instanceof WrongPassword) {
 				return { success: false, message: "Usuário ou senha incorretos." };

@@ -1,6 +1,6 @@
 const { Socket, Namespace } = require("socket.io");
 
-const { Validate } = require("../../../../context/decorators/input-validator/InputValidator");
+const { Validate } = require("../../../../../../context/decorators/input-validator/InputValidator");
 
 const PhasesDTO = require("../../../../../phases/PhasesDTO");
 

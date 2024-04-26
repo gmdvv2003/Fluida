@@ -1,5 +1,5 @@
-const Database = require("../../../database/Database");
-const Repository = require("../../../models/__types/Repository");
+const Database = require("../../../../database/Database");
+const Repository = require("../../../../models/__types/Repository");
 
 const { EventSubscriber } = require("typeorm");
 

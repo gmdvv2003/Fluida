@@ -86,7 +86,7 @@ class UsersController extends Controller {
 	async login(request, response) {
 		const { email, password } = request.body;
 
-		const result = this.getService().login(email, password);
+		const result = await this.getService().login(email, password);
 		if (!result.success) {
 			return response.status(400).json({ message: result.message });
 		}
@@ -105,7 +105,7 @@ class UsersController extends Controller {
 	async logoutAuthenticated(request, response) {
 		const { userId } = request.body;
 
-		const result = this.getService().logoutAuthenticated(userId);
+		const result = await this.getService().logoutAuthenticated(userId);
 		if (!result.success) {
 			return response.status(400).json({ message: result.message });
 		}

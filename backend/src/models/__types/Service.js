@@ -1,3 +1,5 @@
+const Controller = require("./Controller");
+
 class Service {
 	#controller;
 
@@ -5,10 +7,16 @@ class Service {
 		this.setController(controller);
 	}
 
+	/**
+	 * @param {Controller} controller
+	 */
 	setController(controller) {
 		this.#controller = controller;
 	}
 
+	/**
+	 * @returns {Controller}
+	 */
 	getController() {
 		return this.#controller;
 	}

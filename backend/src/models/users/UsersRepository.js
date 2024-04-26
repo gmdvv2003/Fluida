@@ -5,7 +5,7 @@ const Repository = require("../__types/Repository");
 const UsersDTO = require("./UsersDTO");
 const UsersEntity = require("./UsersEntity");
 
-const { Validate } = require("../../context/typeorm/decorators/repository-input-validator/RepositoryInputValidator");
+const { Validate } = require("../../context/decorators/input-validator/InputValidator");
 
 const { UserNotFound, WrongPassword, UserNotVerified, UserAlreadyLogged } = require("../../context/exceptions/users-repository/Exceptions");
 
@@ -60,26 +60,29 @@ class UsersRepository extends Repository {
 			throw new UserNotFound();
 		}
 
+		// Verifica se a senha está correta
 		if (user.password != usersDTO.password) {
 			throw new WrongPassword();
 		}
 
+		// Verifica se o email do usuário foi verificado
 		if (!user.emailVerified) {
 			throw new UserNotVerified();
 		}
 
+		// Verifica se o usuário já está logado
 		if (user.sessionToken != undefined) {
 			throw new UserAlreadyLogged();
 		}
 
 		const session = Session.newSession(user);
-		console.log(`Nova sessão criada para o email: ${email} JWT: ${session}`);
+		console.log(`Nova sessão criada para o email: ${user.email} JWT: ${session}`);
 
-		await this.Repository.createQueryBuilder("Users")
-			.update()
-			.set({ sessionToken: session })
-			.where(`userId = :userId`, usersDTO)
-			.execute();
+		// Atualiza o token de sessão do usuário no banco de dados
+		await this.Repository.createQueryBuilder("Users").update().set({ sessionToken: session }).where(`userId = :userId`, user).execute();
+
+		// Atualiza o token de sessão do usuário no objeto
+		user.sessionToken = session;
 
 		return user;
 	}
