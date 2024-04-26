@@ -1,3 +1,5 @@
+const DEFAULT_PAGE_SIZE = 10;
+
 class Page {
 	constructor({ taken, total, page, pageSize, hasNextPage, retrieveNextPage }) {
 		this.taken = taken;
@@ -27,7 +29,7 @@ class Page {
 function Paginate({ GROUP_BY }) {
 	return (handler, descriptor) =>
 		async function (options, data) {
-			let { PAGE, PAGE_SIZE } = options || { PAGE: 1, PAGE_SIZE: 10 };
+			let { PAGE, PAGE_SIZE } = options || { PAGE: 1, PAGE_SIZE: DEFAULT_PAGE_SIZE };
 
 			PAGE = PAGE || 1;
 			PAGE_SIZE = PAGE_SIZE || 10;
@@ -66,4 +68,4 @@ function Paginate({ GROUP_BY }) {
 		};
 }
 
-module.exports = { Page, Paginate };
+module.exports = { Page, Paginate, DEFAULT_PAGE_SIZE };

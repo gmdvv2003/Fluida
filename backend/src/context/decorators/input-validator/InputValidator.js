@@ -3,9 +3,9 @@ const {
 	NameInputTypeValidator,
 	PasswordTypeValidator,
 	PhoneNumberTypeValidator,
-} = require("../../../../utilities/inputs-validators/InputValidator");
+} = require("../../../utilities/inputs-validators/InputValidator");
 
-const { InvalidInputParameter } = require("../../../exceptions/repository-input-validator/Exceptions");
+const { InvalidInputParameter } = require("../../exceptions/repository-input-validator/Exceptions");
 
 const INPUT_TYPES_VALIDATORS_MAP = {
 	// Validadors de tipos de entrada complexos

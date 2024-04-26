@@ -25,18 +25,6 @@ module.exports = new EntitySchema({
 			type: "varchar",
 			length: 100,
 		},
-
-		// is_final_phase BIT DEFAULT 0
-		isFinalPhase: {
-			default: false,
-			type: "bit",
-		},
-
-		// can_create_cards BIT DEFAULT 1
-		canCreateCards: {
-			default: false,
-			type: "bit",
-		},
 	},
 
 	relations: {

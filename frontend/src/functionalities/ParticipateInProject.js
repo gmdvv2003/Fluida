@@ -6,7 +6,7 @@ import { useProjectAuthentication } from "context/ProjectAuthenticationContext";
 import Loading from "components/shared/loading/Loading";
 
 function ParticipateInProject({ children }) {
-	const [waitingForParticipation, setWaitingForParticipation] = useState(true);
+	const [waitingForParticipation, setWaitingForParticipation] = useState(false);
 	const [navigateToHome, setNavigateToHome] = useState(false);
 
 	const { projectId } = useParams();

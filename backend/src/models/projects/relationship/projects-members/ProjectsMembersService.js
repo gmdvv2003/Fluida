@@ -1,4 +1,4 @@
-const { Page } = require("../../../../context/typeorm/decorators/pagination/Pagination");
+const { Page } = require("../../../../context/decorators/typeorm/pagination/Pagination");
 
 const Service = require("../../../__types/Service");
 
@@ -26,6 +26,7 @@ class ProjectMembersService extends Service {
 	/**
 	 * Retorna os projetos de um usuário.
 	 *
+	 * @param {Object} pageOptions { PAGE: number, PAGE_SIZE: number }
 	 * @param {number} userId
 	 * @returns {Page}
 	 */

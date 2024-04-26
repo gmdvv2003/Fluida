@@ -1,8 +1,7 @@
 // Type linting
-const UserEntity = require("../../../users/UsersEntity");
-const { Socket, Namespace } = require("socket.io");
+const UsersDTO = require("../../../users/UsersDTO");
 
-const { jwt } = require("jsonwebtoken");
+const { Socket, Namespace } = require("socket.io");
 
 const CardFunctionality = require("./modules/Card/CardFunctionality");
 const PhaseFunctionality = require("./modules/Phase/PhaseFunctionality");
@@ -11,6 +10,11 @@ const ChatFunctionality = require("./modules/Chat/ChatFunctionality");
 const ProjectFunctionality = require("./modules/Project/ProjectFunctionality");
 
 const Session = require("../../../../context/session/Session");
+
+const CardsDTO = require("../../../cards/CardsDTO");
+const PhasesDTO = require("../../../phases/PhasesDTO");
+
+const { DEFAULT_PAGE_SIZE } = require("../../../../context/decorators/typeorm/pagination/Pagination");
 
 /**
  * Injeta funcionalidades no projeto.
@@ -35,13 +39,57 @@ class Participant {
 }
 
 class Project {
-	#projectId;
+	projectId;
 
 	#cards = [];
 	#phases = [];
 
 	constructor(projectId) {
-		this.#projectId = projectId;
+		this.projectId = projectId;
+	}
+
+	/**
+	 * @param {number} page
+	 * @returns {Array}
+	 */
+	getCards(page) {
+		return this.#cards.slice((page - 1) * DEFAULT_PAGE_SIZE, page * DEFAULT_PAGE_SIZE);
+	}
+
+	/**
+	 * @param {number} page
+	 * @returns {Array}
+	 */
+	getPhases(page) {
+		return this.#phases.slice((page - 1) * DEFAULT_PAGE_SIZE, page * DEFAULT_PAGE_SIZE);
+	}
+
+	/**
+	 * @param {CardsDTO} cardDTO
+	 */
+	addCard(cardDTO) {
+		this.#cards.push(cardDTO);
+	}
+
+	/**
+	 * @param {number} caseId
+	 */
+	removeCard(caseId) {
+		this.#cards = this.#cards.filter((card) => card.cardId !== cardId);
+	}
+
+	/**
+	 * @param {PhasesDTO} phaseDTO
+	 */
+	addPhase(phaseDTO) {
+		this.#phases.push(phaseDTO);
+	}
+
+	/**
+	 * @param {number} phaseId
+	 */
+	removePhase(phaseId) {
+		this.#phases = this.#phases.filter((phase) => phase.phaseId !== phaseId);
 	}
 }
 
@@ -92,7 +140,11 @@ class ProjectsFunctionalityInterface {
 				return socket.emit("error", { message: "Você não é membro deste projeto." });
 			}
 
-			next(projectsIO, socket, project, data);
+			try {
+				next(projectsIO, socket, project, data);
+			} catch (error) {
+				socket.emit("error", { message: error.message });
+			}
 		};
 	}
 
@@ -109,7 +161,7 @@ class ProjectsFunctionalityInterface {
 	/**
 	 * Adiciona um usuário como participante de um projeto, criando também um token de participação.
 	 *
-	 * @param {UserEntity} user
+	 * @param {UsersDTO} user
 	 * @param {int} projectId
 	 * @returns {[boolean, string]}
 	 */
@@ -179,9 +231,9 @@ class ProjectsFunctionalityInterface {
 	 * @param {Namespace} projectsIO
 	 * @param {Socket} socket
 	 * @param {Project} project
-	 * @param {*} data
+	 * @param {Object} data
 	 */
 	IOUnsubscribeFromProject(projectsIO, socket, project, data) {}
 }
 
-module.exports = ProjectsFunctionalityInterface;
+module.exports = { Participant, Project, ProjectsFunctionalityInterface };
