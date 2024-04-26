@@ -25,7 +25,7 @@ function Login() {
 	const [invalidEmail, setInvalidEmail] = useState(false);
 	const [invalidPassword, setInvalidPassword] = useState(false);
 
-	const [waitingForValidation, setWaitingForValidation] = useState(true);
+	const [waitingForValidation, setWaitingForValidation] = useState(false);
 	const [wrongCredentials, setWrongCredentials] = useState(false);
 	const [somethingWentWrong, setSomethingWentWrong] = useState(false);
 
