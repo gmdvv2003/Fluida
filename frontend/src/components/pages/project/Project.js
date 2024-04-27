@@ -52,7 +52,6 @@ class ProjectState {
 }
 
 function Project() {
-	const [waitingForProjectSocket, setWaitingForProjectSocket] = useState(true);
 	const [currentProjectSocket, setCurrentProjectSocket] = useState(null);
 
 	const { projectId, cardId } = useParams();
@@ -69,7 +68,6 @@ function Project() {
 	useEffect(() => {
 		const socket = getProjectSession(projectId)?.socket;
 		setCurrentProjectSocket(socket);
-		setWaitingForProjectSocket(false);
 
 		if (!socket) {
 			return undefined;
@@ -118,14 +116,6 @@ function Project() {
 	}, [projectId, getProjectSession]);
 
 	useEffect(() => {}, [cardId, getProjectSession]);
-
-	if (waitingForProjectSocket) {
-		return <Loading />;
-	}
-
-	if (!currentProjectSocket) {
-		return <Navigate to="/home" />;
-	}
 
 	return (
 		<div style={{ overflowX: "hidden" }}>

@@ -4,7 +4,9 @@ const ProjectInvitationComponent = require("./components/ProjectInvitationCompon
 
 const ProjectsService = require("./ProjectsService");
 
-const { ProjectsFunctionalityInterface } = require("./functionalities/projects/ProjectsFunctionalityInterface");
+const {
+	ProjectsFunctionalityInterface,
+} = require("./functionalities/projects/ProjectsFunctionalityInterface");
 
 class ProjectsController extends Controller {
 	#ProjectInvitationComponent;
@@ -32,7 +34,9 @@ class ProjectsController extends Controller {
 	async createProjectAuthenticated(request, response) {
 		const { userId, projectName } = request.body;
 		if (!userId || !projectName) {
-			return response.status(400).json({ message: "Usuário ou nome do projeto não informado." });
+			return response
+				.status(400)
+				.json({ message: "Usuário ou nome do projeto não informado." });
 		}
 
 		const result = this.getService().createProjectAuthenticated(userId, projectName);
@@ -40,29 +44,29 @@ class ProjectsController extends Controller {
 			return response.status(400).json({ message: result.message });
 		}
 
-		response.status(201).json({ message: "Projeto criado com sucesso.", successfullyCreated: true });
+		response
+			.status(201)
+			.json({ message: "Projeto criado com sucesso.", successfullyCreated: true });
 	}
 
 	/**
 	 * Faz a exclusão do projeto pelo ID
-	 * 
-	 * @param {Request} request 
-	 * @param {Reponse} response 
+	 *
+	 * @param {Request} request
+	 * @param {Reponse} response
 	 */
 	async deleteProjectAuthenticated(request, response) {
-		
 		const { projectId } = request.params;
-		if(!projectId) {
+		if (!projectId) {
 			return response.status(400).json({ message: "ID de projeto não informado." });
 		}
 
 		const projectExist = await this.getService().getProjectById(projectId);
-
-		if(!projectExist) {
+		if (!projectExist) {
 			return response.status(400).json({ message: "Não existe projeto para esse ID." });
 		}
 
-		await this.getService().deleteProject(projectId) 		
+		(await this.getService().deleteProject(projectId))
 			? response.status(200).json({ message: "Projeto deletado com sucesso" })
 			: response.status(400).json({ message: "Erro ao deletar o projeto" });
 	}
@@ -80,18 +84,24 @@ class ProjectsController extends Controller {
 		}
 
 		// Verifica se o usuário está no projeto
-		const isInProject = this.ProjectMembersService.isUserMemberOfProject(userId, projectId);
+		const isInProject = this.getService().ProjectsMembersService.isUserMemberOfProject(
+			userId,
+			projectId
+		);
 		if (!isInProject) {
 			return response.status(400).json({ message: "Usuário não está no projeto." });
 		}
 
 		// Tenta adicionar o usuário ao projeto e obtem o token de participação
-		const [wasAdded, participationToken] = this.ProjectsFunctionalityInterface.addParticipant(userId, projectId);
+		const [wasAdded, participationToken] = this.ProjectsFunctionalityInterface.addParticipant(
+			userId,
+			projectId
+		);
 		if (!wasAdded) {
 			return response.status(400).json({ message: "Erro ao adicionar usuário ao projeto." });
 		}
 
-		response.json(202).json({
+		response.status(202).json({
 			message: "Participação para o projeto preparada com sucesso.",
 			wasAdded: true,
 			participationToken: participationToken,
@@ -110,13 +120,18 @@ class ProjectsController extends Controller {
 			return response.status(400).json({ message: "Usuário ou projeto não informado." });
 		}
 
-		const result = this.#ProjectInvitationComponent.sendProjectEmailInvitation(userIdToInvite, projectId);
+		const result = this.#ProjectInvitationComponent.sendProjectEmailInvitation(
+			userIdToInvite,
+			projectId
+		);
 
 		if (!result.success) {
 			return response.status(400).json({ message: result.message });
 		}
 
-		response.status(201).json({ message: "Convite enviado com sucesso.", successfullyInvited: true });
+		response
+			.status(201)
+			.json({ message: "Convite enviado com sucesso.", successfullyInvited: true });
 	}
 
 	// ==================================== Métodos Intermediários ==================================== //
@@ -140,7 +155,9 @@ class ProjectsController extends Controller {
 
 			response.status(200).json({ message: "Token validado com sucesso." });
 		} catch (error) {
-			return response.status(400).json({ message: `Falha ao validar convite. Erro: ${error}` });
+			return response
+				.status(400)
+				.json({ message: `Falha ao validar convite. Erro: ${error}` });
 		}
 	}
 }

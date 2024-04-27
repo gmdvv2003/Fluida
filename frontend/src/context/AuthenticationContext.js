@@ -9,7 +9,7 @@ export function useAuthentication() {
 }
 
 export function AuthenticationProvider({ children }) {
-	const [currentUserSession, setCurrentUserSession] = useState(null);
+	const [currentUserSession, setCurrentUserSession] = useState();
 	const [loadingUser, setLoadingUser] = useState(false);
 
 	/**
@@ -49,7 +49,11 @@ export function AuthenticationProvider({ children }) {
 		// Limpa a sessão do usuário
 		setCurrentUserSession(null);
 
-		return await performAuthenticatedRequest(PerformLogoutEndpoint, "POST", JSON.stringify({ userId: currentUserSession.userId }));
+		return await performAuthenticatedRequest(
+			PerformLogoutEndpoint,
+			"POST",
+			JSON.stringify({ userId: currentUserSession.userId })
+		);
 	}
 
 	/**
@@ -65,13 +69,15 @@ export function AuthenticationProvider({ children }) {
 			return { success: false };
 		}
 
-		return await endpoint(method, body, { Authentication: currentUserSession.session });
+		return await endpoint(method, body, { Authorization: currentUserSession.session });
 	}
 
 	useEffect(() => {}, []);
 
 	return (
-		<AuthenticationContext.Provider value={{ currentUserSession, login, logout, performAuthenticatedRequest }}>
+		<AuthenticationContext.Provider
+			value={{ currentUserSession, login, logout, performAuthenticatedRequest }}
+		>
 			{!loadingUser && children}
 		</AuthenticationContext.Provider>
 	);

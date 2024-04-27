@@ -39,17 +39,8 @@ class Session {
 				return [false, null];
 			}
 
-			if (decoded.iss !== ISSUER || !AUDIENCE.includes(decoded.aud)) {
-				return [false, null];
-			}
-
-			// Verifica se o token expirou
-			if (decoded.exp < Date.now()) {
-				return [false, null];
-			}
-
 			// Verifica se o token decoded é o esperado
-			if (!expectedToken || decoded.jti !== expectedToken) {
+			if (expectedToken !== null && token !== expectedToken) {
 				return [false, null];
 			}
 

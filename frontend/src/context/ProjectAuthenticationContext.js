@@ -52,29 +52,34 @@ export function ProjectAuthenticationProvider({ children }) {
 			}
 
 			// Verifica se o usuário já está participando do projeto
-			if (isParticipating(projectId) !== -1) {
+			if (isParticipating(projectId) !== undefined) {
 				return resolve({ success: false });
 			}
 
 			// Realiza a requisição para participar do projeto
-			const response = await performAuthenticatedRequest(ParticipateInProjectEndpoint, "POST", JSON.stringify({ projectId }));
+			const response = await performAuthenticatedRequest(
+				ParticipateInProjectEndpoint,
+				"POST",
+				JSON.stringify({ projectId })
+			);
 			if (response.success) {
-				const { participationToken } = response.data;
-
 				// Cria uma nova instância do socket com o token de participação
 				const socket = io(ProjectsSocketEndpoint, {
 					auth: {
-						sessionToken: currentUserSession,
-						socketToken: participationToken,
+						sessionToken: currentUserSession?.session,
+						socketToken: response.data?.participationToken,
 					},
-				}).of(`/${projectId}`);
+				});
 
 				// Evento que roda quando ocorre um erro na conexão
 				socket.on("connect_error", (error) => {
 					let rejectPromise = false;
 
 					switch (error.message) {
-						case ("io server disconnect", "io client disconnect", "ping timeout", "transport error"):
+						case ("io server disconnect",
+						"io client disconnect",
+						"ping timeout",
+						"transport error"):
 							rejectPromise = true;
 							break;
 
@@ -101,6 +106,20 @@ export function ProjectAuthenticationProvider({ children }) {
 
 				// Evento que roda quando a conexão é estabelecida
 				socket.on("connect", () => {
+					socket.emit("subscribeToProject", { projectId });
+				});
+
+				// Evento que roda quando a conexão é encerrada
+				socket.on("disconnect", () => {
+					setAuthenticatedProjectsSessions(
+						authenticatedProjectsSessions.filter(
+							(session) => session.projectId !== projectId
+						)
+					);
+				});
+
+				// Evento que roda quando o usuário se inscreve no projeto
+				socket.on("subscribedToProject", () => {
 					setAuthenticatedProjectsSessions([
 						...authenticatedProjectsSessions,
 						{
@@ -108,20 +127,10 @@ export function ProjectAuthenticationProvider({ children }) {
 							socket: socket,
 						},
 					]);
-				});
 
-				// Evento que roda quando a conexão é encerrada
-				socket.on("disconnect", () => {
-					setAuthenticatedProjectsSessions(authenticatedProjectsSessions.filter((session) => session.projectId !== projectId));
-				});
-
-				// Evento que roda quando o usuário se inscreve no projeto
-				socket.on("subscribedToProject", () => {
 					resolve({ success: true });
 				});
 			}
-
-			return resolve({ success: false });
 		});
 	}
 

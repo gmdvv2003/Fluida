@@ -14,7 +14,9 @@ const Session = require("../../../../context/session/Session");
 const CardsDTO = require("../../../cards/CardsDTO");
 const PhasesDTO = require("../../../phases/PhasesDTO");
 
-const { DEFAULT_PAGE_SIZE } = require("../../../../context/decorators/typeorm/pagination/Pagination");
+const {
+	DEFAULT_PAGE_SIZE,
+} = require("../../../../context/decorators/typeorm/pagination/Pagination");
 
 /**
  * Injeta funcionalidades no projeto.
@@ -22,8 +24,8 @@ const { DEFAULT_PAGE_SIZE } = require("../../../../context/decorators/typeorm/pa
  * @param {string} name
  * @param {Function} next
  */
-function injectFunctionality(name, next) {
-	this.injectProjectFunctionality(name, next);
+function injectFunctionality(name, next, authenticateless) {
+	this.injectProjectFunctionality(name, next, authenticateless);
 }
 
 class Participant {
@@ -36,6 +38,14 @@ class Participant {
 		this.#user = user;
 		this.#socketToken = socketToken;
 	}
+
+	get user() {
+		return this.#user;
+	}
+
+	get socketToken() {
+		return this.#socketToken;
+	}
 }
 
 class Project {
@@ -43,6 +53,8 @@ class Project {
 
 	#cards = [];
 	#phases = [];
+
+	members = [];
 
 	constructor(projectId) {
 		this.projectId = projectId;
@@ -107,8 +119,8 @@ class ProjectsFunctionalityInterface {
 		new ChatFunctionality(this, inject);
 		new ProjectFunctionality(this, inject);
 
-		inject("IOSubscribeToProject", this.IOSubscribeToProject);
-		inject("IOUnsubscribeFromProject", this.IOUnsubscribeFromProject);
+		inject("IOSubscribeToProject", this.IOSubscribeToProject, true);
+		inject("IOUnsubscribeFromProject", this.IOUnsubscribeFromProject, true);
 
 		this.ProjectsController = ProjectsController;
 	}
@@ -134,7 +146,9 @@ class ProjectsFunctionalityInterface {
 			// Verifica se o usuário é membro do projeto
 			const isValidProjectMember = project.members.some((member) => {
 				// Procura por um usuário que tenha o mesmo token de socket e que esteja inscrito no projeto
-				return member.socketToken === socket.handshake.auth.socketToken && member.subscribed;
+				return (
+					member.socketToken === socket.handshake.auth.socketToken && member.subscribed
+				);
 			});
 			if (!isValidProjectMember) {
 				return socket.emit("error", { message: "Você não é membro deste projeto." });
@@ -154,8 +168,10 @@ class ProjectsFunctionalityInterface {
 	 * @param {string} name
 	 * @param {Function} next
 	 */
-	injectProjectFunctionality(name, next) {
-		this[name] = this.socketToProjectRedirector(next.bind(this));
+	injectProjectFunctionality(name, next, authenticateless = false) {
+		this[name] = authenticateless
+			? next.bind(this)
+			: this.socketToProjectRedirector(next.bind(this));
 	}
 
 	/**
@@ -166,11 +182,12 @@ class ProjectsFunctionalityInterface {
 	 * @returns {[boolean, string]}
 	 */
 	addParticipant(user, projectId) {
-		// Verifica se o projeto existe
-		const project = this.#projects[projectId];
-		if (!project) {
-			return [false, null];
+		// "Cria" o projeto se ele não existir
+		if (!this.#projects[projectId]) {
+			this.#projects[projectId] = new Project(projectId);
 		}
+
+		const project = this.#projects[projectId];
 
 		// Verifica se o usuário já é membro do projeto
 		if (project.members.includes(user)) {
@@ -183,7 +200,8 @@ class ProjectsFunctionalityInterface {
 				userId: user.userId,
 				projectId: projectId,
 			},
-			{ expiresIn: null }
+			// O ano é 12023, o token expirou e agora a civilização está apuros...
+			{ expiresIn: "9999 years" }
 		);
 
 		// Adiciona o usuário ao projeto (mas ainda sem autorização de participação)
@@ -202,7 +220,15 @@ class ProjectsFunctionalityInterface {
 	 * @param {Project} project
 	 * @param {*} data
 	 */
-	IOSubscribeToProject(projectsIO, socket, project, data) {
+	IOSubscribeToProject(projectsIO, socket, data) {
+		// Verifica se o projeto existe
+		const project = this.#projects[data.projectId];
+		if (!project) {
+			return socket.emit("error", { message: "Projeto não encontrado." });
+		}
+
+		const { socketToken } = socket.handshake.auth;
+
 		// Realiza a validação para obter o userId
 		const [_, { userId }] = Session.validate(socketToken);
 
@@ -233,7 +259,7 @@ class ProjectsFunctionalityInterface {
 	 * @param {Project} project
 	 * @param {Object} data
 	 */
-	IOUnsubscribeFromProject(projectsIO, socket, project, data) {}
+	IOUnsubscribeFromProject(projectsIO, socket, data) {}
 }
 
 module.exports = { Participant, Project, ProjectsFunctionalityInterface };

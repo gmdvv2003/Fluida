@@ -61,11 +61,12 @@ module.exports = function (app, io, projectsController) {
 	projectsIO.on("connection", (socket) => {
 		// Função utilitária para linkar os métodos do controller com os eventos do socket
 		function linkToMethod(method) {
-			return (data) => projectsController[method](projectsIO, socket, data);
+			return (data) =>
+				projectsController.ProjectsFunctionalityInterface[method](projectsIO, socket, data);
 		}
 
-		socket.on("subscribeToProject", linkToMethod("subscribeToProject"));
-		socket.on("unsubscribeFromProject", linkToMethod("unsubscribeFromProject"));
+		socket.on("subscribeToProject", linkToMethod("IOSubscribeToProject"));
+		socket.on("unsubscribeFromProject", linkToMethod("IOUnsubscribeFromProject"));
 
 		// Rotas de manipulação de cards
 		socket.on("createCard", linkToMethod("IOCreateCard"));

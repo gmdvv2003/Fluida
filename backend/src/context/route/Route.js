@@ -39,19 +39,19 @@ class Route {
 			const [validated, decoded] = Session.validate(authorization);
 			if (validated) {
 				// Verifica se o token é válido
-				if (!sessionValidator(decoded)) {
+				if (!sessionValidator(authorization, decoded)) {
 					return response.status(401).json({ message: "Sessão inválida." });
 				}
 
 				decoder.forEach((decode) => {
 					try {
-						request[decode] = decoded[decode];
+						request.body[decode] = decoded[decode];
 					} catch (error) {
 						console.error(`Falha ao inserir ${decode} no request. Erro: ${error}`);
 					}
 				});
 
-				await next(request, response);
+				return await next(request, response);
 			}
 
 			return response.status(401).json({ message: "Falha ao autenticar token." });

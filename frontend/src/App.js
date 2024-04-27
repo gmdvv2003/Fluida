@@ -41,9 +41,9 @@ function App() {
 							path="/project/:projectId/:cardId?"
 							element={
 								// <PrivateRoute>
-								// <ParticipateInProject>
-								<Project />
-								// </ParticipateInProject>
+								<ParticipateInProject>
+									<Project />
+								</ParticipateInProject>
 								// </PrivateRoute>
 							}
 						/>

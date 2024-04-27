@@ -6,7 +6,7 @@ import { useProjectAuthentication } from "context/ProjectAuthenticationContext";
 import Loading from "components/shared/loading/Loading";
 
 function ParticipateInProject({ children }) {
-	const [waitingForParticipation, setWaitingForParticipation] = useState(false);
+	const [waitingForParticipation, setWaitingForParticipation] = useState(true);
 	const [navigateToHome, setNavigateToHome] = useState(false);
 
 	const { projectId } = useParams();
@@ -29,7 +29,7 @@ function ParticipateInProject({ children }) {
 	} else if (navigateToHome) {
 		return <Navigate to="/home" />;
 	} else {
-		return { children };
+		return children;
 	}
 }
 

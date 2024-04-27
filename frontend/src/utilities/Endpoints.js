@@ -39,6 +39,16 @@ class Endpoint {
 	}
 }
 
+class FunctionlessEndpoint {
+	static new(path, options = []) {
+		return url.format({
+			...OPTIONS,
+			...options,
+			pathname: path,
+		});
+	}
+}
+
 // Login & Logout
 export const PerformLoginEndpoint = Endpoint.new("/users/login");
 export const PerformLogoutEndpoint = Endpoint.new("/users/logout");
@@ -57,4 +67,4 @@ export const RegisterUserEndpoint = Endpoint.new("/users/register");
 export const ParticipateInProjectEndpoint = Endpoint.new("/projects/participate");
 
 // Projects Socket Endpoint
-export const ProjectsSocketEndpoint = Endpoint.new("/projects");
+export const ProjectsSocketEndpoint = FunctionlessEndpoint.new("/projects");
