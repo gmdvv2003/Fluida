@@ -12,7 +12,8 @@ class PhasesRepository extends Repository {
 	 * Trigger que adiciona a fase ao projeto.
 	 */
 	async afterInsert_addPhaseToProjectPhases({ entity }) {
-		await this.Service.ProjectsPhasesService.addPhaseToProjectPhases(entity.phaseId, entity.projectId);
+		const { ProjectsPhasesService } = this.Service.Controller.Service;
+		await ProjectsPhasesService.addPhaseToProjectPhases(entity.phaseId, entity.projectId);
 	}
 
 	constructor(service) {
@@ -27,7 +28,9 @@ class PhasesRepository extends Repository {
 	 * @returns {PhasesDTO}
 	 */
 	async getPhaseById(phaseId) {
-		return await this.Repository.createQueryBuilder("Phases").where(`phaseId = :phaseId`, { phaseId }).getOne();
+		return await this.Repository.createQueryBuilder("Phases")
+			.where(`phaseId = :phaseId`, { phaseId })
+			.getOne();
 	}
 
 	/**
@@ -37,7 +40,11 @@ class PhasesRepository extends Repository {
 	 * @returns {InsertResult}
 	 */
 	async createPhase(phasesDTO) {
-		return await this.Repository.createQueryBuilder("Phases").insert().into("Phases").values(phasesDTO).execute();
+		return await this.Repository.createQueryBuilder("Phases")
+			.insert()
+			.into("Phases")
+			.values(phasesDTO)
+			.execute();
 	}
 
 	/**
@@ -47,7 +54,11 @@ class PhasesRepository extends Repository {
 	 * @returns {DeleteResult}
 	 */
 	async deletePhase(phasesDTO) {
-		return await this.Repository.createQueryBuilder("Phases").delete().from("Phases").where(`phaseId = :phaseId`, phasesDTO).execute();
+		return await this.Repository.createQueryBuilder("Phases")
+			.delete()
+			.from("Phases")
+			.where(`phaseId = :phaseId`, phasesDTO)
+			.execute();
 	}
 }
 

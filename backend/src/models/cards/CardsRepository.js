@@ -12,7 +12,10 @@ class CardsRepository extends Repository {
 	 * Trigger que adiciona o cartão à fase.
 	 */
 	async afterInsert_addCardToPhasesCards({ entity }) {
-		await this.Service.PhasesService.PhasesCardsService.addPhaseToProjectPhases(entity.phaseId, entity.projectId);
+		await this.Service.Service.PhasesService.PhasesCardsService.addPhaseToProjectPhases(
+			entity.phaseId,
+			entity.projectId
+		);
 	}
 
 	constructor(service) {
@@ -27,7 +30,9 @@ class CardsRepository extends Repository {
 	 * @returns {CardsDTO}
 	 */
 	async getCardById(cardId) {
-		return await this.Repository.createQueryBuilder("Cards").where(`cardId = :cardId`, { cardId }).getOne();
+		return await this.Repository.createQueryBuilder("Cards")
+			.where(`cardId = :cardId`, { cardId })
+			.getOne();
 	}
 
 	/**
@@ -37,7 +42,11 @@ class CardsRepository extends Repository {
 	 * @returns {InsertResult}
 	 */
 	async createCard(cardsDTO) {
-		return await this.Repository.createQueryBuilder("Cards").insert().into("Cards").values(cardsDTO).execute();
+		return await this.Repository.createQueryBuilder("Cards")
+			.insert()
+			.into("Cards")
+			.values(cardsDTO)
+			.execute();
 	}
 
 	/**
@@ -47,7 +56,11 @@ class CardsRepository extends Repository {
 	 * @returns {DeleteResult}
 	 */
 	async deleteCard(cardsDTO) {
-		return await this.Repository.createQueryBuilder("Cards").delete().from("Cards").where(`cardId = :cardId`, cardsDTO).execute();
+		return await this.Repository.createQueryBuilder("Cards")
+			.delete()
+			.from("Cards")
+			.where(`cardId = :cardId`, cardsDTO)
+			.execute();
 	}
 }
 

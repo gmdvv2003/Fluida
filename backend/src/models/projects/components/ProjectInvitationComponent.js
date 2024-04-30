@@ -3,10 +3,10 @@ const jwt = require("jsonwebtoken");
 const EmailTransporter = require("../../../context/nodemailer/EmailTransporter");
 
 class ProjectInvitationComponent {
-	controller;
+	Controller;
 
 	constructor(controller) {
-		this.controller = controller;
+		this.Controller = controller;
 	}
 
 	/**
@@ -17,19 +17,19 @@ class ProjectInvitationComponent {
 	 */
 	async sendProjectEmailInvitation(userIdToInvite, projectId) {
 		// Verifica se o usuário existe
-		const user = this.controller.getService("users").getUserById(userIdToInvite);
+		const user = this.Controller.getService("users").getUserById(userIdToInvite);
 		if (!user) {
 			return { success: false, message: "Usuário não encontrado." };
 		}
 
 		// Verifica se o projeto existe
-		const project = this.controller.getService().getProjectById(projectId);
+		const project = this.Controller.Service.getProjectById(projectId);
 		if (!project) {
 			return { success: false, message: "Projeto não encontrado." };
 		}
 
 		// Verifica se o usuário já é membro do projeto
-		const isMemberOfProject = this.controller.ProjectMembersInterface.isUserMemberOfProject(
+		const isMemberOfProject = this.Controller.ProjectMembersInterface.isUserMemberOfProject(
 			userIdToInvite,
 			projectId
 		);
@@ -38,7 +38,7 @@ class ProjectInvitationComponent {
 		}
 
 		// Verifica se o usuário já foi convidado para o projeto
-		const isUserInvited = this.controller.ProjectInvitationsInterface.isUserInvitedToProject(
+		const isUserInvited = this.Controller.ProjectInvitationsInterface.isUserInvitedToProject(
 			userIdToInvite,
 			projectId
 		);
@@ -84,19 +84,19 @@ class ProjectInvitationComponent {
 				}
 
 				// Verifica se o usuário existe
-				const user = this.controller.getService("users").getUserById(decoded.userId);
+				const user = this.Controller.getService("users").getUserById(decoded.userId);
 				if (!user) {
 					return false;
 				}
 
 				// Verifica se o projeto existe
-				const project = this.controller.getService().getProjectById(decoded.projectId);
+				const project = this.Controller.Service.getProjectById(decoded.projectId);
 				if (!project) {
 					return false;
 				}
 
 				// Adiciona o usuário ao projeto
-				this.controller.ProjectMembersInterface.addUserToProject(
+				this.Controller.ProjectMembersInterface.addUserToProject(
 					decoded.userId,
 					decoded.projectId
 				);

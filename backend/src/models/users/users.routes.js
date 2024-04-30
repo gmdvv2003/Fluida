@@ -20,7 +20,7 @@ module.exports = function (app, io, usersController) {
 			usersController.logoutAuthenticated,
 			usersController,
 			["userId"],
-			usersController.getService().sessionValidator
+			usersController.Service.sessionValidator
 		)
 	);
 
@@ -31,7 +31,7 @@ module.exports = function (app, io, usersController) {
 			usersController.alterSettingsAuthenticated,
 			usersController,
 			["userId"],
-			usersController.getService().sessionValidator
+			usersController.Service.sessionValidator
 		)
 	);
 

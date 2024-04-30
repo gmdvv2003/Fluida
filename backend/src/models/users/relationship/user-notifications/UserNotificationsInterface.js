@@ -14,10 +14,10 @@ const UserNotificationsDTO = require("./UserNotificationsDTO");
 const UserNotificationsEntity = require("./UserNotificationsEntity");
 
 class UserNotificationsInterface {
-	#controller;
+	Controller;
 
 	constructor(controller) {
-		this.#controller = controller;
+		this.Controller = controller;
 	}
 
 	/**
@@ -43,7 +43,7 @@ class UserNotificationsInterface {
 	 * @returns {UserNotificationsDTO[]}
 	 */
 	getNotificationsOfUser(userId) {
-		const notifications = this.#controller.getService().Notifications.filter((notification) => {
+		const notifications = this.Controller.Service.Notifications.filter((notification) => {
 			return notification.userId === userId;
 		});
 

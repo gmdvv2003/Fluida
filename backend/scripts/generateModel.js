@@ -20,7 +20,7 @@ class ${className}Controller extends Controller {
     constructor(servicesProvider) {
         // Inicializa o controller e o serviço
         super(new ${className}Service(), servicesProvider);
-        this.getService().setController(this);
+        this.Service.setController(this);
     }
 }
 
@@ -102,14 +102,18 @@ const path = require("path");
 const arguments = process.argv.slice(2);
 
 if (arguments.length === 0 || arguments.indexOf("-h") > 0) {
-	console.error("\nUtilização: generateModel <nome> <-c>? <-s>? <-r>? <-d>? <-e>? <-t>? <caminho>");
+	console.error(
+		"\nUtilização: generateModel <nome> <-c>? <-s>? <-r>? <-d>? <-e>? <-t>? <caminho>"
+	);
 	console.error("\t-c: Ignora a criação do Controller. (Opcional)");
 	console.error("\t-s: Ignora a criação do Service. (Opcional)");
 	console.error("\t-r: Ignora a criação do Repository. (Opcional)");
 	console.error("\t-d: Ignora a criação do DTO. (Opcional)");
 	console.error("\t-e: Ignora a criação da Entity. (Opcional)");
 	console.error("\t-t: Adiciona um caminho adicional para a criação dos arquivos. (Opcional)");
-	console.error("\nExemplo com caminho específico e sem o controller: generateModel PhasesCards -c -t models/phases/relationship");
+	console.error(
+		"\nExemplo com caminho específico e sem o controller: generateModel PhasesCards -c -t models/phases/relationship"
+	);
 	console.error("Exemplo sem caminho específico: generateModel Users\n");
 	process.exit(1);
 }

@@ -1,6 +1,6 @@
 const { InsertResult, DeleteResult } = require("typeorm");
 
-const { Page } = require("../../../../context/typeorm/decorators/pagination/Pagination");
+const { Page } = require("../../../../context/decorators/typeorm/pagination/Pagination");
 
 const Service = require("../../../__types/Service");
 
@@ -15,14 +15,19 @@ class PhasesCardsService extends Service {
 		this.PhasesCardsRepository = new PhasesCardsRepository(this);
 	}
 
+	async getTotalCardsInPhase(phaseId) {
+		return await this.PhasesCardsRepository.getTotalCardsInPhase(phaseId);
+	}
+
 	/**
 	 * Retorna as fases de um cartão.
 	 *
+	 * @param {Object} pageOptions { PAGE: number, PAGE_SIZE: number }
 	 * @param {number} phaseId
 	 * @returns {Page}
 	 */
-	async getCardsOfPhase(phaseId) {
-		return await this.PhasesCardsRepository.getCardsOfPhase(phaseId);
+	async getCardsOfPhase(pageOptions, phaseId) {
+		return await this.PhasesCardsRepository.getCardsOfPhase(pageOptions, phaseId);
 	}
 
 	/**
@@ -33,7 +38,9 @@ class PhasesCardsService extends Service {
 	 * @returns {InsertResult}
 	 */
 	async addCardToPhase(phaseId, cardId) {
-		return await this.PhasesCardsRepository.addCardToPhase(new PhasesCardsDTO({ phaseId, cardId }));
+		return await this.PhasesCardsRepository.addCardToPhase(
+			new PhasesCardsDTO({ phaseId, cardId })
+		);
 	}
 
 	/**
@@ -44,7 +51,9 @@ class PhasesCardsService extends Service {
 	 * @returns {DeleteResult}
 	 */
 	async removeCardFromPhase(phaseId, cardId) {
-		return await this.PhasesCardsRepository.removeCardFromPhase(new PhasesCardsDTO({ phaseId, cardId }));
+		return await this.PhasesCardsRepository.removeCardFromPhase(
+			new PhasesCardsDTO({ phaseId, cardId })
+		);
 	}
 }
 

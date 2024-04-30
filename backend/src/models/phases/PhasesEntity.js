@@ -25,6 +25,11 @@ module.exports = new EntitySchema({
 			type: "varchar",
 			length: 100,
 		},
+
+		totalCards: {
+			type: "int",
+			default: 0,
+		},
 	},
 
 	relations: {

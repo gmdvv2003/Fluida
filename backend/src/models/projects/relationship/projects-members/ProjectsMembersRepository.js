@@ -87,7 +87,10 @@ class ProjectsMembersRepository extends Repository {
 		return await this.Repository.createQueryBuilder("ProjectsMembers")
 			.delete()
 			.from("ProjectsMembers")
-			.where("projectId = :projectId AND userId = :userId", projectsMembersDTO)
+			.where("projectId = :projectId AND userId = :userId", {
+				projectId: projectsMembersDTO.projectId,
+				userId: projectsMembersDTO.userId,
+			})
 			.execute();
 	}
 
@@ -99,10 +102,13 @@ class ProjectsMembersRepository extends Repository {
 	 */
 	async isUserMemberOfProject(projectsMembersDTO) {
 		const isMember = await this.Repository.createQueryBuilder("ProjectsMembers")
-			.where("userId = :userId AND projectId = :projectId", projectsMembersDTO)
+			.where("userId = :userId AND projectId = :projectId", {
+				userId: projectsMembersDTO.userId,
+				projectId: projectsMembersDTO.projectId,
+			})
 			.getOne();
 
-		return isMember ? true : false;
+		return isMember;
 	}
 }
 

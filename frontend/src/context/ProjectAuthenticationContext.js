@@ -71,6 +71,10 @@ export function ProjectAuthenticationProvider({ children }) {
 					},
 				});
 
+				socket.on("error", (error) => {
+					console.error(`Erro no socket: ${error.message}`);
+				});
+
 				// Evento que roda quando ocorre um erro na conexão
 				socket.on("connect_error", (error) => {
 					let rejectPromise = false;

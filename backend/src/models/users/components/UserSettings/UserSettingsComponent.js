@@ -3,14 +3,14 @@ const PhotoSettingModule = require("./modules/PhotoSettingModule");
 class UserSettingsComponent {
 	#settingsModules;
 
-	controller;
+	Controller;
 
 	constructor(controller) {
 		this.#settingsModules = {
 			UserPhoto: new PhotoSettingModule(this),
 		};
 
-		this.controller = controller;
+		this.Controller = controller;
 	}
 
 	/**
@@ -21,7 +21,7 @@ class UserSettingsComponent {
 	 * @returns {Object} Estrutura que diz se a ação foi bem sucedida ou não
 	 */
 	alterUserSettings(userId, toAlter) {
-		const user = this.controller.getService().getUserById(userId);
+		const user = this.Controller.Service.getUserById(userId);
 		if (!user) {
 			return { success: false, message: "Usuário não encontrado." };
 		}

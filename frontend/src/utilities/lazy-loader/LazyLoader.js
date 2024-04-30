@@ -7,14 +7,13 @@ function LazyLoader({
 	scrollBar,
 	constructElement,
 	width,
+	height,
 	margin,
 	padding,
-	height,
 	direction,
 	fetchMore,
 	getAvailableContentCountForFetch,
 	getContent,
-	setContent,
 	pageSize,
 }) {
 	const [visibleContent, setVisibleContent] = useState([]);
@@ -45,23 +44,23 @@ function LazyLoader({
 		 * @returns {Array}
 		 */
 		async function retrieveVisibleContent(start, end, lateFetch) {
-			let content = getContent;
-
 			// Caso não tenha conteúdo, preenche a lista com conteúdo vazio
 			if (getContent.length < end) {
 				for (let index = getContent.length; index < end; index += 1) {
-					content.push(undefined);
+					getContent.push(undefined);
 				}
-
-				// Atualiza o conteúdo
-				setContent(content);
 			}
 
 			// Pega a "fatia" do conteúdo que está sendo exibido no momento e verifica se há algum elemento indefinido
-			const undefinedContentIndex = content.slice(start, end).findIndex((element) => element === undefined);
+			const undefinedContentIndex = getContent
+				.slice(start, end)
+				.findIndex((element) => element === undefined);
 
 			if (undefinedContentIndex > -1) {
-				if (currentSectionEnd !== lastSectionEnd || currentSectionStart !== lastSectionStart) {
+				if (
+					currentSectionEnd !== lastSectionEnd ||
+					currentSectionStart !== lastSectionStart
+				) {
 					// Cancela o timeout anterior
 					if (sectionFetchTimeoutId) {
 						clearTimeout(sectionFetchTimeoutId);
@@ -69,23 +68,22 @@ function LazyLoader({
 
 					// Inicia um novo timeout
 					sectionFetchTimeoutId = setTimeout(async () => {
-						const fetchedContent = await fetchMore(Math.floor((start + undefinedContentIndex) / pageSize));
+						const fetchedContent = await fetchMore(
+							Math.floor((start + undefinedContentIndex) / pageSize)
+						);
 						fetchedContent.forEach((element, index) => {
 							const contentIndex = start + undefinedContentIndex + index;
-							content[contentIndex] = content[contentIndex] || element;
+							getContent[contentIndex] = getContent[contentIndex] || element;
 						});
 
-						// Atualiza o conteúdo
-						setContent(content);
-
 						// Atualiza o conteúdo a ser exibido na tela
-						lateFetch(content.slice(start, end));
+						lateFetch(getContent.slice(start, end));
 					}, 1000);
 				}
 			}
 
 			// Retorna novamente a "fatia" do conteúdo que está sendo exibido no momento
-			return content.slice(start, end);
+			return getContent.slice(start, end);
 		}
 
 		/**
@@ -110,7 +108,11 @@ function LazyLoader({
 		function getBottomRightOffset() {
 			switch (direction) {
 				case "horizontal":
-					return getAvailableContentCountForFetch() * (width + padding) + margin - getTopLeftOffset();
+					return (
+						getAvailableContentCountForFetch() * (width + padding) +
+						margin -
+						getTopLeftOffset()
+					);
 
 				case "vertical":
 					return 0;
@@ -155,7 +157,10 @@ function LazyLoader({
 		function getCurrentItemIndex() {
 			switch (direction) {
 				case "horizontal":
-					return Math.max(0, Math.floor((scrollBarCopy.scrollLeft - margin) / (width + padding)));
+					return Math.max(
+						0,
+						Math.floor((scrollBarCopy.scrollLeft - margin) / (width + padding))
+					);
 
 				case "vertical":
 					return 0;
@@ -176,7 +181,8 @@ function LazyLoader({
 
 			// Retorna o multiplo mais próximo para baixo e para cima do offset
 			const start = offset - (offset % maxPossibleElementsInContainer);
-			const end = offset + maxPossibleElementsInContainer - (offset % maxPossibleElementsInContainer);
+			const end =
+				offset + maxPossibleElementsInContainer - (offset % maxPossibleElementsInContainer);
 
 			return [start, end];
 		}
@@ -205,7 +211,10 @@ function LazyLoader({
 			// Pega os limites da seção atual e expande a seção para cima e para baixo se necessário
 			const [sectionStart, sectionEnd] = getSectionBounds(currentItemIndex);
 			if (currentItemIndex - sectionStart <= sectionThreshold) {
-				currentSectionStart = Math.max(0, sectionStart - getMaxPossibleElementsInContainer());
+				currentSectionStart = Math.max(
+					0,
+					sectionStart - getMaxPossibleElementsInContainer()
+				);
 			}
 
 			if (sectionEnd - currentItemIndex <= sectionThreshold) {

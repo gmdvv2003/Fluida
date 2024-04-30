@@ -51,7 +51,11 @@ app.use((request, response, next) => {
 if (process.env.HTTP_WATCHER == 1) {
 	// Middleware para logar as requisições
 	app.use((request, _, next) => {
-		console.log(`Requisição: [${request.method}] ${request.url}, Body: ${JSON.stringify(request.body)}`);
+		console.log(
+			`\nRequisição: [${request.method}] ${request.url}, Body: ${JSON.stringify(
+				request.body
+			)}\n`
+		);
 
 		next();
 	});
@@ -61,31 +65,9 @@ if (process.env.HTTP_WATCHER == 1) {
 		const originalSend = response.send;
 
 		response.send = function (body) {
-			console.log(`Resposta: ${body}`);
+			console.log(`\nResposta: ${body}\n`);
 			originalSend.call(this, body);
 		};
-
-		next();
-	});
-}
-
-// Caso SOCKET_WATCHER seja 1, loga os eventos do socket
-if (process.env.SOCKET_WATCHER == 1) {
-	// Middleware para logar os eventos do socket
-	io.use((socket, next) => {
-		socket.onAny((event, ...data) => {
-			console.log(
-				`
-				Evento: ${event},
-				Auth: ${socket.handshake?.auth},
-				Header: ${socket.handshake?.headers},
-				Argumentos: ${JSON.stringify(data)}
-				`
-			);
-		});
-
-		socket.on("connection", () => console.log(`${socket} Conectado`));
-		socket.on("disconnect", () => console.log(`${socket} Desconectado`));
 
 		next();
 	});
@@ -123,7 +105,7 @@ Database.initialize()
 		// Provider de serviços para garantir que os controllers tenham acesso a todos os serviços
 		const servicesProvider = {
 			register(identifier, controller) {
-				INSTANTIATED_SERVICES[identifier] = controller.getService();
+				INSTANTIATED_SERVICES[identifier] = controller.Service;
 			},
 
 			get(identifier) {

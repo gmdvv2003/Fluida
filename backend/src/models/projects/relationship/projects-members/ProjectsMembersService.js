@@ -42,7 +42,9 @@ class ProjectMembersService extends Service {
 	 * @returns {boolean}
 	 */
 	async addUserAsMemberOfProject(userId, projectId) {
-		return await this.#ProjectsMembersRepository.addUserAsMemberOfProject(new ProjectsMembersDTO({ userId, projectId }));
+		return await this.#ProjectsMembersRepository.addUserAsMemberOfProject(
+			new ProjectsMembersDTO({ userId, projectId })
+		);
 	}
 
 	/**
@@ -53,7 +55,9 @@ class ProjectMembersService extends Service {
 	 * @returns {boolean}
 	 */
 	async removeUserFromMembersOfProject(userId, projectId) {
-		return await this.#ProjectsMembersRepository.removeUserFromMembersOfProject(new ProjectsMembersDTO({ userId, projectId }));
+		return await this.#ProjectsMembersRepository.removeUserFromMembersOfProject(
+			new ProjectsMembersDTO({ userId, projectId })
+		);
 	}
 
 	/**
@@ -64,7 +68,9 @@ class ProjectMembersService extends Service {
 	 * @returns {boolean}
 	 */
 	async isUserMemberOfProject(userId, projectId) {
-		return await this.#ProjectsMembersRepository.isUserMemberOfProject(new ProjectsMembersDTO(userId, projectId));
+		return await this.#ProjectsMembersRepository.isUserMemberOfProject(
+			new ProjectsMembersDTO({ userId, projectId })
+		);
 	}
 }
 

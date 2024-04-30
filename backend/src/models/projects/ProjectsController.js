@@ -4,6 +4,9 @@ const ProjectInvitationComponent = require("./components/ProjectInvitationCompon
 
 const ProjectsService = require("./ProjectsService");
 
+const PhasesService = require("../phases/PhasesService");
+const CardsService = require("../cards/CardsService");
+
 const {
 	ProjectsFunctionalityInterface,
 } = require("./functionalities/projects/ProjectsFunctionalityInterface");
@@ -12,10 +15,19 @@ class ProjectsController extends Controller {
 	#ProjectInvitationComponent;
 	ProjectsFunctionalityInterface;
 
+	PhasesService;
+	CardsService;
+
 	constructor(servicesProvider) {
 		// Inicializa o controller e o serviço
 		super(new ProjectsService(), servicesProvider);
-		this.getService().setController(this);
+		this.Service.setController(this);
+
+		this.PhasesService = new PhasesService(this);
+		this.CardsService = new CardsService(this);
+
+		this.PhasesService.setController(this);
+		this.CardsService.setController(this);
 
 		// Inicializa os componentes do controller
 		this.#ProjectInvitationComponent = new ProjectInvitationComponent(this);
@@ -39,7 +51,7 @@ class ProjectsController extends Controller {
 				.json({ message: "Usuário ou nome do projeto não informado." });
 		}
 
-		const result = this.getService().createProjectAuthenticated(userId, projectName);
+		const result = this.Service.createProjectAuthenticated(userId, projectName);
 		if (!result.success) {
 			return response.status(400).json({ message: result.message });
 		}
@@ -61,12 +73,12 @@ class ProjectsController extends Controller {
 			return response.status(400).json({ message: "ID de projeto não informado." });
 		}
 
-		const projectExist = await this.getService().getProjectById(projectId);
+		const projectExist = await this.Service.getProjectById(projectId);
 		if (!projectExist) {
 			return response.status(400).json({ message: "Não existe projeto para esse ID." });
 		}
 
-		(await this.getService().deleteProject(projectId))
+		(await this.Service.deleteProject(projectId))
 			? response.status(200).json({ message: "Projeto deletado com sucesso" })
 			: response.status(400).json({ message: "Erro ao deletar o projeto" });
 	}
@@ -84,7 +96,7 @@ class ProjectsController extends Controller {
 		}
 
 		// Verifica se o usuário está no projeto
-		const isInProject = this.getService().ProjectsMembersService.isUserMemberOfProject(
+		const isInProject = this.Service.ProjectsMembersService.isUserMemberOfProject(
 			userId,
 			projectId
 		);

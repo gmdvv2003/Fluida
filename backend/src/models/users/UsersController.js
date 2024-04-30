@@ -14,7 +14,7 @@ class UsersController extends Controller {
 	constructor(servicesProvider) {
 		// Inicializa o controller e o serviço
 		super(new UsersService(), servicesProvider);
-		this.getService().setController(this);
+		this.Service.setController(this);
 
 		// Inicializa os componentes do controller
 		this.#EmailValidatorComponent = new EmailValidatorComponent(this);
@@ -30,7 +30,7 @@ class UsersController extends Controller {
 	 * @param {Response} response
 	 */
 	async getUsers(_, response) {
-		response.status(200).json(this.getService().getUsers());
+		response.status(200).json(this.Service.getUsers());
 	}
 
 	/**
@@ -42,7 +42,7 @@ class UsersController extends Controller {
 	async getUserById(request, response) {
 		const { userId } = request.params;
 
-		const user = this.getService().getUserById(userId);
+		const user = this.Service.getUserById(userId);
 		if (!user) {
 			return response.status(404).json({ message: "Usuário não encontrado." });
 		}
@@ -59,7 +59,7 @@ class UsersController extends Controller {
 	async register(request, response) {
 		const { firstName, lastName, email, phoneNumber, password } = request.body;
 
-		const result = this.getService().register(firstName, lastName, email, phoneNumber, password);
+		const result = this.Service.register(firstName, lastName, email, phoneNumber, password);
 		if (!result.success) {
 			return response.status(400).json({ message: result.message });
 		}
@@ -74,7 +74,9 @@ class UsersController extends Controller {
 				console.error(`Falha ao enviar email de validação. Erro: ${error}`);
 			});
 
-		response.status(201).json({ successfullyRegistered: true, message: "Usuário cadastrado com sucesso." });
+		response
+			.status(201)
+			.json({ successfullyRegistered: true, message: "Usuário cadastrado com sucesso." });
 	}
 
 	/**
@@ -86,7 +88,7 @@ class UsersController extends Controller {
 	async login(request, response) {
 		const { email, password } = request.body;
 
-		const result = await this.getService().login(email, password);
+		const result = await this.Service.login(email, password);
 		if (!result.success) {
 			return response.status(400).json({ message: result.message });
 		}
@@ -105,7 +107,7 @@ class UsersController extends Controller {
 	async logoutAuthenticated(request, response) {
 		const { userId } = request.body;
 
-		const result = await this.getService().logoutAuthenticated(userId);
+		const result = await this.Service.logoutAuthenticated(userId);
 		if (!result.success) {
 			return response.status(400).json({ message: result.message });
 		}
@@ -127,7 +129,9 @@ class UsersController extends Controller {
 			return response.status(400).json({ message: result.message });
 		}
 
-		response.status(200).json({ message: "Configurações alteradas com sucesso.", altered: result.altered });
+		response
+			.status(200)
+			.json({ message: "Configurações alteradas com sucesso.", altered: result.altered });
 	}
 
 	// ==================================== Métodos Intermediários ==================================== //
@@ -146,10 +150,14 @@ class UsersController extends Controller {
 		try {
 			const success = this.#EmailValidatorComponent.validateValidationEmail(token);
 			if (!success) {
-				return response.status(400).json({ message: "Falha ao validar email. Token inválido." });
+				return response
+					.status(400)
+					.json({ message: "Falha ao validar email. Token inválido." });
 			}
 
-			return response.status(200).json({ message: "Email validado com sucesso.", isValidated: true });
+			return response
+				.status(200)
+				.json({ message: "Email validado com sucesso.", isValidated: true });
 		} catch (error) {
 			return response.status(400).json({ message: `Falha ao validar email. Erro: ${error}` });
 		}
@@ -186,7 +194,9 @@ class UsersController extends Controller {
 	async resetPassword(request, response) {
 		const { token, newPassword } = request.body;
 		if (!token || !newPassword) {
-			return response.status(400).json({ message: "Token ou nova senha não encontrados na requisição" });
+			return response
+				.status(400)
+				.json({ message: "Token ou nova senha não encontrados na requisição" });
 		}
 
 		try {
@@ -196,7 +206,9 @@ class UsersController extends Controller {
 			}
 
 			if (result.samePasswordAsBefore) {
-				return response.status(200).json({ message: "Senha igual a anterior.", samePasswordAsBefore: true });
+				return response
+					.status(200)
+					.json({ message: "Senha igual a anterior.", samePasswordAsBefore: true });
 			}
 
 			return response.status(200).json({ message: "Senha resetada com sucesso." });

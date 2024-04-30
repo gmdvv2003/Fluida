@@ -2,10 +2,7 @@ const Controller = require("./Controller");
 
 class Service {
 	#controller;
-
-	constructor(controller = null) {
-		this.setController(controller);
-	}
+	#service;
 
 	/**
 	 * @param {Controller} controller
@@ -19,6 +16,28 @@ class Service {
 	 */
 	getController() {
 		return this.#controller;
+	}
+
+	/**
+	 * @param {Service} service
+	 */
+	setService(service) {
+		this.#service = service;
+	}
+
+	/**
+	 * @returns {Service}
+	 */
+	getService() {
+		return this.#service;
+	}
+
+	get Controller() {
+		return this.#controller;
+	}
+
+	get Service() {
+		return this.#service;
 	}
 }
 

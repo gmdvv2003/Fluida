@@ -7,7 +7,12 @@ const UsersEntity = require("./UsersEntity");
 
 const { Validate } = require("../../context/decorators/input-validator/InputValidator");
 
-const { UserNotFound, WrongPassword, UserNotVerified, UserAlreadyLogged } = require("../../context/exceptions/users-repository/Exceptions");
+const {
+	UserNotFound,
+	WrongPassword,
+	UserNotVerified,
+	UserAlreadyLogged,
+} = require("../../context/exceptions/users-repository/Exceptions");
 
 class UsersRepository extends Repository {
 	constructor(service) {
@@ -21,7 +26,9 @@ class UsersRepository extends Repository {
 	 * @returns {UsersDTO}
 	 */
 	async getUserByEmail(usersDTO) {
-		return await this.Repository.createQueryBuilder("Users").where(`email = :email`, usersDTO).getOne();
+		return await this.Repository.createQueryBuilder("Users")
+			.where(`email = :email`, usersDTO)
+			.getOne();
 	}
 
 	/**
@@ -31,7 +38,9 @@ class UsersRepository extends Repository {
 	 * @returns {UsersDTO}
 	 */
 	async getUserById(usersDTO) {
-		return await this.Repository.createQueryBuilder("Users").where(`userId = :userId`, usersDTO).getOne();
+		return await this.Repository.createQueryBuilder("Users")
+			.where(`userId = :userId`, usersDTO)
+			.getOne();
 	}
 
 	/**
@@ -45,7 +54,11 @@ class UsersRepository extends Repository {
 	@Validate({ NAME: "phoneNumber", TYPE: "string", LENGTH: 20, VALIDATOR: "phone" })
 	@Validate({ NAME: "password", TYPE: "string", LENGTH: 40, VALIDATOR: "password" })
 	async register(usersDTO) {
-		return await this.Repository.createQueryBuilder("Users").insert().into("Users").values(usersDTO).execute();
+		return await this.Repository.createQueryBuilder("Users")
+			.insert()
+			.into("Users")
+			.values(usersDTO)
+			.execute();
 	}
 
 	/**
@@ -75,11 +88,15 @@ class UsersRepository extends Repository {
 			throw new UserAlreadyLogged();
 		}
 
-		const session = Session.newSession(user);
+		const session = Session.newSession({ userId: user.userId, email: user.email });
 		console.log(`Nova sessão criada para o email: ${user.email} JWT: ${session}`);
 
 		// Atualiza o token de sessão do usuário no banco de dados
-		await this.Repository.createQueryBuilder("Users").update().set({ sessionToken: session }).where(`userId = :userId`, user).execute();
+		await this.Repository.createQueryBuilder("Users")
+			.update()
+			.set({ sessionToken: session })
+			.where(`userId = :userId`, user)
+			.execute();
 
 		// Atualiza o token de sessão do usuário no objeto
 		user.sessionToken = session;

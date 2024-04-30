@@ -22,6 +22,8 @@ class CardFunctionality {
 	#IOUpdateCard(projectsIO, socket, project, data) {}
 
 	#IOMoveCard(projectsIO, socket, project, data) {}
+
+	#IOFetchCards(projectsIO, socket, project, data) {}
 }
 
 module.exports = CardFunctionality;

@@ -16,6 +16,7 @@ const PhasesDTO = require("../../../phases/PhasesDTO");
 
 const {
 	DEFAULT_PAGE_SIZE,
+	Page,
 } = require("../../../../context/decorators/typeorm/pagination/Pagination");
 
 /**
@@ -50,30 +51,86 @@ class Participant {
 
 class Project {
 	projectId;
+	ProjectsController;
 
 	#cards = [];
 	#phases = [];
 
 	members = [];
 
-	constructor(projectId) {
+	constructor(projectId, ProjectsController) {
 		this.projectId = projectId;
+		this.ProjectsController = ProjectsController;
 	}
 
 	/**
-	 * @param {number} page
-	 * @returns {Array}
+	 * Função auxiliar para buscar mais elementos de uma lista.
 	 */
-	getCards(page) {
-		return this.#cards.slice((page - 1) * DEFAULT_PAGE_SIZE, page * DEFAULT_PAGE_SIZE);
+	async #fetchMore(list, fetchFunction, page, ...data) {
+		const head = (page - 1) * DEFAULT_PAGE_SIZE;
+		const tail = page * DEFAULT_PAGE_SIZE;
+
+		if (list.length < tail) {
+			for (let index = list.length; index < tail; index += 1) {
+				list.push(undefined);
+			}
+		}
+
+		const { taken, total, hasNextPage } = await fetchFunction({ PAGE: page }, ...data);
+		for (let index = head; index < taken.length; index += 1) {
+			list[index] = taken[index];
+		}
+
+		return { taken, hasNextPage, total };
 	}
 
 	/**
+	 * Retorna os cards de uma fase.
+	 *
+	 * @param {number} page
+	 * @param {number} phaseId
+	 * @returns {Array}
+	 */
+	async getCards(page, phaseId) {
+		const phasesCardsService = this.ProjectsController.PhasesService.PhasesCardsService;
+		return await this.#fetchMore(
+			this.#cards,
+			phasesCardsService.getCardsOfPhase,
+			page,
+			phaseId
+		);
+	}
+
+	/**
+	 * Retorna o total de cards em uma fase.
+	 *
+	 * @param {number} phaseId
+	 * @returns {number}
+	 */
+	async getTotalCardsInPhase(phaseId) {
+		const projectsPhasesService = this.ProjectsController.Service.ProjectsPhasesService;
+		return await projectsPhasesService.getTotalPhasesInProject(phaseId);
+	}
+
+	/**
+	 * Retorna as fases do projeto.
+	 *
 	 * @param {number} page
 	 * @returns {Array}
 	 */
-	getPhases(page) {
-		return this.#phases.slice((page - 1) * DEFAULT_PAGE_SIZE, page * DEFAULT_PAGE_SIZE);
+	async getPhases(page) {
+		const projectsPhasesService = this.ProjectsController.Service.ProjectsPhasesService;
+		return await this.#fetchMore(this.#phases, projectsPhasesService.getPhasesOfProject, page);
+	}
+
+	/**
+	 * Retorna o total de fases do projeto.
+	 *
+	 * @returns {number}
+	 */
+	async getTotalPhasesInProject() {
+		const phasesCardsService = this.ProjectsController.PhasesService.PhasesCardsService;
+		return await phasesCardsService.getTotalCardsInPhase(this.projectId);
 	}
 
 	/**
@@ -132,7 +189,7 @@ class ProjectsFunctionalityInterface {
 	 */
 	socketToProjectRedirector(next) {
 		return (projectsIO, socket, data) => {
-			const { projectId } = data;
+			const { projectId } = socket;
 			if (!projectId) {
 				return socket.emit("error", { message: '"projectId" não informado.' });
 			}
@@ -184,7 +241,7 @@ class ProjectsFunctionalityInterface {
 	addParticipant(user, projectId) {
 		// "Cria" o projeto se ele não existir
 		if (!this.#projects[projectId]) {
-			this.#projects[projectId] = new Project(projectId);
+			this.#projects[projectId] = new Project(projectId, this.ProjectsController);
 		}
 
 		const project = this.#projects[projectId];

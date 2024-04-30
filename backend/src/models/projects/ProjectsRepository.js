@@ -14,7 +14,10 @@ class ProjectsRepository extends Repository {
 	 * Trigger que adiciona o criador do projeto como membro do projeto.
 	 */
 	async afterInsert_addProjectManagerAsMember({ entity }) {
-		await this.Service.ProjectsPhasesService.add(entity.createdBy, entity.projectId);
+		await this.Service.ProjectsMembersService.addUserAsMemberOfProject(
+			entity.createdBy,
+			entity.projectId
+		);
 	}
 
 	constructor(service) {
@@ -29,7 +32,9 @@ class ProjectsRepository extends Repository {
 	 * @returns {ProjectsDTO}
 	 */
 	async getProjectById(projectId) {
-		return await this.Repository.createQueryBuilder("Projects").where(`projectId = :projectId`, { projectId }).getOne();
+		return await this.Repository.createQueryBuilder("Projects")
+			.where(`projectId = :projectId`, { projectId })
+			.getOne();
 	}
 
 	/**
@@ -40,7 +45,11 @@ class ProjectsRepository extends Repository {
 	 */
 	@Validate({ NAME: "projectName", TYPE: "string", LENGTH: 100 })
 	async createProject(projectsDTO) {
-		return await this.Repository.createQueryBuilder("Projects").insert().into("Projects").values(projectsDTO).execute();
+		return await this.Repository.createQueryBuilder("Projects")
+			.insert()
+			.into("Projects")
+			.values(projectsDTO)
+			.execute();
 	}
 
 	/**

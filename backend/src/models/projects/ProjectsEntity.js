@@ -25,6 +25,11 @@ module.exports = new EntitySchema({
 			nullable: false,
 			type: "int",
 		},
+
+		totalPhases: {
+			type: "int",
+			default: 0,
+		},
 	},
 
 	relations: {

@@ -5,11 +5,18 @@ const Repository = require("../../../__types/Repository");
 const PhasesCardsDTO = require("./PhasesCardsDTO");
 const PhasesCardsEntity = require("./PhasesCardsEntity");
 
-const { Paginate, Page } = require("../../../../context/typeorm/decorators/pagination/Pagination");
+const { Paginate, Page } = require("../../../../context/decorators/typeorm/pagination/Pagination");
 
 class PhasesCardsRepository extends Repository {
 	constructor(service) {
 		super(service, PhasesCardsDTO);
+	}
+
+	async getTotalCardsInPhase(phaseId) {
+		return await this.Repository.createQueryBuilder("PhasesCards")
+			.select("totalPhases")
+			.where("phaseId = :phaseId", { phaseId })
+			.getRawOne();
 	}
 
 	/**

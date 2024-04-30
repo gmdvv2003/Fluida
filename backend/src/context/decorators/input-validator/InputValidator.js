@@ -20,9 +20,12 @@ const INPUT_TYPES_VALIDATORS_MAP = {
 	},
 };
 
-function Validate({ NAME, TYPE, VALIDATOR, ...OPTIONS }) {
+function Validate({ NAME, TYPE, VALIDATOR, INDEX = 0, ...OPTIONS }) {
 	return (handler) =>
-		async function (dto) {
+		async function (...data) {
+			// Pega o input
+			const input = data[INDEX];
+
 			VALIDATOR = VALIDATOR || TYPE;
 
 			// Verifica se existe um validador para o tipo de entrada
@@ -30,21 +33,21 @@ function Validate({ NAME, TYPE, VALIDATOR, ...OPTIONS }) {
 				throw new Error(`O validador para o tipo ${VALIDATOR} não foi encontrado.`);
 			}
 
-			// Verifica se o campo foi encontrado no DTO
-			if (!NAME in dto) {
-				throw new Error(`O campo ${NAME} não foi encontrado no DTO.`);
+			// Verifica se o campo foi encontrado no input
+			if (!NAME in input) {
+				throw new Error(`O campo ${NAME} não foi encontrado no input.`);
 			}
 
 			// Verifica se o tipo do campo é o esperado
-			if (typeof dto[NAME] !== TYPE) {
+			if (typeof input[NAME] !== TYPE) {
 				throw new Error(`O campo ${NAME} não é do tipo ${TYPE}.`);
 			}
 
-			if (!INPUT_TYPES_VALIDATORS_MAP[VALIDATOR](dto[NAME], OPTIONS)) {
+			if (!INPUT_TYPES_VALIDATORS_MAP[VALIDATOR](input[NAME], OPTIONS)) {
 				throw new InvalidInputParameter(NAME);
 			}
 
-			return await handler.apply(this, [dto]);
+			return await handler.apply(this, data);
 		};
 }
 

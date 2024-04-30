@@ -12,6 +12,13 @@ class ProjectsPhasesRepository extends Repository {
 		super(service, ProjectsPhasesDTO);
 	}
 
+	async getTotalPhasesInProject(projectId) {
+		return await this.Repository.createQueryBuilder("ProjectsPhases")
+			.select("totalPhases")
+			.where("projectId = :projectId", { projectId })
+			.getRawOne();
+	}
+
 	/**
 	 * Retorna as fases de um projeto do banco de dados.
 	 *

@@ -8,9 +8,6 @@ const ProjectsMembersService = require("./relationship/projects-members/Projects
 const ProjectsChatsService = require("./relationship/projects-chats/ProjectsChatsService");
 const ProjectsPhasesService = require("./relationship/projects-phases/ProjectsPhasesService");
 
-const PhasesService = require("../phases/PhasesService");
-const CardsService = require("../cards/CardsService");
-
 class ProjectsService extends Service {
 	ProjectsRepository;
 
@@ -19,20 +16,21 @@ class ProjectsService extends Service {
 	ProjectsChatsService;
 	ProjectsPhasesService;
 
-	PhasesService;
-	CardsService;
-
 	constructor() {
 		super();
 		this.ProjectsRepository = new ProjectsRepository(this);
 
-		this.ProjectsInvitationService = new ProjectsInvitationService(this);
-		this.ProjectsMembersService = new ProjectsMembersService(this);
-		this.ProjectsChatsService = new ProjectsChatsService(this);
-		this.ProjectsPhasesService = new ProjectsPhasesService(this);
+		// Inicializa os serviços de relacionamento
+		this.ProjectsInvitationService = new ProjectsInvitationService();
+		this.ProjectsMembersService = new ProjectsMembersService();
+		this.ProjectsChatsService = new ProjectsChatsService();
+		this.ProjectsPhasesService = new ProjectsPhasesService();
 
-		this.PhasesService = new PhasesService(this);
-		this.CardsService = new CardsService(this);
+		// Define o serviço pai
+		this.ProjectsInvitationService.setService(this);
+		this.ProjectsMembersService.setService(this);
+		this.ProjectsChatsService.setService(this);
+		this.ProjectsPhasesService.setService(this);
 	}
 
 	// ==================================== Métodos Seguros ==================================== //
@@ -54,7 +52,9 @@ class ProjectsService extends Service {
 	 * @returns {ProjectsDTO}
 	 */
 	async createProject(createdBy, projectName) {
-		return await this.ProjectsRepository.createProject(new ProjectsDTO({ createdBy, projectName }));
+		return await this.ProjectsRepository.createProject(
+			new ProjectsDTO({ createdBy, projectName })
+		);
 	}
 
 	/**

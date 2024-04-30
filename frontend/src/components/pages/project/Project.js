@@ -1,54 +1,183 @@
 import { useRef, useState, useEffect } from "react";
-import { Navigate, useParams } from "react-router-dom";
-
-import { useProjectAuthentication } from "context/ProjectAuthenticationContext";
+import { useParams } from "react-router-dom";
 
 import { ReactComponent as AddButtonIcon } from "assets/action-icons/add-circle-unlined.svg";
 
-import HomeHeader from "../../shared/login-registration/header-home/HeaderHome";
+import { useProjectAuthentication } from "context/ProjectAuthenticationContext";
+
+import HomeHeader from "components/shared/login-registration/header-home/HeaderHome";
+import LazyLoader from "utilities/lazy-loader/LazyLoader";
 
 import Phase from "./templates/phase/Phase";
-import Card from "./templates/card/Card";
-
-import LazyLoader from "utilities/lazy-loader/LazyLoader";
-import Loading from "components/shared/loading/Loading";
-
-import { useAuthentication } from "context/AuthenticationContext";
 
 import "./Project.css";
 
 class CardState {
-	constructor(cardId) {
-		this.cardId = cardId;
+	cardDTO;
+
+	constructor(cardDTO) {
+		this.cardDTO = cardDTO;
 	}
 }
 
 class PhaseState {
+	phaseDTO;
+
 	cards = [];
 	cardsMap = {};
 
-	constructor(phaseId) {
-		this.phaseId = phaseId;
+	constructor(phaseDTO) {
+		this.phaseDTO = phaseDTO;
 	}
 }
 
 class ProjectState {
+	#socket;
+
 	phases = [];
 	phasesMap = {};
 
+	constructor(socket) {
+		// Fetch das fases inicial
+		socket.emit("fetchPhases", { page: 0 });
+
+		this.#socket = socket;
+	}
+
+	/**
+	 * Pega o estado de uma fase.
+	 *
+	 * @param {number} phaseId
+	 * @returns {PhaseState}
+	 */
 	getPhaseState(phaseId) {
 		return this.phasesMap[phaseId];
 	}
 
+	/**
+	 * Pega o estado de um card.
+	 *
+	 * @param {number} phaseId
+	 * @param {number} cardId
+	 * @returns {CardState}
+	 */
 	getCardState(phaseId, cardId) {
 		return this.getPhaseState(phaseId)?.cardsMap[cardId];
 	}
 
+	/**
+	 * Retorna as fases do projeto.
+	 *
+	 * @returns {Array}
+	 */
 	getPhases() {
 		return this.phases;
 	}
 
-	phaseCreated(phaseDTO) {}
+	/**
+	 * Retorna os cards de uma fase.
+	 *
+	 * @param {number} phaseId
+	 * @returns {Array}
+	 */
+	getCards(phaseId) {
+		return this.getPhaseState(phaseId)?.cards;
+	}
+
+	/**
+	 * Resposta do servidor para a criação de uma fase.
+	 *
+	 * @param {Object} phaseDTO
+	 */
+	phaseCreated(phaseDTO) {
+		const phaseState = new PhaseState(phaseDTO);
+		this.phases.push(phaseState);
+	}
+
+	/**
+	 * Resposta do servidor para a atualização de uma fase.
+	 *
+	 * @param {number} phaseId
+	 * @param {Object} updatedPhaseDTOFields
+	 */
+	phaseUpdated(phaseId, updatedPhaseDTOFields) {}
+
+	/**
+	 * Resposta do servidor para a remoção de uma fase.
+	 *
+	 * @param {number} phaseId
+	 */
+	phaseDeleted(phaseId) {}
+
+	/**
+	 * Resposta do servidor para a movimentação de uma fase.
+	 *
+	 * @param {number} phaseId
+	 * @param {number} targetPositionIndex
+	 */
+	phaseMoved(phaseId, targetPositionIndex) {}
+
+	/**
+	 * Resposta do servidor para a criação de um card.
+	 *
+	 * @param {Object} cardDTO
+	 */
+	cardCreated(cardDTO) {
+		const cardState = new CardState(cardDTO);
+		this.getPhaseState(cardDTO.phaseId).cards?.push(cardState);
+	}
+
+	/**
+	 * Resposta do servidor para a atualização de um card.
+	 *
+	 * @param {number} cardId
+	 * @param {Object} updatedCardDTOFields
+	 */
+	cardUpdated(cardId, updatedCardDTOFields) {}
+
+	/**
+	 * Resposta do servidor para a remoção de um card.
+	 *
+	 * @param {number} cardId
+	 */
+	cardDeleted(cardId) {}
+
+	/**
+	 * Resposta do servidor para a movimentação de um card.
+	 *
+	 * @param {number} cardId
+	 * @param {number} targetPhaseIndex
+	 * @param {number} targetPositionIndex
+	 */
+	cardMoved(cardId, targetPhaseIndex, targetPositionIndex) {}
+
+	/**
+	 * Resposta do servidor para o fetch das fases.
+	 *
+	 * @param {Array} phases
+	 */
+	phasesFetched(phases) {
+		phases?.taken?.forEach((phaseDTO) => {
+			// Cria o estado da fase
+			this.phaseCreated(phaseDTO);
+
+			// Realiza o fetch dos cards da fase inicial
+			this.#socket.emit("fetchCards", { page: 0, phaseId: phaseDTO.phaseId });
+		});
+	}
+
+	/**
+	 * Resposta do servidor para o fetch dos cards.
+	 *
+	 * @param {number} phaseId
+	 * @param {Array} cards
+	 */
+	cardsFetched(phaseId, cards) {
+		cards?.taken?.forEach((cardDTO) => {
+			// Cria o estado do card
+			this.cardCreated(cardDTO);
+		});
+	}
 }
 
 function Project() {
@@ -65,7 +194,21 @@ function Project() {
 	const lazyLoaderTopOffsetRef = useRef(null);
 	const lazyLoaderBottomOffsetRef = useRef(null);
 
+	function handleCreateNewPhaseButtonClick() {
+		currentProjectSocket.emit("createPhase", {
+			phaseName: "Nova Fase",
+		});
+	}
+
+	function handleCreateNewPhaseCardButtonClick(phaseId) {
+		currentProjectSocket.emit("createCard", {
+			phaseId,
+			cardName: "Novo Card",
+		});
+	}
+
 	useEffect(() => {
+		// Pega o socket do projeto, caso exista
 		const socket = getProjectSession(projectId)?.socket;
 		setCurrentProjectSocket(socket);
 
@@ -73,34 +216,48 @@ function Project() {
 			return undefined;
 		}
 
-		const newProjectState = new ProjectState();
+		const newProjectState = new ProjectState(socket);
 		setProjectState(newProjectState);
 
-		socket.on("disconnect", () => {
-			setCurrentProjectSocket(null);
-		});
+		// Funções de resposta do servidor
+		const disconnect = () => setCurrentProjectSocket(null);
 
-		const phaseCreated = (...data) => newProjectState.phaseCreated;
-		const phaseUpdated = (...data) => newProjectState.phaseUpdated;
-		const phaseDeleted = (...data) => newProjectState.phaseDeleted;
-		const phaseMoved = (...data) => newProjectState.phaseMoved;
+		const phaseCreated = (...data) => newProjectState.phaseCreated(data);
+		const phaseUpdated = (...data) => newProjectState.phaseUpdated(data);
+		const phaseDeleted = (...data) => newProjectState.phaseDeleted(data);
+		const phaseMoved = (...data) => newProjectState.phaseMoved(data);
 
-		const cardCreated = (...data) => newProjectState.cardCreated;
-		const cardUpdated = (...data) => newProjectState.cardUpdated;
-		const cardDeleted = (...data) => newProjectState.cardDeleted;
-		const cardMoved = (...data) => newProjectState.cardMoved;
+		const cardCreated = (...data) => newProjectState.cardCreated(data);
+		const cardUpdated = (...data) => newProjectState.cardUpdated(data);
+		const cardDeleted = (...data) => newProjectState.cardDeleted(data);
+		const cardMoved = (...data) => newProjectState.cardMoved(data);
 
-		socket.on("phaseCreated", (phaseDTO) => {});
-		socket.on("phaseUpdated", (phaseId, updatedPhaseDTOFields) => {});
-		socket.on("phaseDeleted", (phaseId) => {});
-		socket.on("phaseMoved", (phaseId, targetPositionIndex) => {});
+		const phasesFetched = (...data) => newProjectState.phasesFetched(data);
+		const cardsFetched = (...data) => newProjectState.cardsFetched(data);
 
-		socket.on("cardCreated", (cardDTO) => {});
-		socket.on("cardUpdated", (cardId, updatedCardDTOFields) => {});
-		socket.on("cardDeleted", (cardId) => {});
-		socket.on("cardMoved", (cardId, targetPhaseIndex, targetPositionIndex) => {});
+		// Adiciona os listeners
+		socket.on("disconnect", disconnect);
+
+		socket.on("phaseCreated", phaseCreated);
+		socket.on("phaseUpdated", phaseUpdated);
+		socket.on("phaseDeleted", phaseDeleted);
+		socket.on("phaseMoved", phaseMoved);
+
+		socket.on("cardCreated", cardCreated);
+		socket.on("cardUpdated", cardUpdated);
+		socket.on("cardDeleted", cardDeleted);
+		socket.on("cardMoved", cardMoved);
+
+		socket.on("cardsFetched", phasesFetched);
+		socket.on("phasesFetched", cardsFetched);
 
 		return () => {
+			// Remove o socket do projeto
+			setCurrentProjectSocket(null);
+
+			// Remove os listeners
+			socket.off("disconnect", disconnect);
+
 			socket.off("phaseCreated", phaseCreated);
 			socket.off("phaseUpdated", phaseUpdated);
 			socket.off("phaseDeleted", phaseDeleted);
@@ -111,7 +268,8 @@ function Project() {
 			socket.off("cardDeleted", cardDeleted);
 			socket.off("cardMoved", cardMoved);
 
-			setCurrentProjectSocket(null);
+			socket.off("cardsFetched", phasesFetched);
+			socket.off("phasesFetched", cardsFetched);
 		};
 	}, [projectId, getProjectSession]);
 
@@ -122,10 +280,51 @@ function Project() {
 			<HomeHeader />
 			<div className="P-background" ref={phasesContainerScrollBarRef}>
 				<div className="P-phases-container-holder">
-					<div className="P-phases-container" ref={phasesContainerRef}></div>
+					<div className="P-phases-container" ref={phasesContainerRef}>
+						<div ref={lazyLoaderTopOffsetRef} />
+						<LazyLoader
+							// Referências para os offsets
+							topLeftOffset={lazyLoaderBottomOffsetRef}
+							bottomRightOffset={lazyLoaderBottomOffsetRef}
+							// Container e barra de rolagem
+							container={phasesContainerRef}
+							scrollBar={phasesContainerScrollBarRef}
+							// Função para construir os elementos
+							constructElement={({ phaseId }, isLoading) => {
+								return (
+									<Phase
+										isLoading={isLoading}
+										phaseId={phaseId}
+										projectState={projectState}
+									/>
+								);
+							}}
+							// Dimensões dos elementos
+							width={320}
+							margin={20}
+							padding={20}
+							// Direção de rolagem
+							direction={"horizontal"}
+							// Funções de controle do conteúdo
+							fetchMore={(page) => {
+								return currentProjectSocket?.emit("fetchPhases", { page });
+							}}
+							getAvailableContentCountForFetch={() => {
+								return currentProjectSocket?.emit("phasesInProject");
+							}}
+							// Tamanho da página
+							pageSize={10}
+							// Função para obter o conteúdo
+							getContent={projectState?.getPhases()}
+						/>
+						<div ref={lazyLoaderBottomOffsetRef} />
+					</div>
 
 					<div className="P-add-new-phase-button-container">
-						<button className="P-add-new-phase-button">
+						<button
+							className="P-add-new-phase-button"
+							onClick={handleCreateNewPhaseButtonClick}
+						>
 							<AddButtonIcon className="P-add-new-phase-button-icon" />
 						</button>
 					</div>
