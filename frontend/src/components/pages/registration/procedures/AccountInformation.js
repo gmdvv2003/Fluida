@@ -13,6 +13,7 @@ import NameInputTypeValidator from "utilities/inputs-validators/models/NameInput
 import PhoneNumberField from "./../input-types/PhoneNumberField";
 import PhoneNumberInputTypeValidator from "utilities/inputs-validators/models/PhoneNumberInputTypeValidator";
 import TextInputField from "../../../shared/text-input-field/TextInputField";
+import ActionButton from "components/shared/action-button/ActionButton";
 
 const AccountInformation = React.forwardRef(
 	({ nextProcedure, previousProcedure, setState }, ref) => {
@@ -21,14 +22,14 @@ const AccountInformation = React.forwardRef(
 		const lastNameFieldReference = useRef(null);
 		const phoneNumberReference = useRef(null);
 
-		const [enteredEmail, setEnteredEmail] = useState("");
-		const [enteredFirstName, setEnteredFirstName] = useState("");
-		const [enteredLastName, setEnteredLastName] = useState("");
-		const [enteredPhoneNumber, setEnteredPhoneNumber] = useState("");
+		const [enteredEmail, setEnteredEmail] = useState("stefanimada@gmail.com");
+		const [enteredFirstName, setEnteredFirstName] = useState("sdasd");
+		const [enteredLastName, setEnteredLastName] = useState("asdasd");
+		const [enteredPhoneNumber, setEnteredPhoneNumber] = useState("43234234234");
 
 		const [invalidEmail, setInvalidEmail] = useState(false);
-		const [invalidFirstName, setInvalidFirstName] = useState(true);
-		const [invalidLastName, setInvalidLastName] = useState(true);
+		const [invalidFirstName, setInvalidFirstName] = useState(false);
+		const [invalidLastName, setInvalidLastName] = useState(false);
 		const [invalidPhoneNumber, setInvalidPhoneNumber] = useState(false);
 
 		const [hasInvalidFields, setHasInvalidFields] = useState(false);
@@ -173,9 +174,16 @@ const AccountInformation = React.forwardRef(
 										<InputFieldError error="Por favor, preencha todos os campos." />
 									)}
 									<div className="R-registration-button">
-										<button type="button" onClick={handleOnContinueButton}>
-											Continuar
-										</button>
+										<ActionButton
+											title="Continuar"
+											is_active={
+												enteredEmail.length > 0 &&
+												enteredFirstName.length > 0 &&
+												enteredLastName.length > 0 &&
+												enteredPhoneNumber.length > 0
+											}
+											on_click={handleOnContinueButton}
+										/>
 									</div>
 								</div>
 

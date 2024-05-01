@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import EmailInputTypeValidator from "utilities/inputs-validators/models/EmailInputTypeValidator";
 import Header from "components/shared/login-registration/header/Header";
 import InputFieldError from "components/shared/login-registration/error/InputFieldError";
+import ActionButton from "components/shared/action-button/ActionButton";
 import LoadingDots from "components/shared/loading/LoadingDots";
 import { RequestPasswordResetEndpoint } from "utilities/Endpoints";
 import TextInputField from "../../shared/text-input-field/TextInputField";
@@ -66,13 +67,10 @@ function SendPasswordReset() {
 		<div className="SPR-background-container">
 			<Header />
 			<div className="SPR-box-container">
-				<div className="SPR-form-container" style={{ height: "60%" }}>
-					<div className="SPR-form" style={{ width: "80%" }}>
+				<div className="SPR-form-container">
+					<div className="SPR-form">
 						<h2 className="SPR-form-title">Esqueceu sua senha?</h2>
-						<h5
-							className="SPR-form-description"
-							style={{ width: "120%", paddingTop: "2rem" }}
-						>
+						<h5 className="SPR-form-description">
 							Insira o email da sua conta, caso ele esteja correto, <br />
 							você receberá um email para redefinição de senha.
 						</h5>

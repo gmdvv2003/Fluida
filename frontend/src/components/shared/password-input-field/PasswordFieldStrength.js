@@ -40,11 +40,18 @@ const PasswordFieldStrength = React.forwardRef(({ field }, ref) => {
 	return (
 		<div className="R-PFS-password-strength-container">
 			{passwordStrengthValidador.getParameters().map((parameter) => {
+				const isValidated = currentPassword && parameter.isSatisfied(currentPassword);
 				return (
 					<div className="R-PFS-password-strength-requirement-container">
 						<div className="R-PFS-password-strength-requirement">
-							<a className="R-PFS-password-strength-description">{parameter.description}</a>
-							{currentPassword && parameter.isSatisfied(currentPassword) ? <TickIcon /> : <TickXIcon />}
+							<a
+								className={`R-PFS-password-strength-description " ${
+									isValidated ? "R-PFS-validated-strength-text" : ""
+								}`}
+							>
+								{parameter.description}
+							</a>
+							{isValidated ? <TickIcon /> : <TickXIcon />}
 						</div>
 					</div>
 				);
