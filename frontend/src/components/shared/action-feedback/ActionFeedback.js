@@ -22,9 +22,16 @@ function Button({ text }) {
 
 function ActionFeedback({ elements }) {
 	return (
-		<div className="LR-C-forms-container-holder" style={{ justifyContent: "start", paddingTop: "50px" }}>
-			<div className="LR-C-forms-container" style={{ height: "40%" }}>
-				<div className="LR-C-forms" style={{ width: "80%" }}>
+		<div
+			className="LR-C-forms-container-holder"
+			style={{
+				justifyContent: "start",
+				paddingTop: "50px",
+				height: "calc(100vh - var(--header-height) - 50px)",
+			}}
+		>
+			<div className="LR-C-forms-container" style={{ height: "180px" }}>
+				<div className="LR-C-forms" style={{ width: "80%", padding: "0px" }}>
 					<div className="AF-form">
 						{elements.map((element) => {
 							if (element.type === "custom") {

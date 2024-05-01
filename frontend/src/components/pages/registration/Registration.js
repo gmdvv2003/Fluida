@@ -9,14 +9,13 @@ import PasswordCreation from "./procedures/PasswordCreation";
 import ActionFeedback from "components/shared/action-feedback/ActionFeedback";
 
 import { RegisterUserEndpoint } from "utilities/Endpoints";
-import Background from "components/shared/login-registration/background/Background";
 
 function Registration() {
 	const [currentProcedure, setCurrentProcedure] = useState(0);
 
 	const [waitingForRegistration, setWaitingForRegistration] = useState(false);
 	const [finishedRegistrationProcess, setFinishedRegistrationProcess] = useState(false);
-	const [successfullyRegistered, setSuccessfullyRegistered] = useState(false);
+	const [successfullyRegistered, setSuccessfullyRegistered] = useState(true);
 
 	const accountInformationFieldsProvider = {
 		email: useState(false),
@@ -77,10 +76,10 @@ function Registration() {
 			<ActionFeedback
 				elements={[
 					{ type: "title", text: "Parabéns!" },
-					{ type: "subSitle", text: "Sua conta foi cadastrada com sucesso!" },
+					{ type: "subSitle", text: "Sua conta foi cadastrada com sucesso." },
 					{
 						type: "description",
-						text: "Agora você está um passo mais próximo de começar a explorar a nossa plataforma. Um email foi enviado para a sua caixa de entrada para que você possa validar a sua conta.",
+						text: "Agora você está um passo mais próximo de começar a explorar a nossa plataforma. Encaminhos uma mensagem para o seu email para validar a sua conta.",
 					},
 				]}
 			/>
@@ -98,7 +97,7 @@ function Registration() {
 					},
 					{
 						type: "description",
-						text: "Favor tente novamente mais tarde. Se o problema persistir, entre em contato conosco para que possamos resolver o problema.",
+						text: "Por favor tente novamente mais tarde. Se o problema persistir, entre em contato conosco para que possamos resolver o problema.",
 					},
 				]}
 			/>
@@ -108,7 +107,7 @@ function Registration() {
 	return (
 		<div>
 			<Header />
-			<div>
+			<div className="R-background-container">
 				{(() => {
 					if (waitingForRegistration) {
 						return <Loading text="Cadastrando sua conta" />;
