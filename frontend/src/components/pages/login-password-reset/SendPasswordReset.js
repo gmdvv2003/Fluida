@@ -71,8 +71,8 @@ function SendPasswordReset() {
 					<div className="SPR-form">
 						<h2 className="SPR-form-title">Esqueceu sua senha?</h2>
 						<h5 className="SPR-form-description">
-							Insira o email da sua conta, caso ele esteja correto, <br />
-							você receberá um email para redefinição de senha.
+							Insira o email da sua conta, caso ele esteja correto, você receberá um
+							email para redefinição de senha.
 						</h5>
 						{!emailSent && (
 							<div style={{ width: "100%" }}>
@@ -121,9 +121,11 @@ function SendPasswordReset() {
 
 							return (
 								<div className="SPR-button-container">
-									<button onClick={handleSendButton} className="SPR-button">
-										Enviar email
-									</button>
+									<ActionButton
+										title="Enviar email"
+										is_active={enteredEmail}
+										on_click={handleSendButton}
+									/>
 								</div>
 							);
 						})()}
