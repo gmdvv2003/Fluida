@@ -10,9 +10,7 @@ const TextInputField = React.forwardRef(({ name, placeholder, grid_area, contain
 	const onTextChangeSubscriptionHelper = new ReactSubscriptionHelper();
 
 	function handleOnTextChange(event) {
-		onTextChangeSubscriptionHelper.getSubscriptions().forEach((subscriber) => {
-			subscriber.notify(event);
-		});
+		onTextChangeSubscriptionHelper.notify(event);
 	}
 
 	useImperativeHandle(ref, () => ({

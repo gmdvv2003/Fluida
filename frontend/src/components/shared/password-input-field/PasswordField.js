@@ -19,9 +19,7 @@ const PasswordField = React.forwardRef(({ name, placeholder }, ref) => {
 	}
 
 	function handleOnPasswordChange(event) {
-		onPasswordChangeSubscriptionHelper.getSubscriptions().forEach((subscription) => {
-			subscription.notify(event);
-		});
+		onPasswordChangeSubscriptionHelper.notify(event);
 	}
 
 	useImperativeHandle(ref, () => ({

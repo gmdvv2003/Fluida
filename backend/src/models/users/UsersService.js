@@ -3,15 +3,8 @@ const Service = require("../__types/Service");
 const UsersDTO = require("./UsersDTO");
 const UsersRepository = require("./UsersRepository");
 
-const {
-	UserNotFound,
-	WrongPassword,
-	UserNotVerified,
-	UserAlreadyLogged,
-} = require("../../context/exceptions/users-repository/Exceptions");
-const {
-	InvalidInputParameter,
-} = require("../../context/exceptions/repository-input-validator/Exceptions");
+const { UserNotFound, WrongPassword, UserNotVerified, UserAlreadyLogged } = require("../../context/exceptions/users-repository/Exceptions");
+const { InvalidInputParameter } = require("../../context/exceptions/repository-input-validator/Exceptions");
 
 // HashMap para armazenar as sessões ativas (facilita a busca de sessões ativas)
 const ACTIVE_SESSIONS = new Map();
@@ -45,16 +38,12 @@ class UsersService extends Service {
 			return false;
 		}
 
-		if (session != authorization) {
-			return false;
-		}
-
-		return true;
+		return session == authorization;
 	}
 
 	/**
 	 * Pega um usuário pelo email.
-	 *
+	 *w
 	 * @param {string} email
 	 * @returns {UsersDTO}
 	 */
@@ -86,9 +75,7 @@ class UsersService extends Service {
 	 */
 	async register(firstName, lastName, email, phoneNumber, password) {
 		try {
-			const user = await this.#UsersRepository.register(
-				new UsersDTO({ firstName, lastName, email, phoneNumber, password })
-			);
+			const user = await this.#UsersRepository.register(new UsersDTO({ firstName, lastName, email, phoneNumber, password }));
 			return { success: true, user: user };
 		} catch (error) {
 			if (error instanceof InvalidInputParameter) {

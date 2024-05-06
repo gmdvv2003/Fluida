@@ -4,7 +4,7 @@ const ISSUER = "Fluida";
 const AUDIENCE = ["All"];
 
 const ALGORITHM = "RS256";
-const EXPIRATION_TIME = "1h"; // TODO: Garantir a atualização do token
+const EXPIRATION_TIME = "888888h"; // TODO: Garantir a atualização do token
 
 const JWT_OPTIONS = {
 	issuer: ISSUER,

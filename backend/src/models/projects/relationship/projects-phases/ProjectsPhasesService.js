@@ -22,11 +22,12 @@ class ProjectsPhasesService extends Service {
 	/**
 	 *  Retorna as fases de um projeto.
 	 *
+	 * @param {Object} pageOptions { PAGE: number, PAGE_SIZE: number }
 	 * @param {number} projectId
 	 * @returns {Page}
 	 */
-	async getPhasesOfProject(projectId) {
-		return await this.ProjectsPhasesRepository.getPhasesOfProject(projectId);
+	async getPhasesOfProject(pageOptions, projectId) {
+		return await this.ProjectsPhasesRepository.getPhasesOfProject(pageOptions, projectId);
 	}
 
 	/**
@@ -37,9 +38,7 @@ class ProjectsPhasesService extends Service {
 	 * @returns {InsertResult}
 	 */
 	async addPhaseToProjectPhases(phaseId, projectId) {
-		return await this.ProjectsPhasesRepository.addPhaseToProjectPhases(
-			new ProjectsPhasesDTO({ phaseId, projectId })
-		);
+		return await this.ProjectsPhasesRepository.addPhaseToProjectPhases(new ProjectsPhasesDTO({ phaseId, projectId }));
 	}
 
 	/**
@@ -50,9 +49,7 @@ class ProjectsPhasesService extends Service {
 	 * @returns {DeleteResult}
 	 */
 	async removePhaseFromProjectPhases(phaseId, projectId) {
-		return await this.ProjectsPhasesRepository.removePhaseFromProjectPhases(
-			new ProjectsPhasesDTO({ phaseId, projectId })
-		);
+		return await this.ProjectsPhasesRepository.removePhaseFromProjectPhases(new ProjectsPhasesDTO({ phaseId, projectId }));
 	}
 }
 

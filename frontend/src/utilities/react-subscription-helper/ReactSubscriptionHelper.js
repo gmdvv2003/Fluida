@@ -23,6 +23,17 @@ class ReactSubscriptionHelper {
 		};
 	};
 
+	notify(...pass) {
+		this.subscriptions.forEach((subscription) => {
+			subscription.notify(...pass);
+		});
+	}
+
+	remove(callback) {
+		const index = this.subscriptions.indexOf(callback);
+		this.subscriptions.splice(index, 1);
+	}
+
 	getSubscriptions() {
 		return this.subscriptions;
 	}

@@ -11,7 +11,7 @@ export function useAuthentication() {
 export function AuthenticationProvider({ children }) {
 	const [currentUserSession, setCurrentUserSession] = useState({
 		session:
-			"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImZpcnN0TmFtZSI6Ikd1aWxoZXJtZSIsImxhc3ROYW1lIjoiRGFnaGxpYW4iLCJlbWFpbCI6ImdtLmRhZ2hsaWFuQGdtYWlsLmNvbSIsInBob25lTnVtYmVyIjoiMTE5MTczNTk5NTYiLCJwYXNzd29yZCI6IkNhc2NvbGEwNGdtISIsInNlc3Npb25Ub2tlbiI6bnVsbCwiZW1haWxWYWxpZGF0aW9uVG9rZW4iOm51bGwsInBhc3N3b3JkUmVzZXRUb2tlbiI6bnVsbCwiZW1haWxWZXJpZmllZCI6dHJ1ZSwiaWF0IjoxNzE0MTg3NDA2LCJleHAiOjIwNzQxODM4MDYsImF1ZCI6WyJBbGwiXSwiaXNzIjoiRmx1aWRhIn0.hEE57MJtdH-9JB9RFXZzDGoDsPoWjefvkybHDviaRmGKxnA5SituuPtolv6FAj6l3DbvtmyfiZoaGu56YDmsEuaMfwOS-vdvHtxgH_7RbPCB_sDejpWDgfulgjQdpJOvMjawuMHMY0nPgTIR1UJgVDVNgtfZSpzS_5zLhA56llXBKHgs3Emuo_ZLgIcbwO1FnMHu2pr7Ak_xSPzWSeLZtM222Awg-01h_RdCzs8VkHujvUJqQTgbVWpSdACNlAsqLQZhLfSrZyAd-n_dvZrnU4PWndqV5u6wOBm8qoVPq3E1VbQigpx9C6MVCFKhjI4mJkdzcg8exdVYLHXeSMu1Pg",
+			"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdtLmRhZ2hsaWFuQGdtYWlsLmNvbSIsInVzZXJJZCI6MSwiaWF0IjoxNzE0NTIwNDM3LCJleHAiOjQ5MTQ1MTcyMzcsImF1ZCI6WyJBbGwiXSwiaXNzIjoiRmx1aWRhIn0.GVUyQYQA6gNkUm5aKmooD_6TiCacGWsAnsDd295TtDmbOccKTnpWhf5tvF9Nk1CrocP_OnC6cqCdyXPsRm6joCF2Watth3jj4yODuujDSkWV2OKp7TkglwbdyWokCjqqA0l4eiwo0Py82RnYZsYRUkAG6z4R7TUW9lBYDpNlBJqCw75l91P1M8ZltIbCOtBr1wJmw9wvIDldGPK50zdIkNCuo4CsksHA7iwaAd80nTHZjasJoOeOSOeePY4aZtpkJVFwhmbtIe5yM3TdeH5s-qC9CjezfU_aV_D2vVYt5XSeZXwuUpYqb3WkVfgNAB2DP6cxeO2icaQyuVSk1MvPOQ",
 		userId: 1,
 	});
 	const [loadingUser, setLoadingUser] = useState(false);
@@ -56,11 +56,7 @@ export function AuthenticationProvider({ children }) {
 		// Limpa a sessão do usuário
 		setCurrentUserSession(null);
 
-		return await performAuthenticatedRequest(
-			PerformLogoutEndpoint,
-			"POST",
-			JSON.stringify({ userId: currentUserSession.userId })
-		);
+		return await performAuthenticatedRequest(PerformLogoutEndpoint, "POST", JSON.stringify({ userId: currentUserSession.userId }));
 	}
 
 	/**
@@ -82,9 +78,7 @@ export function AuthenticationProvider({ children }) {
 	useEffect(() => {}, []);
 
 	return (
-		<AuthenticationContext.Provider
-			value={{ currentUserSession, login, logout, performAuthenticatedRequest }}
-		>
+		<AuthenticationContext.Provider value={{ currentUserSession, login, logout, performAuthenticatedRequest }}>
 			{!loadingUser && children}
 		</AuthenticationContext.Provider>
 	);

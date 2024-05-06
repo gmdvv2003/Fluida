@@ -18,11 +18,23 @@ function ParticipateInProject({ children }) {
 			return setNavigateToHome(true);
 		}
 
-		participate(projectId)
-			.then((response) => setNavigateToHome(!response.success))
-			.catch(() => setNavigateToHome(true))
-			.finally(() => setWaitingForParticipation(false));
-	}, []);
+		let isCancelled = false;
+
+		participate(parseInt(projectId)).then(({ success }) => {
+			if (isCancelled) {
+				return null;
+			}
+
+			setNavigateToHome(!success);
+			setWaitingForParticipation(false);
+		});
+
+		return () => {
+			isCancelled = true;
+			setWaitingForParticipation(true);
+			setNavigateToHome(false);
+		};
+	}, [projectId]);
 
 	if (waitingForParticipation) {
 		return <Loading />;

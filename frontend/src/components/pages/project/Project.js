@@ -39,7 +39,7 @@ class ProjectState {
 
 	constructor(socket) {
 		// Fetch das fases inicial
-		socket.emit("fetchPhases", { page: 0 });
+		// socket.emit("fetchPhases", { page: 0 });
 
 		this.#socket = socket;
 	}
@@ -194,6 +194,9 @@ function Project() {
 	const lazyLoaderTopOffsetRef = useRef(null);
 	const lazyLoaderBottomOffsetRef = useRef(null);
 
+	const lazyLoaderRef = useRef(null);
+
+	// ============================== Criação de fases e cards ============================== //
 	function handleCreateNewPhaseButtonClick() {
 		currentProjectSocket.emit("createPhase", {
 			phaseName: "Nova Fase",
@@ -207,6 +210,33 @@ function Project() {
 		});
 	}
 
+	// ============================== Drag das fases ============================== //
+	function getPhaseFromRef(ref) {
+		return ref.current?.children?.[0];
+	}
+
+	function getComponentDataFromRef(ref) {
+		return lazyLoaderRef.current?.getComponentDataFromRef(getPhaseFromRef(ref));
+	}
+
+	function handlePhaseDragBegin(ref, _, event) {
+		console.log("Begin", ref.current, getComponentDataFromRef(ref));
+		console.log("=====================================");
+		// const { current, index } = getComponentDataFromRef(ref);
+		// lazyLoaderRef.current?.associatePlaceholder(current, lazyLoaderRef.current?.addPlaceholder(<h1>Oi</h1>, index));
+	}
+
+	function handlePhaseDragEnd(ref, _, event) {
+		console.log("End");
+	}
+
+	function handlePhaseDragMove(ref, _, event) {
+		console.log("Move", ref.current, getComponentDataFromRef(ref));
+		console.log("=====================================\n\n");
+		// const { current } = getComponentDataFromRef(ref);
+	}
+
+	// ============================== Socket ============================== //
 	useEffect(() => {
 		// Pega o socket do projeto, caso exista
 		const socket = getProjectSession(projectId)?.socket;
@@ -271,65 +301,73 @@ function Project() {
 			socket.off("cardsFetched", phasesFetched);
 			socket.off("phasesFetched", cardsFetched);
 		};
-	}, [projectId, getProjectSession]);
-
-	useEffect(() => {}, [cardId, getProjectSession]);
+	}, [projectId]);
 
 	return (
 		<div style={{ overflowX: "hidden" }}>
 			<HomeHeader />
-			<div className="P-background" ref={phasesContainerScrollBarRef}>
-				<div className="P-phases-container-holder">
-					<div className="P-phases-container" ref={phasesContainerRef}>
-						<div ref={lazyLoaderTopOffsetRef} />
-						<LazyLoader
-							// Referências para os offsets
-							topLeftOffset={lazyLoaderBottomOffsetRef}
-							bottomRightOffset={lazyLoaderBottomOffsetRef}
-							// Container e barra de rolagem
-							container={phasesContainerRef}
-							scrollBar={phasesContainerScrollBarRef}
-							// Função para construir os elementos
-							constructElement={({ phaseId }, isLoading) => {
-								return (
+			{projectState && (
+				<div className="P-background" ref={phasesContainerScrollBarRef}>
+					<div className="P-phases-container-holder">
+						<div className="P-phases-container" ref={phasesContainerRef}>
+							<div ref={lazyLoaderTopOffsetRef} />
+							<LazyLoader
+								// Referências para os offsets
+								topLeftOffset={lazyLoaderBottomOffsetRef}
+								bottomRightOffset={lazyLoaderBottomOffsetRef}
+								// Container e barra de rolagem
+								container={phasesContainerRef}
+								scrollBar={phasesContainerScrollBarRef}
+								// Função para construir os elementos
+								constructElement={(phase, index, isLoading, setReference) => (
 									<Phase
 										isLoading={isLoading}
-										phaseId={phaseId}
+										phase={phase}
 										projectState={projectState}
+										dragBegin={handlePhaseDragBegin}
+										dragEnd={handlePhaseDragEnd}
+										dragMove={handlePhaseDragMove}
+										ref={(element) => setReference(element)}
 									/>
-								);
-							}}
-							// Dimensões dos elementos
-							width={320}
-							margin={20}
-							padding={20}
-							// Direção de rolagem
-							direction={"horizontal"}
-							// Funções de controle do conteúdo
-							fetchMore={(page) => {
-								return currentProjectSocket?.emit("fetchPhases", { page });
-							}}
-							getAvailableContentCountForFetch={() => {
-								return currentProjectSocket?.emit("phasesInProject");
-							}}
-							// Tamanho da página
-							pageSize={10}
-							// Função para obter o conteúdo
-							getContent={projectState?.getPhases()}
-						/>
-						<div ref={lazyLoaderBottomOffsetRef} />
-					</div>
+								)}
+								// Dimensões dos elementos
+								width={320}
+								margin={20}
+								padding={20}
+								// Direção de rolagem
+								direction={"horizontal"}
+								// Funções de controle do conteúdo
+								fetchMore={(page) => {
+									return new Promise((resolve, reject) => {
+										// return currentProjectSocket?.emit("fetchPhases", { page }, (response) => {
+										// 	resolve(response?.phases || []);
+										// });
+										resolve([new PhaseState({ phaseId: 1, order: 0 })]);
+									});
+								}}
+								getAvailableContentCountForFetch={async () => {
+									return new Promise((resolve, reject) => {
+										resolve(100);
+									});
+								}}
+								// Tamanho da página
+								pageSize={1}
+								// Função para obter o conteúdo
+								getContent={projectState?.getPhases()}
+								// Referência para o lazy loader
+								ref={lazyLoaderRef}
+							/>
+							<div ref={lazyLoaderBottomOffsetRef} />
+						</div>
 
-					<div className="P-add-new-phase-button-container">
-						<button
-							className="P-add-new-phase-button"
-							onClick={handleCreateNewPhaseButtonClick}
-						>
-							<AddButtonIcon className="P-add-new-phase-button-icon" />
-						</button>
+						<div className="P-add-new-phase-button-container">
+							<button className="P-add-new-phase-button" onClick={handleCreateNewPhaseButtonClick}>
+								<AddButtonIcon className="P-add-new-phase-button-icon" />
+							</button>
+						</div>
 					</div>
 				</div>
-			</div>
+			)}
 		</div>
 	);
 }

@@ -51,11 +51,7 @@ app.use((request, response, next) => {
 if (process.env.HTTP_WATCHER == 1) {
 	// Middleware para logar as requisições
 	app.use((request, _, next) => {
-		console.log(
-			`\nRequisição: [${request.method}] ${request.url}, Body: ${JSON.stringify(
-				request.body
-			)}\n`
-		);
+		console.log(`\nRequisição: [${request.method}] ${request.url}, Body: ${JSON.stringify(request.body)}\n`);
 
 		next();
 	});
@@ -92,42 +88,46 @@ Database.initialize()
 			`
 		);
 
-		const UsersController = require("./models/users/UsersController");
-		const ProjectsController = require("./models/projects/ProjectsController");
+		try {
+			const UsersController = require("./models/users/UsersController");
+			const ProjectsController = require("./models/projects/ProjectsController");
 
-		// Singletons que inicializam as rotas
-		const usersRoutes = require("./models/users/users.routes");
-		const projectsRoutes = require("./models/projects/projects.routes");
+			// Singletons que inicializam as rotas
+			const usersRoutes = require("./models/users/users.routes");
+			const projectsRoutes = require("./models/projects/projects.routes");
 
-		// Serviços inicializados
-		const INSTANTIATED_SERVICES = {};
+			// Serviços inicializados
+			const INSTANTIATED_SERVICES = {};
 
-		// Provider de serviços para garantir que os controllers tenham acesso a todos os serviços
-		const servicesProvider = {
-			register(identifier, controller) {
-				INSTANTIATED_SERVICES[identifier] = controller.Service;
-			},
+			// Provider de serviços para garantir que os controllers tenham acesso a todos os serviços
+			const servicesProvider = {
+				register(identifier, controller) {
+					INSTANTIATED_SERVICES[identifier] = controller.Service;
+				},
 
-			get(identifier) {
-				return INSTANTIATED_SERVICES[identifier];
-			},
-		};
+				get(identifier) {
+					return INSTANTIATED_SERVICES[identifier];
+				},
+			};
 
-		const usersController = new UsersController(servicesProvider);
-		const projectsController = new ProjectsController(servicesProvider);
+			const usersController = new UsersController(servicesProvider);
+			const projectsController = new ProjectsController(servicesProvider);
 
-		// Registrando os serviços de cada controller
-		servicesProvider.register("users", usersController);
-		servicesProvider.register("projects", projectsController);
+			// Registrando os serviços de cada controller
+			servicesProvider.register("users", usersController);
+			servicesProvider.register("projects", projectsController);
 
-		usersRoutes(app, io, usersController);
-		projectsRoutes(app, io, projectsController);
+			usersRoutes(app, io, usersController);
+			projectsRoutes(app, io, projectsController);
 
-		const port = process.env.SERVER_PORT || 8080;
+			const port = process.env.SERVER_PORT || 8080;
 
-		server.listen(port, () => {
-			console.log(`Servidor rodando em ${urls.__origin_server.url}`);
-		});
+			server.listen(port, () => {
+				console.log(`Servidor rodando em ${urls.__origin_server.url}`);
+			});
+		} catch (error) {
+			console.error(`Erro ao inicializar o servidor: ${error}`);
+		}
 	})
 	.catch((error) => {
 		console.error(`Erro ao inicializar o banco de dados: ${error}`);

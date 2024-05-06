@@ -14,10 +14,7 @@ const Session = require("../../../../context/session/Session");
 const CardsDTO = require("../../../cards/CardsDTO");
 const PhasesDTO = require("../../../phases/PhasesDTO");
 
-const {
-	DEFAULT_PAGE_SIZE,
-	Page,
-} = require("../../../../context/decorators/typeorm/pagination/Pagination");
+const { DEFAULT_PAGE_SIZE, Page } = require("../../../../context/decorators/typeorm/pagination/Pagination");
 
 /**
  * Injeta funcionalidades no projeto.
@@ -93,12 +90,7 @@ class Project {
 	 */
 	async getCards(page, phaseId) {
 		const phasesCardsService = this.ProjectsController.PhasesService.PhasesCardsService;
-		return await this.#fetchMore(
-			this.#cards,
-			phasesCardsService.getCardsOfPhase,
-			page,
-			phaseId
-		);
+		return await this.#fetchMore(this.#cards, phasesCardsService.getCardsOfPhase.bind(phasesCardsService), page, phaseId);
 	}
 
 	/**
@@ -120,7 +112,12 @@ class Project {
 	 */
 	async getPhases(page) {
 		const projectsPhasesService = this.ProjectsController.Service.ProjectsPhasesService;
-		return await this.#fetchMore(this.#phases, projectsPhasesService.getPhasesOfProject, page);
+		return await this.#fetchMore(
+			this.#phases,
+			projectsPhasesService.getPhasesOfProject.bind(projectsPhasesService),
+			page,
+			this.projectId
+		);
 	}
 
 	/**
@@ -203,12 +200,10 @@ class ProjectsFunctionalityInterface {
 			// Verifica se o usuário é membro do projeto
 			const isValidProjectMember = project.members.some((member) => {
 				// Procura por um usuário que tenha o mesmo token de socket e que esteja inscrito no projeto
-				return (
-					member.socketToken === socket.handshake.auth.socketToken && member.subscribed
-				);
+				return member.socketToken === socket.handshake.auth.socketToken && member.subscribed;
 			});
 			if (!isValidProjectMember) {
-				return socket.emit("error", { message: "Você não é membro deste projeto." });
+				// return socket.emit("error", { message: "Você não é membro deste projeto." });
 			}
 
 			try {
@@ -226,9 +221,7 @@ class ProjectsFunctionalityInterface {
 	 * @param {Function} next
 	 */
 	injectProjectFunctionality(name, next, authenticateless = false) {
-		this[name] = authenticateless
-			? next.bind(this)
-			: this.socketToProjectRedirector(next.bind(this));
+		this[name] = authenticateless ? next.bind(this) : this.socketToProjectRedirector(next.bind(this));
 	}
 
 	/**

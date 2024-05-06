@@ -38,9 +38,7 @@ class PhaseFunctionality {
 				// Emite o evento de criação da fase
 				projectsIO.to(project.projectId).emit("phaseCreated", phaseDTO);
 			})
-			.catch((error) =>
-				socket.emit("error", { message: "Erro ao criar a fase", error: error })
-			);
+			.catch((error) => socket.emit("error", { message: "Erro ao criar a fase", error: error }));
 	}
 
 	#IODeletePhase(projectsIO, socket, project, data) {}
@@ -58,7 +56,9 @@ class PhaseFunctionality {
 	 * @param {Object} data
 	 */
 	#IOFetchPhases(projectsIO, socket, project, data) {
-		project.fetchPhases(data?.page).then((result) => socket.emit("phasesFetched", result));
+		project.getPhases(data?.page).then((result) => {
+			data?.callback ? data?.callback({ phases: result }) : socket.emit("phasesFetched", result);
+		});
 	}
 }
 

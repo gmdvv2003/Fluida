@@ -6,10 +6,7 @@ function InputFieldContainer({ description, grid_template_areas, children }) {
 			<div>
 				<span className="IFC-input-field-description">{description}</span>
 			</div>
-			<div
-				className="IFC-input-field-container"
-				style={{ gridTemplateAreas: `"${grid_template_areas}"` }}
-			>
+			<div className="IFC-input-field-container" style={{ gridTemplateAreas: `"${grid_template_areas}"` }}>
 				{children}
 			</div>
 		</div>
