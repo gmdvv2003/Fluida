@@ -13,21 +13,6 @@
 	height: var(--action-button-height);
 }
 
-.R-registration-button button {
-	border: 0px;
-	border-radius: var(--border-radius);
-	background-color: var(--action-button-background-color);
-	width: 100%;
-	height: 100%;
-	color: white;
-	font-weight: bold;
-	font-size: var(--action-button-font-size);
-}
-
-.R-registration-button button:hover {
-	cursor: pointer;
-}
-
 .R-go-back-button-container {
 	display: flex;
 	justify-content: left;
@@ -73,10 +58,6 @@
 
 .R-registration-footer {
 	font-weight: normal;
-}
-
-.R-registration-button button:hover {
-	background-color: var(--action-button-selected-background-color);
 }
 
 .R-go-back-button:hover path {

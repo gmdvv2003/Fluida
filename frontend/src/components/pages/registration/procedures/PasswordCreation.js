@@ -10,13 +10,15 @@ import InputFieldContainer from "../../../shared/text-input-field/InputFieldCont
 import InputFieldError from "components/shared/login-registration/error/InputFieldError";
 import PasswordField from "../../../shared/password-input-field/PasswordField";
 import PasswordFieldStrength from "../../../shared/password-input-field/PasswordFieldStrength";
+import Background from "components/shared/login-registration/background/Background";
+import ActionButton from "components/shared/action-button/ActionButton";
 
 const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure, setState }, ref) => {
 	const passwordFieldReference = useRef(null);
 	const passwordConfirmationFieldReference = useRef(null);
 	const passwordStrengthFieldRefrence = useRef(null);
 
-	const [enteredPassword, setEnteredPassword] = useState();
+	const [enteredPassword, setEnteredPassword] = useState("");
 
 	const [isPasswordNotSatisfied, setIsPasswordNotSatisfied] = useState(false);
 	const [matchingPassword, setMatchingPassword] = useState(true);
@@ -34,7 +36,7 @@ const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure, s
 	}
 
 	function handleOnContinueButton() {
-		if (matchingPassword && !isPasswordNotSatisfied) {
+		if (matchingPassword && !isPasswordNotSatisfied && enteredPassword.length > 0) {
 			setState("password", enteredPassword);
 			nextProcedure();
 		}
@@ -54,8 +56,9 @@ const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure, s
 
 	return (
 		<div>
-			<div className="LR-C-forms-container-holder BG-fluida-background-waves-container">
-				<div className="LR-C-forms-container-holder BG-fluida-identity-fish-container">
+			<Background />
+			<div className="LR-C-forms-vertical-lock">
+				<div className="LR-C-forms-horizontal-lock">
 					<div className="LR-C-forms-container">
 						<div className="LR-C-forms" style={{ width: "80%" }}>
 							<div>
@@ -103,9 +106,11 @@ const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure, s
 								/>
 
 								<div className="R-registration-button">
-									<button type="button" onClick={handleOnContinueButton}>
-										Continuar
-									</button>
+									<ActionButton
+										title="Criar conta"
+										is_active={enteredPassword.length > 0}
+										on_click={handleOnContinueButton}
+									/>
 								</div>
 
 								<div className="R-go-back-button-container">

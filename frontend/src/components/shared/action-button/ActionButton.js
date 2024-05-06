@@ -5,7 +5,7 @@ function ActionButton({ title, is_active, on_click }) {
 		<button
 			onClick={on_click}
 			type="button"
-			className={`L-start-session-button ${is_active ? "active" : ""}`}
+			className={`ACB-start-session-button ${is_active ? "ACB-action-button-active" : ""}`}
 		>
 			{title}
 		</button>

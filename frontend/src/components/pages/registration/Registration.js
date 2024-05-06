@@ -9,7 +9,6 @@ import PasswordCreation from "./procedures/PasswordCreation";
 import ActionFeedback from "components/shared/action-feedback/ActionFeedback";
 
 import { RegisterUserEndpoint } from "utilities/Endpoints";
-import Background from "components/shared/login-registration/background/Background";
 
 function Registration() {
 	const [currentProcedure, setCurrentProcedure] = useState(0);
@@ -74,97 +73,98 @@ function Registration() {
 
 	function successed() {
 		return (
-			<ActionFeedback
-				elements={[
-					{ type: "title", text: "Parabéns!" },
-					{ type: "subSitle", text: "Sua conta foi cadastrada com sucesso!" },
-					{
-						type: "description",
-						text: "Agora você está um passo mais próximo de começar a explorar a nossa plataforma. Um email foi enviado para a sua caixa de entrada para que você possa validar a sua conta.",
-					},
-				]}
-			/>
+			<div className="R-background-container">
+				<ActionFeedback
+					elements={[
+						{ type: "title", text: "Parabéns!" },
+						{ type: "subSitle", text: "Sua conta foi cadastrada com sucesso." },
+						{
+							type: "description",
+							text: "Agora você está um passo mais próximo de começar a explorar a nossa plataforma. Encaminhos uma mensagem para o seu email para validar a sua conta.",
+						},
+					]}
+				/>
+			</div>
 		);
 	}
 
 	function failed() {
 		return (
-			<ActionFeedback
-				elements={[
-					{ type: "title", text: "Ops! :(" },
-					{
-						type: "subTitle",
-						text: "Não foi possível realizar o cadastro da sua conta.",
-					},
-					{
-						type: "description",
-						text: "Favor tente novamente mais tarde. Se o problema persistir, entre em contato conosco para que possamos resolver o problema.",
-					},
-				]}
-			/>
+			<div className="R-background-container">
+				<ActionFeedback
+					elements={[
+						{ type: "title", text: "Ops! :(" },
+						{
+							type: "subTitle",
+							text: "Não foi possível realizar o cadastro da sua conta.",
+						},
+						{
+							type: "description",
+							text: "Por favor tente novamente mais tarde. Se o problema persistir, entre em contato conosco para que possamos resolver o problema.",
+						},
+					]}
+				/>
+			</div>
 		);
 	}
 
 	return (
 		<div>
 			<Header />
-			<div>
-				{(() => {
-					if (waitingForRegistration) {
-						return <Loading text="Cadastrando sua conta" />;
-					}
 
-					if (finishedRegistrationProcess) {
-						return successfullyRegistered ? successed() : failed();
-					}
+			{(() => {
+				if (waitingForRegistration) {
+					return <Loading text="Cadastrando sua conta" />;
+				}
 
-					switch (currentProcedure) {
-						case 0:
-							return (
-								<AccountInformation
-									nextProcedure={nextProcedure}
-									previousProcedure={previousProcedure}
-									setState={setState}
-								/>
-							);
+				if (finishedRegistrationProcess) {
+					return successfullyRegistered ? successed() : failed();
+				}
 
-						case 1:
-							return (
-								<PasswordCreation
-									nextProcedure={nextProcedure}
-									previousProcedure={previousProcedure}
-									setState={setState}
-								/>
-							);
+				switch (currentProcedure) {
+					case 0:
+						return (
+							<AccountInformation
+								nextProcedure={nextProcedure}
+								previousProcedure={previousProcedure}
+								setState={setState}
+							/>
+						);
 
-						// Envia as informações de cadastro para o back
-						case 2: {
-							// Assegura que todos os campos estão preenchidos
-							let allValid = true;
-							for (const [_, value] of Object.entries(
-								accountInformationFieldsProvider
-							)) {
-								if (!value[0]) {
-									allValid = false;
-									break;
-								}
+					case 1:
+						return (
+							<PasswordCreation
+								nextProcedure={nextProcedure}
+								previousProcedure={previousProcedure}
+								setState={setState}
+							/>
+						);
+
+					// Envia as informações de cadastro para o back
+					case 2: {
+						// Assegura que todos os campos estão preenchidos
+						let allValid = true;
+						for (const [_, value] of Object.entries(accountInformationFieldsProvider)) {
+							if (!value[0]) {
+								allValid = false;
+								break;
 							}
-
-							// Caso algum campo não esteja preenchido, redireciona para a tela de cadastro
-							if (!allValid) {
-								document.location.href = "/registration";
-							} else {
-								finalizeRegistration();
-							}
-
-							break;
 						}
 
-						default:
-							break;
+						// Caso algum campo não esteja preenchido, redireciona para a tela de cadastro
+						if (!allValid) {
+							document.location.href = "/registration";
+						} else {
+							finalizeRegistration();
+						}
+
+						break;
 					}
-				})()}
-			</div>
+
+					default:
+						break;
+				}
+			})()}
 		</div>
 	);
 }

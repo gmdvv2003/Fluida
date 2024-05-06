@@ -1,4 +1,4 @@
-.L-start-session-button {
+.ACB-start-session-button {
 	border: none;
 	border-radius: var(--border-radius);
 	background-color: var(--action-button-background-color-inactive);
@@ -10,15 +10,15 @@
 	font-size: 20px;
 }
 
-.active {
+.ACB-action-button-active {
 	background-color: var(--action-button-background-color) !important;
 }
 
-.active:hover {
+.ACB-action-button-active:hover {
 	background-color: var(--action-button-selected-background-color) !important;
 	cursor: pointer;
 }
 
-.L-start-session-button:focus {
+.ACB-start-session-button:focus {
 	outline: none;
 }
