@@ -39,7 +39,7 @@ class ProjectState {
 
 	constructor(socket) {
 		// Fetch das fases inicial
-		// socket.emit("fetchPhases", { page: 0 });
+		socket.emit("fetchPhases", { page: 0 });
 
 		this.#socket = socket;
 	}
@@ -157,12 +157,12 @@ class ProjectState {
 	 * @param {Array} phases
 	 */
 	phasesFetched(phases) {
-		phases?.taken?.forEach((phaseDTO) => {
+		phases?.[0]?.taken?.forEach(({ phaseId, phase }) => {
 			// Cria o estado da fase
-			this.phaseCreated(phaseDTO);
+			this.phaseCreated(phase);
 
 			// Realiza o fetch dos cards da fase inicial
-			this.#socket.emit("fetchCards", { page: 0, phaseId: phaseDTO.phaseId });
+			this.#socket.emit("fetchCards", { page: 0, phaseId: phaseId });
 		});
 	}
 
@@ -196,44 +196,131 @@ function Project() {
 
 	const lazyLoaderRef = useRef(null);
 
+	// ============================== Construtor do placeholder da fase ============================== //
+	function constructPhasePlaceholder(setPlaceholder, { order }) {
+		return (
+			<div
+				ref={(element) => setPlaceholder(element)}
+				className="PP-background PP-background-placeholder"
+				style={{ order: order + 1 }}
+			/>
+		);
+	}
+
 	// ============================== Criação de fases e cards ============================== //
 	function handleCreateNewPhaseButtonClick() {
-		currentProjectSocket.emit("createPhase", {
+		currentProjectSocket?.emit("createPhase", {
 			phaseName: "Nova Fase",
 		});
 	}
 
 	function handleCreateNewPhaseCardButtonClick(phaseId) {
-		currentProjectSocket.emit("createCard", {
+		currentProjectSocket?.emit("createCard", {
 			phaseId,
 			cardName: "Novo Card",
 		});
 	}
 
 	// ============================== Drag das fases ============================== //
+	/**
+	 *
+	 * @param {*} clientX
+	 * @param {*} clientY
+	 * @returns
+	 */
+	function getNewPhaseOrderIndex(clientX) {
+		return Math.max(0, Math.floor((clientX - 20) / (320 + 20)));
+	}
+
+	/**
+	 *
+	 * @param {*} ref
+	 * @returns
+	 */
 	function getPhaseFromRef(ref) {
 		return ref.current?.children?.[0];
 	}
 
+	/**
+	 *
+	 * @param {*} ref
+	 * @returns
+	 */
 	function getComponentDataFromRef(ref) {
 		return lazyLoaderRef.current?.getComponentDataFromRef(getPhaseFromRef(ref));
 	}
 
+	/**
+	 *
+	 * @param {*} ref
+	 * @returns
+	 */
+	function getAssociatedPlaceholder(ref) {
+		return lazyLoaderRef.current?.getAssociatedPlaceholder(ref);
+	}
+
+	/**
+	 *
+	 * @param {*} ref
+	 * @param {*} _
+	 * @param {*} event
+	 */
 	function handlePhaseDragBegin(ref, _, event) {
-		console.log("Begin", ref.current, getComponentDataFromRef(ref));
-		console.log("=====================================");
-		// const { current, index } = getComponentDataFromRef(ref);
-		// lazyLoaderRef.current?.associatePlaceholder(current, lazyLoaderRef.current?.addPlaceholder(<h1>Oi</h1>, index));
+		const { current, data, index } = getComponentDataFromRef(ref);
+		lazyLoaderRef.current?.associatePlaceholder(
+			current,
+			lazyLoaderRef.current?.addPlaceholder(index, constructPhasePlaceholder, data?.phaseDTO)
+		);
 	}
 
+	/**
+	 *
+	 * @param {*} ref
+	 * @param {*} _
+	 * @param {*} event
+	 */
 	function handlePhaseDragEnd(ref, _, event) {
-		console.log("End");
+		// Pega o componente associado ao ref
+		const { current, data } = getComponentDataFromRef(ref);
+
+		// Pega o UUID do placeholder associado ao elemento
+		const { uuid } = getAssociatedPlaceholder(current);
+
+		// Remove o placeholder associado ao elemento
+		lazyLoaderRef.current?.removePlaceholder(uuid);
+
+		// Novo índice de ordem da fase
+		let newOrderIndex = getNewPhaseOrderIndex(event.clientX);
+		newOrderIndex += newOrderIndex >= data?.phaseDTO?.order ? 1 : 0;
+
+		// Manda um evento para o servidor para mover a fase
+		currentProjectSocket?.emit("movePhase", {
+			phaseId: data?.phaseDTO?.phaseId,
+			targetPositionIndex: newOrderIndex,
+		});
 	}
 
+	/**
+	 *
+	 * @param {*} ref
+	 * @param {*} _
+	 * @param {*} event
+	 */
 	function handlePhaseDragMove(ref, _, event) {
-		console.log("Move", ref.current, getComponentDataFromRef(ref));
-		console.log("=====================================\n\n");
-		// const { current } = getComponentDataFromRef(ref);
+		// Pega o componente associado ao ref
+		const { current, data } = getComponentDataFromRef(ref);
+
+		// Pega o placeholder associado ao elemento
+		const { getReference } = getAssociatedPlaceholder(current);
+
+		const { clientX } = event;
+
+		// Novo índice de ordem da fase
+		let newOrderIndex = getNewPhaseOrderIndex(clientX);
+		newOrderIndex += newOrderIndex >= data?.phaseDTO?.order ? 1 : 0;
+
+		// Atualiza a ordem da fase
+		getReference().style.order = newOrderIndex;
 	}
 
 	// ============================== Socket ============================== //
@@ -278,8 +365,8 @@ function Project() {
 		socket.on("cardDeleted", cardDeleted);
 		socket.on("cardMoved", cardMoved);
 
-		socket.on("cardsFetched", phasesFetched);
-		socket.on("phasesFetched", cardsFetched);
+		socket.on("phasesFetched", phasesFetched);
+		socket.on("cardsFetched", cardsFetched);
 
 		return () => {
 			// Remove o socket do projeto
@@ -298,8 +385,8 @@ function Project() {
 			socket.off("cardDeleted", cardDeleted);
 			socket.off("cardMoved", cardMoved);
 
-			socket.off("cardsFetched", phasesFetched);
-			socket.off("phasesFetched", cardsFetched);
+			socket.off("phasesFetched", phasesFetched);
+			socket.off("cardsFetched", cardsFetched);
 		};
 	}, [projectId]);
 
@@ -309,7 +396,7 @@ function Project() {
 			{projectState && (
 				<div className="P-background" ref={phasesContainerScrollBarRef}>
 					<div className="P-phases-container-holder">
-						<div className="P-phases-container" ref={phasesContainerRef}>
+						<ol className="P-phases-container" ref={phasesContainerRef}>
 							<div ref={lazyLoaderTopOffsetRef} />
 							<LazyLoader
 								// Referências para os offsets
@@ -319,7 +406,7 @@ function Project() {
 								container={phasesContainerRef}
 								scrollBar={phasesContainerScrollBarRef}
 								// Função para construir os elementos
-								constructElement={(phase, index, isLoading, setReference) => (
+								constructElement={(phase, _, isLoading, setReference) => (
 									<Phase
 										isLoading={isLoading}
 										phase={phase}
@@ -339,29 +426,41 @@ function Project() {
 								// Funções de controle do conteúdo
 								fetchMore={(page) => {
 									return new Promise((resolve, reject) => {
-										// return currentProjectSocket?.emit("fetchPhases", { page }, (response) => {
-										// 	resolve(response?.phases || []);
-										// });
-										resolve([new PhaseState({ phaseId: 1, order: 0 })]);
+										return currentProjectSocket?.emit(
+											"fetchPhases",
+											{ page },
+											(response) => {
+												resolve(response?.phases?.taken || []);
+											}
+										);
 									});
 								}}
-								getAvailableContentCountForFetch={async () => {
+								getAvailableContentCountForFetch={() => {
 									return new Promise((resolve, reject) => {
-										resolve(100);
+										return currentProjectSocket?.emit(
+											"getTotalPhases",
+											null,
+											(response) => {
+												resolve(response?.data?.totalPhases || 0);
+											}
+										);
 									});
 								}}
 								// Tamanho da página
-								pageSize={1}
+								pageSize={10}
 								// Função para obter o conteúdo
 								getContent={projectState?.getPhases()}
 								// Referência para o lazy loader
 								ref={lazyLoaderRef}
 							/>
 							<div ref={lazyLoaderBottomOffsetRef} />
-						</div>
+						</ol>
 
 						<div className="P-add-new-phase-button-container">
-							<button className="P-add-new-phase-button" onClick={handleCreateNewPhaseButtonClick}>
+							<button
+								className="P-add-new-phase-button"
+								onClick={handleCreateNewPhaseButtonClick}
+							>
 								<AddButtonIcon className="P-add-new-phase-button-icon" />
 							</button>
 						</div>

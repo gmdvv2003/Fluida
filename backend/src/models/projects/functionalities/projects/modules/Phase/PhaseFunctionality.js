@@ -11,6 +11,7 @@ class PhaseFunctionality {
 		inject("IOUpdatePhase", this.#IOUpdatePhase);
 		inject("IOMovePhase", this.#IOMovePhase);
 		inject("IOFetchPhases", this.#IOFetchPhases);
+		inject("IOGetTotalPhases", this.#IOGetTotalPhases);
 	}
 
 	/**
@@ -38,7 +39,9 @@ class PhaseFunctionality {
 				// Emite o evento de criação da fase
 				projectsIO.to(project.projectId).emit("phaseCreated", phaseDTO);
 			})
-			.catch((error) => socket.emit("error", { message: "Erro ao criar a fase", error: error }));
+			.catch((error) =>
+				socket.emit("error", { message: "Erro ao criar a fase", error: error })
+			);
 	}
 
 	#IODeletePhase(projectsIO, socket, project, data) {}
@@ -55,9 +58,24 @@ class PhaseFunctionality {
 	 * @param {Projec} project
 	 * @param {Object} data
 	 */
-	#IOFetchPhases(projectsIO, socket, project, data) {
+	#IOFetchPhases(projectsIO, socket, project, data, acknowledgement) {
 		project.getPhases(data?.page).then((result) => {
-			data?.callback ? data?.callback({ phases: result }) : socket.emit("phasesFetched", result);
+			acknowledgement
+				? acknowledgement({ phases: result })
+				: socket.emit("phasesFetched", result);
+		});
+	}
+
+	/**
+	 *
+	 * @param {*} projectsIO
+	 * @param {*} socket
+	 * @param {*} project
+	 * @param {*} data
+	 */
+	#IOGetTotalPhases(projectsIO, socket, project, data, acknowledgement) {
+		project.getTotalPhasesInProject().then((result) => {
+			acknowledgement && acknowledgement({ data: result });
 		});
 	}
 }

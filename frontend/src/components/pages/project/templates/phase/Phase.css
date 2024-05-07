@@ -44,3 +44,12 @@
 	width: calc(var(--phase-header-height) - var(--phase-margin));
 	height: calc(var(--phase-header-height) - var(--phase-margin));
 }
+
+.PP-background-dragging {
+	border: 2px dashed rgb(215, 215, 215);
+	background-color: aliceblue;
+}
+
+.PP-background-placeholder {
+	background-color: rgb(202, 202, 202);
+}

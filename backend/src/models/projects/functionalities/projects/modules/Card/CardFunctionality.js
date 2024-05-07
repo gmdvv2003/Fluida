@@ -6,6 +6,7 @@ class CardFunctionality {
 		inject("IODeleteCard", this.#IODeleteCard);
 		inject("IOUpdateCard", this.#IOUpdateCard);
 		inject("IOMoveCard", this.#IOMoveCard);
+		inject("IOFetchCards", this.#IOFetchCards);
 	}
 
 	/**
@@ -24,6 +25,8 @@ class CardFunctionality {
 	#IOMoveCard(projectsIO, socket, project, data) {}
 
 	#IOFetchCards(projectsIO, socket, project, data) {}
+
+	#IOGetTotalCards(projectsIO, socket, project, data) {}
 }
 
 module.exports = CardFunctionality;

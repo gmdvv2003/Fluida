@@ -16,6 +16,16 @@ class PhasesRepository extends Repository {
 		await ProjectsPhasesService.addPhaseToProjectPhases(entity.phaseId, entity.projectId);
 	}
 
+	/**
+	 * Trigger que incrementa o total de fases em um projeto.
+	 */
+	async afterInsert_incrementProjectTotalPhasesCount({ entity }) {
+		const ProjectsService = this.Service.Controller.Service;
+		await ProjectsService.incrementTotalPhasesInProject(entity.projectId);
+	}
+
+	async afterInsert_definePhaseOrder({ entity }) {}
+
 	constructor(service) {
 		super(service, PhasesDTO);
 		Subscribe(PhasesDTO, this);

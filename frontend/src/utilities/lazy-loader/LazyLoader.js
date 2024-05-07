@@ -28,29 +28,26 @@ const LazyLoader = React.forwardRef(
 		// Referências das intancias dos elementos que estão sendo exibidos na tela
 		const visibleContentDataRefs = useRef([]);
 
+		const placeholdersContent = useRef([]);
+		const placeholdersContentRefs = useRef({});
+
 		const associatedPlaceholdersRefs = useRef({});
 
 		const [topOffset, setTopOffset] = useState(0);
 		const [bottomOffset, setBottomOffset] = useState(0);
-
-		const placeholdersContent = useRef([]);
 
 		useImperativeHandle(
 			ref,
 			() => ({
 				/**
 				 *
-				 * @param {*} component
+				 * @param {*} element
 				 * @returns
 				 */
-				getComponentDataFromRef: (component) => {
-					console.log("===================================== FIND");
+				getComponentDataFromRef: (element) => {
 					return (
 						visibleContentDataRefs.current.find(({ current }) => {
-							console.log("Current:", current);
-							console.log("Component:", component);
-							console.log("\n");
-							return current == component;
+							return current == element;
 						}) || {}
 					);
 				},
@@ -62,6 +59,17 @@ const LazyLoader = React.forwardRef(
 				 */
 				getAssociatedPlaceholder: (ref) => {
 					return associatedPlaceholdersRefs.current[ref];
+				},
+
+				/**
+				 *
+				 * @param {*} ref
+				 * @returns
+				 */
+				getPlaceholderFromRef: (ref) => {
+					return placeholdersContent.current.find(({ element }) => {
+						return element == ref;
+					});
 				},
 
 				/**
@@ -81,7 +89,13 @@ const LazyLoader = React.forwardRef(
 				 *
 				 * @param {*} uuid
 				 */
-				removePlaceholderAssociation: (uuid) => {},
+				removePlaceholderAssociation: (uuid) => {
+					Object.keys(associatedPlaceholdersRefs.current).forEach((key, _, value) => {
+						if (value.uuid == uuid) {
+							delete associatedPlaceholdersRefs.current[key];
+						}
+					});
+				},
 
 				/**
 				 *
@@ -89,11 +103,33 @@ const LazyLoader = React.forwardRef(
 				 * @param {*} index
 				 * @returns
 				 */
-				addPlaceholder: (element, index) => {
+				addPlaceholder: (index, makePlaceholder, ...placeholderData) => {
 					const uuid = uuidv4();
 
-					const order = (placeholdersContent.current[index]?.order || 0) + 1;
-					placeholdersContent.current.splice(index, 0, { placeholder: true, element, order, uuid });
+					// Função para setar a referência do elemento
+					let setReference = (element) => {
+						if (element == null) {
+							return null;
+						}
+
+						placeholdersContentRefs.current[uuid] = element;
+					};
+
+					// Cria o placeholder
+					const placeholder = makePlaceholder(setReference, ...placeholderData);
+
+					// Adiciona o placeholder na lista de placeholders
+					placeholdersContent.current.splice(index, 0, {
+						isPlaceholder: true,
+						placeholder,
+						uuid,
+						getReference: () => placeholdersContentRefs.current[uuid],
+					});
+
+					// Adiciona o placeholder como um elemento visível
+					setVisibleContent((visibleContent) => {
+						return [...visibleContent, placeholdersContent.current[0]];
+					});
 
 					return uuid;
 				},
@@ -103,7 +139,17 @@ const LazyLoader = React.forwardRef(
 				 * @param {*} uuid
 				 */
 				removePlaceholder: (uuid) => {
-					placeholdersContent.current.filter((element) => element.uuid == uuid);
+					placeholdersContent.current = placeholdersContent.current.filter(
+						(placeholder) => placeholder.uuid != uuid
+					);
+
+					// Remove a associação do placeholder ao elemento
+					ref.current.removePlaceholderAssociation(uuid);
+
+					// Remove o placeholder da lista de elementos visíveis
+					setVisibleContent((visibleContent) => {
+						return visibleContent.filter((element) => element.uuid != uuid);
+					});
 				},
 			}),
 			[]
@@ -132,6 +178,8 @@ const LazyLoader = React.forwardRef(
 			 * @returns {Array}
 			 */
 			async function retrieveVisibleContent(start, end, lateFetch) {
+				end = Math.min(end, await getAvailableContentCountForFetch());
+
 				// Caso não tenha conteúdo, preenche a lista com conteúdo vazio
 				if (getContent.length < end) {
 					for (let index = getContent.length; index < end; index += 1) {
@@ -140,10 +188,12 @@ const LazyLoader = React.forwardRef(
 				}
 
 				// Pega a "fatia" do conteúdo que está sendo exibido no momento e verifica se há algum elemento indefinido
-				const undefinedContentIndex = getContent.slice(start, end).findIndex((element) => element === undefined);
+				const undefinedContentIndex = getContent
+					.slice(start, end)
+					.findIndex((element) => element === undefined);
 
 				if (undefinedContentIndex > -1) {
-					if (currentSectionEnd !== lastSectionEnd || currentSectionStart !== lastSectionStart) {
+					if (end !== lastSectionEnd || start !== lastSectionStart) {
 						// Cancela o timeout anterior
 						if (sectionFetchTimeoutId) {
 							clearTimeout(sectionFetchTimeoutId);
@@ -151,7 +201,9 @@ const LazyLoader = React.forwardRef(
 
 						// Inicia um novo timeout
 						sectionFetchTimeoutId = setTimeout(async () => {
-							const fetchedContent = await fetchMore(Math.floor((start + undefinedContentIndex) / pageSize));
+							const fetchedContent = await fetchMore(
+								Math.floor((start + undefinedContentIndex) / pageSize)
+							);
 							fetchedContent.forEach((element, index) => {
 								const contentIndex = start + undefinedContentIndex + index;
 								getContent[contentIndex] = getContent[contentIndex] || element;
@@ -189,7 +241,11 @@ const LazyLoader = React.forwardRef(
 			function getBottomRightOffset() {
 				switch (direction) {
 					case "horizontal":
-						return getAvailableContentCountForFetch() * (width + padding) + margin - getTopLeftOffset();
+						return (
+							getAvailableContentCountForFetch() * (width + padding) +
+							margin -
+							getTopLeftOffset()
+						);
 
 					case "vertical":
 						return 0;
@@ -234,7 +290,10 @@ const LazyLoader = React.forwardRef(
 			function getCurrentItemIndex() {
 				switch (direction) {
 					case "horizontal":
-						return Math.max(0, Math.floor((scrollBarCopy.scrollLeft - margin) / (width + padding)));
+						return Math.max(
+							0,
+							Math.floor((scrollBarCopy.scrollLeft - margin) / (width + padding))
+						);
 
 					case "vertical":
 						return 0;
@@ -255,7 +314,10 @@ const LazyLoader = React.forwardRef(
 
 				// Retorna o multiplo mais próximo para baixo e para cima do offset
 				const start = offset - (offset % maxPossibleElementsInContainer);
-				const end = offset + maxPossibleElementsInContainer - (offset % maxPossibleElementsInContainer);
+				const end =
+					offset +
+					maxPossibleElementsInContainer -
+					(offset % maxPossibleElementsInContainer);
 
 				return [start, end];
 			}
@@ -268,7 +330,9 @@ const LazyLoader = React.forwardRef(
 					setVisibleContent(visibleContent);
 				};
 
-				update(await retrieveVisibleContent(currentSectionStart, currentSectionEnd, update));
+				update(
+					await retrieveVisibleContent(currentSectionStart, currentSectionEnd, update)
+				);
 			}
 
 			/**
@@ -284,7 +348,10 @@ const LazyLoader = React.forwardRef(
 				// Pega os limites da seção atual e expande a seção para cima e para baixo se necessário
 				const [sectionStart, sectionEnd] = getSectionBounds(currentItemIndex);
 				if (currentItemIndex - sectionStart <= sectionThreshold) {
-					currentSectionStart = Math.max(0, sectionStart - getMaxPossibleElementsInContainer());
+					currentSectionStart = Math.max(
+						0,
+						sectionStart - getMaxPossibleElementsInContainer()
+					);
 				}
 
 				if (sectionEnd - currentItemIndex <= sectionThreshold) {
@@ -311,6 +378,9 @@ const LazyLoader = React.forwardRef(
 				setDisplayableContent();
 			}
 
+			topLeftOffset.current.style.order = "-100000000";
+			bottomRightOffset.current.style.order = "100000000";
+
 			scrollBarCopy.addEventListener("scroll", handleScroll, { passive: true });
 
 			return () => {
@@ -319,9 +389,13 @@ const LazyLoader = React.forwardRef(
 		}, [container, scrollBar]);
 
 		return visibleContent.map((data, index) => {
+			if (data?.isPlaceholder) {
+				return data?.placeholder;
+			}
+
 			// Função para setar a referência do elemento
-			const setReference = (element = {}) => {
-				if (element === null) {
+			const setReference = (element) => {
+				if (element == null) {
 					return null;
 				}
 

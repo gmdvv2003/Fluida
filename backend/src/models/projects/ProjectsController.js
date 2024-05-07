@@ -7,7 +7,9 @@ const ProjectsService = require("./ProjectsService");
 const PhasesService = require("../phases/PhasesService");
 const CardsService = require("../cards/CardsService");
 
-const { ProjectsFunctionalityInterface } = require("./functionalities/projects/ProjectsFunctionalityInterface");
+const {
+	ProjectsFunctionalityInterface,
+} = require("./functionalities/projects/ProjectsFunctionalityInterface");
 
 class ProjectsController extends Controller {
 	#ProjectInvitationComponent;
@@ -44,7 +46,9 @@ class ProjectsController extends Controller {
 	async createProjectAuthenticated(request, response) {
 		const { userId, projectName } = request.body;
 		if (!userId || !projectName) {
-			return response.status(400).json({ message: "Usuário ou nome do projeto não informado." });
+			return response
+				.status(400)
+				.json({ message: "Usuário ou nome do projeto não informado." });
 		}
 
 		const result = this.Service.createProjectAuthenticated(userId, projectName);
@@ -52,7 +56,9 @@ class ProjectsController extends Controller {
 			return response.status(400).json({ message: result.message });
 		}
 
-		response.status(201).json({ message: "Projeto criado com sucesso.", successfullyCreated: true });
+		response
+			.status(201)
+			.json({ message: "Projeto criado com sucesso.", successfullyCreated: true });
 	}
 
 	/**
@@ -90,13 +96,19 @@ class ProjectsController extends Controller {
 		}
 
 		// Verifica se o usuário está no projeto
-		const isInProject = this.Service.ProjectsMembersService.isUserMemberOfProject(userId, projectId);
+		const isInProject = await this.Service.ProjectsMembersService.isUserMemberOfProject(
+			userId,
+			projectId
+		);
 		if (!isInProject) {
 			return response.status(400).json({ message: "Usuário não está no projeto." });
 		}
 
 		// Tenta adicionar o usuário ao projeto e obtem o token de participação
-		const [wasAdded, participationToken] = this.ProjectsFunctionalityInterface.addParticipant(userId, projectId);
+		const [wasAdded, participationToken] = this.ProjectsFunctionalityInterface.addParticipant(
+			userId,
+			projectId
+		);
 		if (!wasAdded) {
 			return response.status(400).json({ message: "Erro ao adicionar usuário ao projeto." });
 		}
@@ -120,13 +132,18 @@ class ProjectsController extends Controller {
 			return response.status(400).json({ message: "Usuário ou projeto não informado." });
 		}
 
-		const result = this.#ProjectInvitationComponent.sendProjectEmailInvitation(userIdToInvite, projectId);
+		const result = this.#ProjectInvitationComponent.sendProjectEmailInvitation(
+			userIdToInvite,
+			projectId
+		);
 
 		if (!result.success) {
 			return response.status(400).json({ message: result.message });
 		}
 
-		response.status(201).json({ message: "Convite enviado com sucesso.", successfullyInvited: true });
+		response
+			.status(201)
+			.json({ message: "Convite enviado com sucesso.", successfullyInvited: true });
 	}
 
 	// ==================================== Métodos Intermediários ==================================== //
@@ -150,7 +167,9 @@ class ProjectsController extends Controller {
 
 			response.status(200).json({ message: "Token validado com sucesso." });
 		} catch (error) {
-			return response.status(400).json({ message: `Falha ao validar convite. Erro: ${error}` });
+			return response
+				.status(400)
+				.json({ message: `Falha ao validar convite. Erro: ${error}` });
 		}
 	}
 }

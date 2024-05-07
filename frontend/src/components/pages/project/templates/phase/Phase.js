@@ -34,13 +34,16 @@ const Phase = React.forwardRef(({ isLoading, phase, projectState, ...callbacks }
 			order={phase?.phaseDTO?.order}
 			// Esqueleto de drag
 			draggingSkeleton={() => (
-				<div className="PP-background">
+				<div className="PP-background PP-background-dragging" ref={backgroundRef}>
 					<h1>Salve</h1>
 				</div>
 			)}
 			// Elementos do modal
-			elements={
-				<div className="PP-background" ref={backgroundRef}>
+			elements={(isDragging) => (
+				<div
+					className={`PP-background ${isDragging && "PP-background-dragging"}`}
+					ref={backgroundRef}
+				>
 					<Suspense fallback={<LoadingDots />}>
 						{isLoading ? (
 							<div className="PP-center-lock">
@@ -51,8 +54,14 @@ const Phase = React.forwardRef(({ isLoading, phase, projectState, ...callbacks }
 								<div className="PP-header">
 									<TextInputField
 										name="title"
-										placeholder="Nome da Fase"
-										style={{ backgroundColor: "white", width: "100%", height: "100%" }}
+										placeholder={`${phase?.phaseDTO?.phaseName || "Título"} (#${
+											phase?.phaseDTO?.phaseId
+										})`}
+										style={{
+											backgroundColor: "white",
+											width: "100%",
+											height: "100%",
+										}}
 									/>
 									<PlusIcon className="PP-header-icon" />
 									<DotsIcon className="PP-header-icon" />
@@ -69,7 +78,7 @@ const Phase = React.forwardRef(({ isLoading, phase, projectState, ...callbacks }
 						)}
 					</Suspense>
 				</div>
-			}
+			)}
 			// Callbacks
 			callbacks={callbacks}
 			// Referência para o modal

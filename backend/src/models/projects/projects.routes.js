@@ -61,8 +61,13 @@ module.exports = function (app, io, projectsController) {
 	projectsIO.on("connection", (socket) => {
 		// Função utilitária para linkar os métodos do controller com os eventos do socket
 		function linkToMethod(method) {
-			return (data) => {
-				projectsController.ProjectsFunctionalityInterface[method](projectsIO, socket, data);
+			return (data, acknowledgement) => {
+				projectsController.ProjectsFunctionalityInterface[method](
+					projectsIO,
+					socket,
+					data,
+					acknowledgement
+				);
 			};
 		}
 
@@ -75,6 +80,7 @@ module.exports = function (app, io, projectsController) {
 		socket.on("updateCard", linkToMethod("IOUpdateCard"));
 		socket.on("moveCard", linkToMethod("IOMoveCard"));
 		socket.on("fetchCards", linkToMethod("IOFetchCards"));
+		socket.on("getTotalCards", linkToMethod("IOGetTotalCards"));
 
 		// Rotas de manipulação de fases
 		socket.on("createPhase", linkToMethod("IOCreatePhase"));
@@ -82,6 +88,7 @@ module.exports = function (app, io, projectsController) {
 		socket.on("updatePhase", linkToMethod("IOUpdatePhase"));
 		socket.on("movePhase", linkToMethod("IOMovePhase"));
 		socket.on("fetchPhases", linkToMethod("IOFetchPhases"));
+		socket.on("getTotalPhases", linkToMethod("IOGetTotalPhases"));
 
 		// Rotas do chat
 		socket.on("sendMessage", linkToMethod("IOSendMessage"));

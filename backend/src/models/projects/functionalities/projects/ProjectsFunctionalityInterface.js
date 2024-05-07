@@ -14,7 +14,10 @@ const Session = require("../../../../context/session/Session");
 const CardsDTO = require("../../../cards/CardsDTO");
 const PhasesDTO = require("../../../phases/PhasesDTO");
 
-const { DEFAULT_PAGE_SIZE, Page } = require("../../../../context/decorators/typeorm/pagination/Pagination");
+const {
+	DEFAULT_PAGE_SIZE,
+	Page,
+} = require("../../../../context/decorators/typeorm/pagination/Pagination");
 
 /**
  * Injeta funcionalidades no projeto.
@@ -90,7 +93,12 @@ class Project {
 	 */
 	async getCards(page, phaseId) {
 		const phasesCardsService = this.ProjectsController.PhasesService.PhasesCardsService;
-		return await this.#fetchMore(this.#cards, phasesCardsService.getCardsOfPhase.bind(phasesCardsService), page, phaseId);
+		return await this.#fetchMore(
+			this.#cards,
+			phasesCardsService.getCardsOfPhase.bind(phasesCardsService),
+			page,
+			phaseId
+		);
 	}
 
 	/**
@@ -101,7 +109,7 @@ class Project {
 	 */
 	async getTotalCardsInPhase(phaseId) {
 		const projectsPhasesService = this.ProjectsController.Service.ProjectsPhasesService;
-		return await projectsPhasesService.getTotalPhasesInProject(phaseId);
+		return await projectsPhasesService.getTotalCardsInPhase(phaseId);
 	}
 
 	/**
@@ -126,8 +134,7 @@ class Project {
 	 * @returns {number}
 	 */
 	async getTotalPhasesInProject() {
-		const phasesCardsService = this.ProjectsController.PhasesService.PhasesCardsService;
-		return await phasesCardsService.getTotalCardsInPhase(this.projectId);
+		return await this.ProjectsController.Service.getTotalPhasesInProject(this.projectId);
 	}
 
 	/**
@@ -179,37 +186,53 @@ class ProjectsFunctionalityInterface {
 		this.ProjectsController = ProjectsController;
 	}
 
+	#acknowledgeError(socket, acknowledgement, error) {
+		return acknowledgement
+			? acknowledgement({ error: error })
+			: socket.emit("error", { message: error });
+	}
+
 	/**
 	 * Middleware que redireciona o socket para o projeto correto.
 	 *
 	 * @param {Function} next
 	 */
 	socketToProjectRedirector(next) {
-		return (projectsIO, socket, data) => {
+		return (projectsIO, socket, data, acknowledgement) => {
 			const { projectId } = socket;
 			if (!projectId) {
-				return socket.emit("error", { message: '"projectId" não informado.' });
+				return this.#acknowledgeError(
+					socket,
+					acknowledgement,
+					'"projectId" não informado.'
+				);
 			}
 
 			// Verifica se o projeto existe
 			const project = this.#projects[projectId];
 			if (!project) {
-				return socket.emit("error", { message: "Projeto não encontrado." });
+				return this.#acknowledgeError(socket, acknowledgement, "Projeto não encontrado.");
 			}
 
 			// Verifica se o usuário é membro do projeto
 			const isValidProjectMember = project.members.some((member) => {
 				// Procura por um usuário que tenha o mesmo token de socket e que esteja inscrito no projeto
-				return member.socketToken === socket.handshake.auth.socketToken && member.subscribed;
+				return (
+					member.socketToken === socket.handshake.auth.socketToken && member.subscribed
+				);
 			});
 			if (!isValidProjectMember) {
-				// return socket.emit("error", { message: "Você não é membro deste projeto." });
+				// return this.#acknowledgeError(
+				// 	socket,
+				// 	acknowledgement,
+				// 	"Você não é membro deste projeto."
+				// );
 			}
 
 			try {
-				next(projectsIO, socket, project, data);
+				next(projectsIO, socket, project, data, acknowledgement);
 			} catch (error) {
-				socket.emit("error", { message: error.message });
+				this.#acknowledgeError(socket, acknowledgement, error.message);
 			}
 		};
 	}
@@ -221,7 +244,9 @@ class ProjectsFunctionalityInterface {
 	 * @param {Function} next
 	 */
 	injectProjectFunctionality(name, next, authenticateless = false) {
-		this[name] = authenticateless ? next.bind(this) : this.socketToProjectRedirector(next.bind(this));
+		this[name] = authenticateless
+			? next.bind(this)
+			: this.socketToProjectRedirector(next.bind(this));
 	}
 
 	/**

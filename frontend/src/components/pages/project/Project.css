@@ -5,7 +5,8 @@
 }
 
 .P-background {
-	overflow: auto;
+	overflow-x: auto;
+	overflow-y: hidden;
 	position: relative;
 	width: calc(100vw - var(--cards-column-gap));
 	height: calc(100vh - var(--header-height));
@@ -23,6 +24,8 @@
 }
 
 .P-phases-container {
+	margin: 0;
+	padding: 0;
 	display: flex;
 	column-gap: var(--cards-column-gap);
 	width: 100%;

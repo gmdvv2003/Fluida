@@ -15,12 +15,8 @@ class ProjectsPhasesService extends Service {
 		this.ProjectsPhasesRepository = new ProjectsPhasesRepository(this);
 	}
 
-	async getTotalPhasesInProject(projectId) {
-		return await this.ProjectsPhasesRepository.getTotalPhasesInProject(projectId);
-	}
-
 	/**
-	 *  Retorna as fases de um projeto.
+	 * Retorna as fases de um projeto.
 	 *
 	 * @param {Object} pageOptions { PAGE: number, PAGE_SIZE: number }
 	 * @param {number} projectId
@@ -38,7 +34,9 @@ class ProjectsPhasesService extends Service {
 	 * @returns {InsertResult}
 	 */
 	async addPhaseToProjectPhases(phaseId, projectId) {
-		return await this.ProjectsPhasesRepository.addPhaseToProjectPhases(new ProjectsPhasesDTO({ phaseId, projectId }));
+		return await this.ProjectsPhasesRepository.addPhaseToProjectPhases(
+			new ProjectsPhasesDTO({ phaseId, projectId })
+		);
 	}
 
 	/**
@@ -49,7 +47,9 @@ class ProjectsPhasesService extends Service {
 	 * @returns {DeleteResult}
 	 */
 	async removePhaseFromProjectPhases(phaseId, projectId) {
-		return await this.ProjectsPhasesRepository.removePhaseFromProjectPhases(new ProjectsPhasesDTO({ phaseId, projectId }));
+		return await this.ProjectsPhasesRepository.removePhaseFromProjectPhases(
+			new ProjectsPhasesDTO({ phaseId, projectId })
+		);
 	}
 }
 

@@ -8,6 +8,8 @@ const ProjectsMembersService = require("./relationship/projects-members/Projects
 const ProjectsChatsService = require("./relationship/projects-chats/ProjectsChatsService");
 const ProjectsPhasesService = require("./relationship/projects-phases/ProjectsPhasesService");
 
+const { UpdateResult } = require("typeorm");
+
 class ProjectsService extends Service {
 	ProjectsRepository;
 
@@ -34,6 +36,16 @@ class ProjectsService extends Service {
 	}
 
 	// ==================================== Métodos Seguros ==================================== //
+	/**
+	 * Retorna o total de fases em um projeto.
+	 *
+	 * @param {number} projectId
+	 * @returns {number}
+	 */
+	async getTotalPhasesInProject(projectId) {
+		return await this.ProjectsRepository.getTotalPhasesInProject(projectId);
+	}
+
 	/**
 	 * Retorna um projeto pelo id.
 	 *
@@ -67,7 +79,15 @@ class ProjectsService extends Service {
 		return await this.ProjectsRepository.deleteProject(new ProjectsDTO({ projectId }));
 	}
 
-	async participate(userId, projectId) {}
+	/**
+	 * Incrementa o total de fases em um projeto.
+	 *
+	 * @param {number} projectId
+	 * @returns {UpdateResult}
+	 */
+	async incrementTotalPhasesInProject(projectId) {
+		return await this.ProjectsRepository.incrementTotalPhasesInProject(projectId);
+	}
 }
 
 module.exports = ProjectsService;

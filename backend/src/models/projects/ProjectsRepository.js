@@ -26,6 +26,19 @@ class ProjectsRepository extends Repository {
 	}
 
 	/**
+	 * Retorna o total de fases em um projeto do banco de dados.
+	 *
+	 * @param {number} projectId
+	 * @returns {number}
+	 */
+	async getTotalPhasesInProject(projectId) {
+		return await this.Repository.createQueryBuilder("Projects")
+			.select("totalPhases")
+			.where("projectId = :projectId", { projectId })
+			.getRawOne();
+	}
+
+	/**
 	 * Retorna um projeto pelo id
 	 *
 	 * @param {number} projectId
@@ -63,6 +76,20 @@ class ProjectsRepository extends Repository {
 			.delete()
 			.from("Projects")
 			.where(`projectId = :projectId`, projectsDTO)
+			.execute();
+	}
+
+	/**
+	 * Incrementa o total de fases em um projeto do banco de dados.
+	 *
+	 * @param {number} projectId
+	 * @returns {UpdateResult}
+	 */
+	async incrementTotalPhasesInProject(projectId) {
+		return await this.Repository.createQueryBuilder("Projects")
+			.update(ProjectsEntity)
+			.set({ totalPhases: () => "totalPhases + 1" })
+			.where("projectId = :projectId", { projectId })
 			.execute();
 	}
 }

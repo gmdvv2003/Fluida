@@ -6,6 +6,7 @@ class CardsDTO {
 		this.cardDescription = card?.cardDescription;
 		this.cardDueDate = card?.cardDueDate;
 		this.cardCreationDate = card?.cardCreationDate;
+		this.order = card?.order;
 	}
 
 	toEntity() {
@@ -16,6 +17,7 @@ class CardsDTO {
 			cardDescription: this.cardDescription,
 			cardDueDate: this.cardDueDate,
 			cardCreationDate: this.cardCreationDate,
+			order: this.order,
 		};
 	}
 

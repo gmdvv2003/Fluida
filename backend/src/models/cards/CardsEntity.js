@@ -45,6 +45,13 @@ module.exports = new EntitySchema({
 			nullable: false,
 			type: "datetime",
 		},
+
+		// order INT NOT NULL DEFAULT 0
+		order: {
+			nullable: false,
+			type: "int",
+			default: 0,
+		},
 	},
 
 	relations: {

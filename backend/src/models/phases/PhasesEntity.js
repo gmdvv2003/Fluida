@@ -26,7 +26,15 @@ module.exports = new EntitySchema({
 			length: 100,
 		},
 
+		// totalCards INT DEFAULT 0
 		totalCards: {
+			type: "int",
+			default: 0,
+		},
+
+		// order INT NOT NULL DEFAULT 0
+		order: {
+			nullable: false,
 			type: "int",
 			default: 0,
 		},

@@ -108,7 +108,7 @@ class ProjectsMembersRepository extends Repository {
 			})
 			.getOne();
 
-		return isMember;
+		return isMember != null;
 	}
 }
 
