@@ -11,12 +11,17 @@ import Loading from "components/shared/loading/Loading";
 
 const Registration = lazy(() => import("components/pages/registration/Registration"));
 const Login = lazy(() => import("components/pages/login/Login"));
-const SendPasswordReset = lazy(() => import("components/pages/login-password-reset/SendPasswordReset"));
-const LoginPasswordReset = lazy(() => import("components/pages/login-password-reset/LoginPasswordReset"));
+const SendPasswordReset = lazy(() =>
+	import("components/pages/login-password-reset/SendPasswordReset")
+);
+const LoginPasswordReset = lazy(() =>
+	import("components/pages/login-password-reset/LoginPasswordReset")
+);
 const ValidateEmail = lazy(() => import("components/pages/validate-email/ValidateEmail"));
 
 const HomeProjects = lazy(() => import("components/pages/home-projects/HomeProjects"));
 const Project = lazy(() => import("components/pages/project/Project"));
+const LandingPage = lazy(() => import("components/pages/landing-page/LandingPage"));
 
 function App() {
 	return (
@@ -25,6 +30,15 @@ function App() {
 				<BrowserRouter>
 					<Routes>
 						{/* Rotas Públicas */}
+						<Route
+							path="*"
+							element={
+								<Suspense fallback={<Loading />}>
+									<LandingPage />
+								</Suspense>
+							}
+						/>
+
 						<Route
 							path="/registration"
 							element={

@@ -1,0 +1,55 @@
+.LP-background-page {
+	width: 100vw;
+	height: 100%;
+	top: calc(var(--header-height) * -1);
+	position: absolute;
+
+	background: rgb(255, 244, 227);
+	background: linear-gradient(
+		0deg,
+		rgba(255, 244, 227, 1) 30%,
+		rgba(255, 255, 255, 1) 75%,
+		rgba(255, 244, 227, 1) 100%
+	);
+}
+
+.LP-fluida-background-waves {
+	width: 100%;
+	height: 700px;
+	position: relative;
+}
+
+.LP-fluida-description {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	position: absolute;
+	top: 220px;
+	width: 100%;
+	gap: 10px;
+}
+
+.LP-description-text-a {
+	color: white;
+	align-items: center;
+}
+
+.LP-description-text-h1 {
+	font-size: 25px;
+	font-weight: bold;
+	color: white;
+	margin: 0;
+	text-align: center;
+}
+
+.LP-fluida-icon-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.LP-fluida-icon {
+	width: 500px;
+	bottom: 600px;
+}
