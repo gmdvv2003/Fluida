@@ -7,6 +7,9 @@
 	--header-height: 4rem;
 	--header-logo-height: 35%;
 
+	--footer-height: 4rem;
+	--footer-logo-height: 25%;
+
 	--action-button-background-color: #ff8c00; /* Padrão */
 	--action-button-background-color-inactive: #e87f00; /* Inativo */
 	--action-button-selected-background-color: #f18500; /* Selecionado */

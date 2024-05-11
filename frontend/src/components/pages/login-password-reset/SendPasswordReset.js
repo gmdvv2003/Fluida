@@ -58,6 +58,8 @@ function SendPasswordReset() {
 	}
 
 	useEffect(() => {
+		document.title = "Fluida | Reset Password";
+
 		if (emailFieldReference.current != null) {
 			return emailFieldReference.current.onTextChange(handleOnEmailChange);
 		}

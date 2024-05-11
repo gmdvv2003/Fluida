@@ -1,6 +1,6 @@
 import "../validate-email/ValidateEmail.css";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import AccountInformation from "./procedures/AccountInformation";
 import Header from "components/shared/login-registration/header/Header";
@@ -107,6 +107,10 @@ function Registration() {
 			</div>
 		);
 	}
+
+	useEffect(() => {
+		document.title = "Fluida | Register";
+	}, []);
 
 	return (
 		<div>

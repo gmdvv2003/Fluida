@@ -1,0 +1,20 @@
+.F-footer-container {
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: white;
+	z-index: 10;
+	width: 100%;
+	height: var(--footer-height);
+	column-gap: 10px;
+}
+
+.F-footer-logo {
+	height: var(--footer-logo-height);
+}
+
+.F-footer-copyright {
+	padding-top: 6px;
+	font-size: small;
+}

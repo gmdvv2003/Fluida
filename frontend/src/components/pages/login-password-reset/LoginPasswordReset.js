@@ -93,6 +93,8 @@ function LoginPasswordReset() {
 	}
 
 	useEffect(() => {
+		document.title = "Fluida | Reset Password";
+
 		const searchParameters = new URLSearchParams(window.location.search);
 		if (!searchParameters.has("token")) {
 			window.location.href = "/login";

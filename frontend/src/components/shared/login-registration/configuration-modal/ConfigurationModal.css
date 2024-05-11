@@ -1,0 +1,36 @@
+.CM-fluida-container {
+	display: flex;
+	flex-direction: column;
+	position: absolute;
+	z-index: 1000;
+	left: calc(100% - 238px);
+	width: 200px;
+	height: 140px;
+	background-color: rgb(240, 240, 240);
+	border: 1px;
+	border-style: solid;
+	border-color: rgb(213, 213, 213);
+	box-shadow: rgb(238, 238, 238) 0px 3px 8px;
+	border-radius: 8px;
+	padding: 10px;
+}
+
+.CM-title-option {
+	font-size: 18px;
+	margin: 0;
+	color: gray;
+	font-weight: lighter;
+}
+
+.CM-text-option {
+	font-size: 14px;
+	margin: 0;
+	color: gray;
+	text-decoration: none;
+}
+
+.CM-hr-divider {
+	border: 1px;
+	border-style: solid;
+	border-color: rgb(213, 213, 213);
+}

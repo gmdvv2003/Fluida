@@ -64,7 +64,11 @@ export function ProjectAuthenticationProvider({ children }) {
 			}
 
 			// Realiza a requisição para participar do projeto
-			const response = await performAuthenticatedRequest(ParticipateInProjectEndpoint, "POST", JSON.stringify({ projectId }));
+			const response = await performAuthenticatedRequest(
+				ParticipateInProjectEndpoint,
+				"POST",
+				JSON.stringify({ projectId })
+			);
 			if (response.success) {
 				// Cria uma nova instância do socket com o token de participação
 				const socket = io(ProjectsSocketEndpoint, {
@@ -83,7 +87,10 @@ export function ProjectAuthenticationProvider({ children }) {
 					let rejectPromise = false;
 
 					switch (error.message) {
-						case ("io server disconnect", "io client disconnect", "ping timeout", "transport error"):
+						case ("io server disconnect",
+						"io client disconnect",
+						"ping timeout",
+						"transport error"):
 							rejectPromise = true;
 							break;
 
@@ -115,7 +122,11 @@ export function ProjectAuthenticationProvider({ children }) {
 
 				// Evento que roda quando a conexão é encerrada
 				socket.on("disconnect", () => {
-					setAuthenticatedProjectsSessions(authenticatedProjectsSessions.filter((session) => session.projectId !== projectId));
+					setAuthenticatedProjectsSessions(
+						authenticatedProjectsSessions.filter(
+							(session) => session.projectId !== projectId
+						)
+					);
 				});
 
 				// Evento que roda quando o usuário se inscreve no projeto
@@ -123,6 +134,7 @@ export function ProjectAuthenticationProvider({ children }) {
 					setAuthenticatedProjectsSessions([
 						...authenticatedProjectsSessions,
 						{
+							projectName: response.data?.projectName,
 							projectId: projectId,
 							socket: socket,
 						},

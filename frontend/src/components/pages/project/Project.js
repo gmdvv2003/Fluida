@@ -406,15 +406,18 @@ function Project() {
 	// ============================== Socket ============================== //
 	useEffect(() => {
 		// Pega o socket do projeto, caso exista
-		const socket = getProjectSession(projectId)?.socket;
-		setCurrentProjectSocket(socket);
-
-		if (!socket) {
+		const project = getProjectSession(projectId);
+		if (!project) {
 			return undefined;
 		}
 
+		const { socket, projectName } = project;
+		setCurrentProjectSocket(socket);
+
 		const newProjectState = new ProjectState(socket, () => updateLazyLoader());
 		setProjectState(newProjectState);
+
+		document.title = `Fluida | ${projectName}`;
 
 		// Funções de resposta do servidor
 		const disconnect = () => setCurrentProjectSocket(null);

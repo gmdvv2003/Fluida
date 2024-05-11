@@ -1,0 +1,103 @@
+.LP-background-page {
+	position: absolute;
+	width: 100%;
+	top: calc(var(--header-height) * -1);
+	background: linear-gradient(0deg, rgba(255, 244, 227, 1) 6%, rgba(255, 255, 255, 1) 40%);
+}
+
+.LP-fluida-background-waves {
+	width: 100%;
+	height: 700px;
+	position: relative;
+}
+
+.LP-fluida-description {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	position: absolute;
+	top: 220px;
+	width: 100%;
+	gap: 10px;
+}
+
+.LP-description-text-a {
+	color: white;
+	align-items: center;
+}
+
+.LP-description-text-h1 {
+	color: white;
+	font-size: 30px;
+	font-weight: bold;
+	text-align: center;
+	margin: 0;
+}
+
+.LP-fluida-icon-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	column-gap: 70px;
+}
+
+.LP-fluida-icon {
+	width: 600px;
+	bottom: 700px;
+}
+
+.LP-fluida-title-description-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+}
+
+.LP-fluida-title-description-container h1 {
+	text-align: center;
+}
+
+.LP-kanban-description {
+	text-align: right;
+	width: 100%;
+	font-size: 20px;
+}
+
+.LP-registration-field-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	margin-top: 340px;
+	padding-bottom: 64px;
+}
+
+.LP-registration-field-title-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	z-index: 10;
+}
+
+.LP-fluida-background-container {
+	--height: 320px;
+	display: flex;
+	position: absolute;
+	width: 100%;
+	height: var(--height);
+	transform: translateY(calc(var(--height) * -1));
+	z-index: 5;
+}
+
+.LP-fluida-background-bluewave {
+	width: 100%;
+}
+
+.LP-fluida-background-fishwave {
+	position: absolute;
+	width: 200px;
+	left: 75%;
+	top: 10%;
+}
