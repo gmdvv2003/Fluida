@@ -26,6 +26,8 @@ class PhaseState {
 	cards = [];
 	cardsMap = {};
 
+	totalCards = 0;
+
 	constructor(phaseDTO) {
 		this.phaseDTO = phaseDTO;
 	}
@@ -33,15 +35,50 @@ class PhaseState {
 
 class ProjectState {
 	#socket;
+	#projectStateUpdated;
 
 	phases = [];
 	phasesMap = {};
 
-	constructor(socket) {
+	totalPhases = 0;
+
+	// Indica se o número total de fases foi sincronizado com o servidor
+	totalPhasesSynced = false;
+
+	constructor(socket, projectStateUpdated) {
 		// Fetch das fases inicial
 		socket.emit("fetchPhases", { page: 0 });
 
 		this.#socket = socket;
+		this.#projectStateUpdated = projectStateUpdated;
+	}
+
+	/**
+	 * Retorna o número total de fases.
+	 *
+	 * @param {boolean} sync
+	 * @returns {Promise}
+	 */
+	async getTotalPhases(sync = false) {
+		return new Promise((resolve) => {
+			// Caso sync = true ou o número total de fases ainda não tenha sido sincronizado, então é feito um fetch do número total de fases
+			// Caso contrário, é retornado o número total de fases local
+			if (!this.totalPhasesSynced && !sync) {
+				return this.#socket.emit("getTotalPhases", null, (response) => {
+					let retrievedCount = response?.amount;
+
+					// Se o número total de fases foi retornado, então o número total de fases foi sincronizado
+					if (retrievedCount != undefined) {
+						this.totalPhases = retrievedCount;
+						this.totalPhasesSynced = true;
+					}
+
+					resolve(this.totalPhases);
+				});
+			}
+
+			return resolve(this.totalPhases);
+		});
 	}
 
 	/**
@@ -90,8 +127,22 @@ class ProjectState {
 	 * @param {Object} phaseDTO
 	 */
 	phaseCreated(phaseDTO) {
+		console.log(phaseDTO);
+		phaseDTO = phaseDTO?.[0];
+		if (!phaseDTO) {
+			return null;
+		}
+
+		// Criar o estado da fase
 		const phaseState = new PhaseState(phaseDTO);
+
 		this.phases.push(phaseState);
+		this.phasesMap[phaseDTO.phaseId] = phaseState;
+
+		this.totalPhases += 1;
+
+		// Atualizar o estado do projeto
+		this.#projectStateUpdated();
 	}
 
 	/**
@@ -123,8 +174,28 @@ class ProjectState {
 	 * @param {Object} cardDTO
 	 */
 	cardCreated(cardDTO) {
+		cardDTO = cardDTO?.[0];
+		if (!cardDTO) {
+			return null;
+		}
+
+		// Adicionar o card ao estado da fase
+		const phaseState = this.getPhaseState(cardDTO.phaseId);
+		if (!phaseState) {
+			return null;
+		}
+
+		// Criar o estado do card
 		const cardState = new CardState(cardDTO);
-		this.getPhaseState(cardDTO.phaseId).cards?.push(cardState);
+
+		phaseState.cards?.push(cardState);
+		phaseState.cardsMap[cardDTO.cardId] = cardState;
+
+		// Incrimenta o número total de cards
+		phaseState.totalCards += 1;
+
+		// Atualizar o estado do projeto
+		this.#projectStateUpdated();
 	}
 
 	/**
@@ -157,9 +228,10 @@ class ProjectState {
 	 * @param {Array} phases
 	 */
 	phasesFetched(phases) {
-		phases?.[0]?.taken?.forEach(({ phaseId, phase }) => {
+		phases = phases?.[0]?.taken?.filter(({ phaseId }) => this.phasesMap[phaseId] == undefined);
+		phases.forEach(({ phaseId, phase }) => {
 			// Cria o estado da fase
-			this.phaseCreated(phase);
+			this.phaseCreated([phase]);
 
 			// Realiza o fetch dos cards da fase inicial
 			this.#socket.emit("fetchCards", { page: 0, phaseId: phaseId });
@@ -175,7 +247,7 @@ class ProjectState {
 	cardsFetched(phaseId, cards) {
 		cards?.taken?.forEach((cardDTO) => {
 			// Cria o estado do card
-			this.cardCreated(cardDTO);
+			this.cardCreated([cardDTO]);
 		});
 	}
 }
@@ -196,15 +268,11 @@ function Project() {
 
 	const lazyLoaderRef = useRef(null);
 
-	// ============================== Construtor do placeholder da fase ============================== //
-	function constructPhasePlaceholder(setPlaceholder, { order }) {
-		return (
-			<div
-				ref={(element) => setPlaceholder(element)}
-				className="PP-background PP-background-placeholder"
-				style={{ order: order + 1 }}
-			/>
-		);
+	const performLazyLoaderUpdateRef = useRef(null);
+
+	// ============================== LazyLoader update ============================== //
+	function updateLazyLoader() {
+		performLazyLoaderUpdateRef.current?.();
 	}
 
 	// ============================== Criação de fases e cards ============================== //
@@ -221,6 +289,17 @@ function Project() {
 		});
 	}
 
+	// ============================== Construtor do placeholder da fase ============================== //
+	function constructPhasePlaceholder(setPlaceholder, { order }) {
+		return (
+			<div
+				className="PP-background PP-background-placeholder"
+				style={{ order: order + 1 }}
+				ref={(element) => setPlaceholder(element)}
+			/>
+		);
+	}
+
 	// ============================== Drag das fases ============================== //
 	/**
 	 *
@@ -229,6 +308,7 @@ function Project() {
 	 * @returns
 	 */
 	function getNewPhaseOrderIndex(clientX) {
+		// TODO: Não utilizar valores fixos
 		return Math.max(0, Math.floor((clientX - 20) / (320 + 20)));
 	}
 
@@ -333,7 +413,7 @@ function Project() {
 			return undefined;
 		}
 
-		const newProjectState = new ProjectState(socket);
+		const newProjectState = new ProjectState(socket, () => updateLazyLoader());
 		setProjectState(newProjectState);
 
 		// Funções de resposta do servidor
@@ -399,6 +479,7 @@ function Project() {
 						<ol className="P-phases-container" ref={phasesContainerRef}>
 							<div ref={lazyLoaderTopOffsetRef} />
 							<LazyLoader
+								update={performLazyLoaderUpdateRef}
 								// Referências para os offsets
 								topLeftOffset={lazyLoaderBottomOffsetRef}
 								bottomRightOffset={lazyLoaderBottomOffsetRef}
@@ -426,25 +507,13 @@ function Project() {
 								// Funções de controle do conteúdo
 								fetchMore={(page) => {
 									return new Promise((resolve, reject) => {
-										return currentProjectSocket?.emit(
-											"fetchPhases",
-											{ page },
-											(response) => {
-												resolve(response?.phases?.taken || []);
-											}
-										);
+										return currentProjectSocket?.emit("fetchPhases", { page }, (response) => {
+											resolve(response?.phases?.taken || []);
+										});
 									});
 								}}
-								getAvailableContentCountForFetch={() => {
-									return new Promise((resolve, reject) => {
-										return currentProjectSocket?.emit(
-											"getTotalPhases",
-											null,
-											(response) => {
-												resolve(response?.data?.totalPhases || 0);
-											}
-										);
-									});
+								getAvailableContentCountForFetch={async (sync = false) => {
+									return await projectState?.getTotalPhases(sync);
 								}}
 								// Tamanho da página
 								pageSize={10}
@@ -457,10 +526,7 @@ function Project() {
 						</ol>
 
 						<div className="P-add-new-phase-button-container">
-							<button
-								className="P-add-new-phase-button"
-								onClick={handleCreateNewPhaseButtonClick}
-							>
+							<button className="P-add-new-phase-button" onClick={handleCreateNewPhaseButtonClick}>
 								<AddButtonIcon className="P-add-new-phase-button-icon" />
 							</button>
 						</div>

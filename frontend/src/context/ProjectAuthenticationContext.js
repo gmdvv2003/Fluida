@@ -1,6 +1,6 @@
 import { io } from "https://cdn.socket.io/4.7.5/socket.io.esm.min.js";
 
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useRef } from "react";
 
 import { ParticipateInProjectEndpoint, ProjectsSocketEndpoint } from "utilities/Endpoints";
 import { useAuthentication } from "context/AuthenticationContext";
@@ -15,6 +15,8 @@ export function ProjectAuthenticationProvider({ children }) {
 	const [authenticatedProjectsSessions, setAuthenticatedProjectsSessions] = useState([]);
 
 	const { currentUserSession, performAuthenticatedRequest } = useAuthentication();
+
+	const projectsBeingValidated = useRef({});
 
 	/**
 	 * Indica se o usuário está participando do projeto.
@@ -45,7 +47,12 @@ export function ProjectAuthenticationProvider({ children }) {
 	 * @returns {Promise}
 	 */
 	async function participate(projectId) {
-		return new Promise(async (resolve, reject) => {
+		// Verifica se a participação no projeto já está sendo validada
+		if (projectsBeingValidated.current[projectId]) {
+			return projectsBeingValidated.current[projectId];
+		}
+
+		const promise = new Promise(async (resolve, reject) => {
 			// Verifica se o usuário está logado
 			if (!currentUserSession) {
 				return resolve({ success: false });
@@ -124,6 +131,20 @@ export function ProjectAuthenticationProvider({ children }) {
 					resolve({ success: true });
 				});
 			}
+		});
+
+		// Define que a participação no projeto está sendo validada
+		projectsBeingValidated.current[projectId] = promise;
+
+		return new Promise((resolve, reject) => {
+			promise
+				.then((response) => {
+					resolve(response);
+				})
+				.catch((error) => {
+					reject(error);
+				})
+				.finally(() => (projectsBeingValidated.current[projectId] = false));
 		});
 	}
 

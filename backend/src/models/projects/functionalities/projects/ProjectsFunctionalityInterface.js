@@ -14,10 +14,7 @@ const Session = require("../../../../context/session/Session");
 const CardsDTO = require("../../../cards/CardsDTO");
 const PhasesDTO = require("../../../phases/PhasesDTO");
 
-const {
-	DEFAULT_PAGE_SIZE,
-	Page,
-} = require("../../../../context/decorators/typeorm/pagination/Pagination");
+const { DEFAULT_PAGE_SIZE, Page } = require("../../../../context/decorators/typeorm/pagination/Pagination");
 
 /**
  * Injeta funcionalidades no projeto.
@@ -58,6 +55,9 @@ class Project {
 
 	members = [];
 
+	#totalPhasesInProject = undefined;
+	#totalMembersInProject = undefined;
+
 	constructor(projectId, ProjectsController) {
 		this.projectId = projectId;
 		this.ProjectsController = ProjectsController;
@@ -74,6 +74,12 @@ class Project {
 			for (let index = list.length; index < tail; index += 1) {
 				list.push(undefined);
 			}
+		}
+
+		// Pega a "fatia" do conteúdo que está sendo exibido no momento e verifica se há algum elemento indefinido
+		const undefinedContentIndex = list.slice(head, tail).findIndex((element) => element === undefined);
+		if (undefinedContentIndex > -1) {
+			return { taken: list.slice(head, tail), hasNextPage: true, total: DEFAULT_PAGE_SIZE, cached: true };
 		}
 
 		const { taken, total, hasNextPage } = await fetchFunction({ PAGE: page }, ...data);
@@ -93,12 +99,7 @@ class Project {
 	 */
 	async getCards(page, phaseId) {
 		const phasesCardsService = this.ProjectsController.PhasesService.PhasesCardsService;
-		return await this.#fetchMore(
-			this.#cards,
-			phasesCardsService.getCardsOfPhase.bind(phasesCardsService),
-			page,
-			phaseId
-		);
+		return await this.#fetchMore(this.#cards, phasesCardsService.getCardsOfPhase.bind(phasesCardsService), page, phaseId);
 	}
 
 	/**
@@ -134,7 +135,9 @@ class Project {
 	 * @returns {number}
 	 */
 	async getTotalPhasesInProject() {
-		return await this.ProjectsController.Service.getTotalPhasesInProject(this.projectId);
+		this.#totalPhasesInProject =
+			this.#totalPhasesInProject || (await this.ProjectsController.Service.getTotalPhasesInProject(this.projectId));
+		return this.#totalPhasesInProject;
 	}
 
 	/**
@@ -156,6 +159,7 @@ class Project {
 	 */
 	addPhase(phaseDTO) {
 		this.#phases.push(phaseDTO);
+		this.#totalPhasesInProject = this.#phases.length;
 	}
 
 	/**
@@ -163,6 +167,7 @@ class Project {
 	 */
 	removePhase(phaseId) {
 		this.#phases = this.#phases.filter((phase) => phase.phaseId !== phaseId);
+		this.#totalPhasesInProject = this.#phases.length;
 	}
 }
 
@@ -187,9 +192,7 @@ class ProjectsFunctionalityInterface {
 	}
 
 	#acknowledgeError(socket, acknowledgement, error) {
-		return acknowledgement
-			? acknowledgement({ error: error })
-			: socket.emit("error", { message: error });
+		return acknowledgement ? acknowledgement({ error: error }) : socket.emit("error", { message: error });
 	}
 
 	/**
@@ -201,11 +204,7 @@ class ProjectsFunctionalityInterface {
 		return (projectsIO, socket, data, acknowledgement) => {
 			const { projectId } = socket;
 			if (!projectId) {
-				return this.#acknowledgeError(
-					socket,
-					acknowledgement,
-					'"projectId" não informado.'
-				);
+				return this.#acknowledgeError(socket, acknowledgement, '"projectId" não informado.');
 			}
 
 			// Verifica se o projeto existe
@@ -217,9 +216,7 @@ class ProjectsFunctionalityInterface {
 			// Verifica se o usuário é membro do projeto
 			const isValidProjectMember = project.members.some((member) => {
 				// Procura por um usuário que tenha o mesmo token de socket e que esteja inscrito no projeto
-				return (
-					member.socketToken === socket.handshake.auth.socketToken && member.subscribed
-				);
+				return member.socketToken === socket.handshake.auth.socketToken && member.subscribed;
 			});
 			if (!isValidProjectMember) {
 				// return this.#acknowledgeError(
@@ -244,9 +241,7 @@ class ProjectsFunctionalityInterface {
 	 * @param {Function} next
 	 */
 	injectProjectFunctionality(name, next, authenticateless = false) {
-		this[name] = authenticateless
-			? next.bind(this)
-			: this.socketToProjectRedirector(next.bind(this));
+		this[name] = authenticateless ? next.bind(this) : this.socketToProjectRedirector(next.bind(this));
 	}
 
 	/**

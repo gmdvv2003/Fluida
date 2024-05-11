@@ -25,23 +25,25 @@ class PhaseFunctionality {
 	@Validate({ NAME: "phaseName", TYPE: "string", LENGTH: 100, INDEX: 3 })
 	#IOCreatePhase(projectsIO, socket, project, data) {
 		// Cria um DTO para a fase
-		const phaseDTO = new PhasesDTO({
+		let phaseDTO = new PhasesDTO({
 			projectId: project.projectId,
 			phaseName: data.phaseName,
 		});
 
-		// Adiciona a fase ao projeto localmente
-		project.addPhase(phaseDTO);
-
 		// Cria a fase no banco de dados
 		this.ProjectsController.PhasesService.createPhase(phaseDTO)
-			.then(() => {
+			.then(({ generatedMap }) => {
+				// Atualiza o DTO com os valores gerados
+				phaseDTO = { ...phaseDTO, ...generatedMap };
+
+				// Adiciona a fase ao projeto localmente
+				project.addPhase(phaseDTO);
+				console.log(phaseDTO);
+
 				// Emite o evento de criação da fase
 				projectsIO.to(project.projectId).emit("phaseCreated", phaseDTO);
 			})
-			.catch((error) =>
-				socket.emit("error", { message: "Erro ao criar a fase", error: error })
-			);
+			.catch((error) => socket.emit("error", { message: "Erro ao criar a fase", error: error }));
 	}
 
 	#IODeletePhase(projectsIO, socket, project, data) {}
@@ -60,9 +62,7 @@ class PhaseFunctionality {
 	 */
 	#IOFetchPhases(projectsIO, socket, project, data, acknowledgement) {
 		project.getPhases(data?.page).then((result) => {
-			acknowledgement
-				? acknowledgement({ phases: result })
-				: socket.emit("phasesFetched", result);
+			acknowledgement ? acknowledgement({ phases: result }) : socket.emit("phasesFetched", result);
 		});
 	}
 
@@ -75,7 +75,7 @@ class PhaseFunctionality {
 	 */
 	#IOGetTotalPhases(projectsIO, socket, project, data, acknowledgement) {
 		project.getTotalPhasesInProject().then((result) => {
-			acknowledgement && acknowledgement({ data: result });
+			acknowledgement && acknowledgement({ amount: result });
 		});
 	}
 }

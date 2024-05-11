@@ -1,6 +1,6 @@
 .R-background-container {
 	width: 100vw;
-	height: calc(100vh - var(--header-height));
+	height: 100vh;
 	background-color: #f1f1f1;
 }
 

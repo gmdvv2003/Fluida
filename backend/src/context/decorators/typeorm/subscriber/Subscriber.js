@@ -27,7 +27,7 @@ const LISTENERS = [
 	"afterTransactionRollback",
 ];
 
-function getListenersRepository(listener) {
+function renameListenerToIdentifier(listener) {
 	return `${listener}%repository`;
 }
 
@@ -50,25 +50,37 @@ function Subscribe(dto, target) {
 		// Verifica se o método é um listener.
 		const listener = method.split("_")[0];
 		if (LISTENERS.includes(listener)) {
-			// Substitui o método original por um novo que executa os listeners.
-			if (target[method] instanceof Function) {
-				target[getListenersRepository(listener)] = [target[method]];
+			// "Substitui" o método original por um novo que executa os listeners.
+			if (target[renameListenerToIdentifier(listener)] == undefined) {
+				target[renameListenerToIdentifier(listener)] = [target[method]];
 			} else {
-				target[getListenersRepository(listener)].push(target[method]);
+				target[renameListenerToIdentifier(listener)].slice(0, target[method]);
 			}
 		}
 	});
 
 	// Prepara os listeners para serem executados.
 	LISTENERS.forEach((listener) => {
-		const repository = target[getListenersRepository(listener)];
+		const repository = target[renameListenerToIdentifier(listener)];
 		if (repository) {
-			eventSubscriber[listener] = (...data) => repository.forEach((callback) => callback.apply(target, data));
+			eventSubscriber[listener] = (...data) => {
+				const execute = async (index) => {
+					if (index >= repository.length) {
+						return Promise.resolve();
+					}
+
+					repository[index].apply(target, data).finally(() => execute(index + 1));
+				};
+
+				execute(0);
+			};
 		}
 	});
 
 	// Adiciona os listeners as inscrições do banco de dados.
 	Database.subscribers.push({ ...eventSubscriber });
 }
+
+function SubscribeOnce(runner, afterTriggers) {}
 
 module.exports = { Subscribe };

@@ -5,6 +5,7 @@ import React, { useEffect, useState, useImperativeHandle, useRef } from "react";
 const LazyLoader = React.forwardRef(
 	(
 		{
+			update,
 			topLeftOffset,
 			bottomRightOffset,
 			container,
@@ -139,9 +140,7 @@ const LazyLoader = React.forwardRef(
 				 * @param {*} uuid
 				 */
 				removePlaceholder: (uuid) => {
-					placeholdersContent.current = placeholdersContent.current.filter(
-						(placeholder) => placeholder.uuid != uuid
-					);
+					placeholdersContent.current = placeholdersContent.current.filter((placeholder) => placeholder.uuid != uuid);
 
 					// Remove a associação do placeholder ao elemento
 					ref.current.removePlaceholderAssociation(uuid);
@@ -188,9 +187,7 @@ const LazyLoader = React.forwardRef(
 				}
 
 				// Pega a "fatia" do conteúdo que está sendo exibido no momento e verifica se há algum elemento indefinido
-				const undefinedContentIndex = getContent
-					.slice(start, end)
-					.findIndex((element) => element === undefined);
+				const undefinedContentIndex = getContent.slice(start, end).findIndex((element) => element === undefined);
 
 				if (undefinedContentIndex > -1) {
 					if (end !== lastSectionEnd || start !== lastSectionStart) {
@@ -201,9 +198,7 @@ const LazyLoader = React.forwardRef(
 
 						// Inicia um novo timeout
 						sectionFetchTimeoutId = setTimeout(async () => {
-							const fetchedContent = await fetchMore(
-								Math.floor((start + undefinedContentIndex) / pageSize)
-							);
+							const fetchedContent = await fetchMore(Math.floor((start + undefinedContentIndex) / pageSize));
 							fetchedContent.forEach((element, index) => {
 								const contentIndex = start + undefinedContentIndex + index;
 								getContent[contentIndex] = getContent[contentIndex] || element;
@@ -241,11 +236,7 @@ const LazyLoader = React.forwardRef(
 			function getBottomRightOffset() {
 				switch (direction) {
 					case "horizontal":
-						return (
-							getAvailableContentCountForFetch() * (width + padding) +
-							margin -
-							getTopLeftOffset()
-						);
+						return getAvailableContentCountForFetch() * (width + padding) + margin - getTopLeftOffset();
 
 					case "vertical":
 						return 0;
@@ -290,10 +281,7 @@ const LazyLoader = React.forwardRef(
 			function getCurrentItemIndex() {
 				switch (direction) {
 					case "horizontal":
-						return Math.max(
-							0,
-							Math.floor((scrollBarCopy.scrollLeft - margin) / (width + padding))
-						);
+						return Math.max(0, Math.floor((scrollBarCopy.scrollLeft - margin) / (width + padding)));
 
 					case "vertical":
 						return 0;
@@ -314,10 +302,7 @@ const LazyLoader = React.forwardRef(
 
 				// Retorna o multiplo mais próximo para baixo e para cima do offset
 				const start = offset - (offset % maxPossibleElementsInContainer);
-				const end =
-					offset +
-					maxPossibleElementsInContainer -
-					(offset % maxPossibleElementsInContainer);
+				const end = offset + maxPossibleElementsInContainer - (offset % maxPossibleElementsInContainer);
 
 				return [start, end];
 			}
@@ -330,9 +315,7 @@ const LazyLoader = React.forwardRef(
 					setVisibleContent(visibleContent);
 				};
 
-				update(
-					await retrieveVisibleContent(currentSectionStart, currentSectionEnd, update)
-				);
+				update(await retrieveVisibleContent(currentSectionStart, currentSectionEnd, update));
 			}
 
 			/**
@@ -348,10 +331,7 @@ const LazyLoader = React.forwardRef(
 				// Pega os limites da seção atual e expande a seção para cima e para baixo se necessário
 				const [sectionStart, sectionEnd] = getSectionBounds(currentItemIndex);
 				if (currentItemIndex - sectionStart <= sectionThreshold) {
-					currentSectionStart = Math.max(
-						0,
-						sectionStart - getMaxPossibleElementsInContainer()
-					);
+					currentSectionStart = Math.max(0, sectionStart - getMaxPossibleElementsInContainer());
 				}
 
 				if (sectionEnd - currentItemIndex <= sectionThreshold) {
@@ -378,6 +358,10 @@ const LazyLoader = React.forwardRef(
 				setDisplayableContent();
 			}
 
+			// Seta a função de atualização do conteúdo a ser exibido na tela
+			update.current = setDisplayableContent;
+
+			// Garante que os elementos de offset fiquem fixos no inicio e no final do container
 			topLeftOffset.current.style.order = "-100000000";
 			bottomRightOffset.current.style.order = "100000000";
 
@@ -386,7 +370,7 @@ const LazyLoader = React.forwardRef(
 			return () => {
 				scrollBarCopy.removeEventListener("scroll", handleScroll);
 			};
-		}, [container, scrollBar]);
+		}, [update, container, scrollBar]);
 
 		return visibleContent.map((data, index) => {
 			if (data?.isPlaceholder) {

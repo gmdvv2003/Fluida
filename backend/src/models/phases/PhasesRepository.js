@@ -24,8 +24,6 @@ class PhasesRepository extends Repository {
 		await ProjectsService.incrementTotalPhasesInProject(entity.projectId);
 	}
 
-	async afterInsert_definePhaseOrder({ entity }) {}
-
 	constructor(service) {
 		super(service, PhasesDTO);
 		Subscribe(PhasesDTO, this);
@@ -38,9 +36,7 @@ class PhasesRepository extends Repository {
 	 * @returns {PhasesDTO}
 	 */
 	async getPhaseById(phaseId) {
-		return await this.Repository.createQueryBuilder("Phases")
-			.where(`phaseId = :phaseId`, { phaseId })
-			.getOne();
+		return await this.Repository.createQueryBuilder("Phases").where(`phaseId = :phaseId`, { phaseId }).getOne();
 	}
 
 	/**
@@ -53,7 +49,11 @@ class PhasesRepository extends Repository {
 		return await this.Repository.createQueryBuilder("Phases")
 			.insert()
 			.into("Phases")
-			.values(phasesDTO)
+			.values({
+				...phasesDTO,
+				order: () => "(COALESCE((SELECT MAX(`order`) FROM (SELECT * FROM `Phases` WHERE `projectId` = :projectId) AS _) + 1, 0))",
+			})
+			.setParameter("projectId", phasesDTO.projectId)
 			.execute();
 	}
 
@@ -64,11 +64,7 @@ class PhasesRepository extends Repository {
 	 * @returns {DeleteResult}
 	 */
 	async deletePhase(phasesDTO) {
-		return await this.Repository.createQueryBuilder("Phases")
-			.delete()
-			.from("Phases")
-			.where(`phaseId = :phaseId`, phasesDTO)
-			.execute();
+		return await this.Repository.createQueryBuilder("Phases").delete().from("Phases").where(`phaseId = :phaseId`, phasesDTO).execute();
 	}
 }
 
