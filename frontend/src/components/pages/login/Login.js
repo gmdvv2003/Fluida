@@ -72,8 +72,12 @@ function Login() {
 	}
 
 	useEffect(() => {
-		const unbindEmailChangeSubscription = emailFieldReference.current.onTextChange(handleOnEmailChange);
-		const unbindPasswordChangeSubscription = passwordFieldReference.current.onPasswordChange(handleOnPasswordChange);
+		document.title = "Fluida | Login";
+
+		const unbindEmailChangeSubscription =
+			emailFieldReference.current.onTextChange(handleOnEmailChange);
+		const unbindPasswordChangeSubscription =
+			passwordFieldReference.current.onPasswordChange(handleOnPasswordChange);
 
 		return () => {
 			unbindEmailChangeSubscription();
@@ -123,12 +127,18 @@ function Login() {
 								/>
 							</div>
 
-							{invalidEmail && !wrongCredentials && <InputFieldError error="Preencha este campo." />}
+							{invalidEmail && !wrongCredentials && (
+								<InputFieldError error="Preencha este campo." />
+							)}
 
 							<PasswordField ref={passwordFieldReference} />
 
-							{invalidPassword && !wrongCredentials && <InputFieldError error="Preencha este campo." />}
-							{wrongCredentials && <InputFieldError error="Email e usuário ou senha inválidos." />}
+							{invalidPassword && !wrongCredentials && (
+								<InputFieldError error="Preencha este campo." />
+							)}
+							{wrongCredentials && (
+								<InputFieldError error="Email e usuário ou senha inválidos." />
+							)}
 
 							<div className="L-login-form-reset-container">
 								<a href="/send-password-reset" className="L-login-form-reset">

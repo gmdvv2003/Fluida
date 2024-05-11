@@ -8,6 +8,7 @@ import PrivateRoute from "functionalities/PrivateRoute";
 import ParticipateInProject from "functionalities/ParticipateInProject";
 
 import Loading from "components/shared/loading/Loading";
+import Configurations from "components/pages/configurations/Configurations";
 
 const Registration = lazy(() => import("components/pages/registration/Registration"));
 const Login = lazy(() => import("components/pages/login/Login"));
@@ -90,6 +91,15 @@ function App() {
 							element={
 								<PrivateRoute>
 									<HomeProjects />
+								</PrivateRoute>
+							}
+						/>
+
+						<Route
+							path="/configurations"
+							element={
+								<PrivateRoute>
+									<Configurations />
 								</PrivateRoute>
 							}
 						/>

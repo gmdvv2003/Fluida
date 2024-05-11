@@ -49,6 +49,8 @@ function ValidateEmail() {
 	}
 
 	useEffect(() => {
+		document.title = "Fluida | Validate your Email";
+
 		const searchParameters = new URLSearchParams(window.location.search);
 		if (!searchParameters.has("token")) {
 			setWaitingForValidation(false);

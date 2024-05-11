@@ -95,6 +95,11 @@ class ProjectsController extends Controller {
 			return response.status(400).json({ message: "Usuário ou projeto não informado." });
 		}
 
+		const project = await this.Service.getProjectById(projectId);
+		if (!project) {
+			return response.status(400).json({ message: "Projeto não encontrado." });
+		}
+
 		// Verifica se o usuário está no projeto
 		const isInProject = await this.Service.ProjectsMembersService.isUserMemberOfProject(
 			userId,
@@ -117,6 +122,7 @@ class ProjectsController extends Controller {
 			message: "Participação para o projeto preparada com sucesso.",
 			wasAdded: true,
 			participationToken: participationToken,
+			projectName: project.projectName,
 		});
 	}
 
