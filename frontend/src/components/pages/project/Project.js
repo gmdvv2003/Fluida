@@ -65,7 +65,7 @@ class ProjectState {
 			// Caso contrário, é retornado o número total de fases local
 			if (!this.totalPhasesSynced && !sync) {
 				return this.#socket.emit("getTotalPhases", null, (response) => {
-					let retrievedCount = response?.amount;
+					let retrievedCount = response?.amount?.totalPhases;
 
 					// Se o número total de fases foi retornado, então o número total de fases foi sincronizado
 					if (retrievedCount != undefined) {
@@ -126,8 +126,7 @@ class ProjectState {
 	 *
 	 * @param {Object} phaseDTO
 	 */
-	phaseCreated(phaseDTO) {
-		console.log(phaseDTO);
+	phaseCreated(phaseDTO, fromFetch = false) {
 		phaseDTO = phaseDTO?.[0];
 		if (!phaseDTO) {
 			return null;
@@ -139,7 +138,7 @@ class ProjectState {
 		this.phases.push(phaseState);
 		this.phasesMap[phaseDTO.phaseId] = phaseState;
 
-		this.totalPhases += 1;
+		this.totalPhases += fromFetch ? 0 : 1;
 
 		// Atualizar o estado do projeto
 		this.#projectStateUpdated();
@@ -173,7 +172,7 @@ class ProjectState {
 	 *
 	 * @param {Object} cardDTO
 	 */
-	cardCreated(cardDTO) {
+	cardCreated(cardDTO, fromFetch = false) {
 		cardDTO = cardDTO?.[0];
 		if (!cardDTO) {
 			return null;
@@ -192,7 +191,7 @@ class ProjectState {
 		phaseState.cardsMap[cardDTO.cardId] = cardState;
 
 		// Incrimenta o número total de cards
-		phaseState.totalCards += 1;
+		phaseState.totalCards += fromFetch ? 0 : 1;
 
 		// Atualizar o estado do projeto
 		this.#projectStateUpdated();
@@ -231,7 +230,7 @@ class ProjectState {
 		phases = phases?.[0]?.taken?.filter(({ phaseId }) => this.phasesMap[phaseId] == undefined);
 		phases.forEach(({ phaseId, phase }) => {
 			// Cria o estado da fase
-			this.phaseCreated([phase]);
+			this.phaseCreated([phase], true);
 
 			// Realiza o fetch dos cards da fase inicial
 			this.#socket.emit("fetchCards", { page: 0, phaseId: phaseId });
@@ -247,7 +246,7 @@ class ProjectState {
 	cardsFetched(phaseId, cards) {
 		cards?.taken?.forEach((cardDTO) => {
 			// Cria o estado do card
-			this.cardCreated([cardDTO]);
+			this.cardCreated([cardDTO], true);
 		});
 	}
 }
@@ -510,9 +509,17 @@ function Project() {
 								// Funções de controle do conteúdo
 								fetchMore={(page) => {
 									return new Promise((resolve, reject) => {
-										return currentProjectSocket?.emit("fetchPhases", { page }, (response) => {
-											resolve(response?.phases?.taken || []);
-										});
+										return currentProjectSocket?.emit(
+											"fetchPhases",
+											{ page },
+											(response) => {
+												resolve(
+													response?.phases?.taken.map(
+														(taken) => new PhaseState(taken)
+													) || []
+												);
+											}
+										);
 									});
 								}}
 								getAvailableContentCountForFetch={async (sync = false) => {
@@ -529,7 +536,10 @@ function Project() {
 						</ol>
 
 						<div className="P-add-new-phase-button-container">
-							<button className="P-add-new-phase-button" onClick={handleCreateNewPhaseButtonClick}>
+							<button
+								className="P-add-new-phase-button"
+								onClick={handleCreateNewPhaseButtonClick}
+							>
 								<AddButtonIcon className="P-add-new-phase-button-icon" />
 							</button>
 						</div>
