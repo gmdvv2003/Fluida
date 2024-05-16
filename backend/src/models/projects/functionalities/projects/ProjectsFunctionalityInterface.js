@@ -135,8 +135,9 @@ class Project {
 	 * @returns {number}
 	 */
 	async getTotalPhasesInProject() {
+		// Retorno o valor já calculado caso ele exista, caso contrário, é feita a busca no banco de dados
 		this.#totalPhasesInProject =
-			this.#totalPhasesInProject || (await this.ProjectsController.Service.getTotalPhasesInProject(this.projectId));
+			this.#totalPhasesInProject || (await this.ProjectsController.Service.getTotalPhasesInProject(this.projectId)?.totalPhases);
 		return this.#totalPhasesInProject;
 	}
 

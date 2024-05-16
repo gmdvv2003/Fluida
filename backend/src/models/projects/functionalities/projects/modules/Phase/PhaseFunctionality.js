@@ -32,26 +32,19 @@ class PhaseFunctionality {
 
 		// Cria a fase no banco de dados
 		this.ProjectsController.PhasesService.createPhase(phaseDTO)
-			.then((x) => {
-				console.log(x.generatedMaps);
-				console.log("========");
-				console.log(x.generatedMaps[0]);
-				let generatedMap = x.generatedMap;
+			.then(({ generatedMaps }) => {
+				let generatedMap = generatedMaps[0];
+
 				// Atualiza o DTO com os valores gerados
 				phaseDTO = { ...phaseDTO, ...generatedMap };
 
 				// Adiciona a fase ao projeto localmente
 				project.addPhase(phaseDTO);
-				console.log(generatedMap);
-				console.log(phaseDTO);
-				console.log({ ...phaseDTO, ...generatedMap });
 
 				// Emite o evento de criação da fase
 				projectsIO.to(project.projectId).emit("phaseCreated", phaseDTO);
 			})
-			.catch((error) =>
-				socket.emit("error", { message: "Erro ao criar a fase", error: error })
-			);
+			.catch((error) => socket.emit("error", { message: "Erro ao criar a fase", error: error }));
 	}
 
 	#IODeletePhase(projectsIO, socket, project, data) {}
@@ -70,9 +63,7 @@ class PhaseFunctionality {
 	 */
 	#IOFetchPhases(projectsIO, socket, project, data, acknowledgement) {
 		project.getPhases(data?.page).then((result) => {
-			acknowledgement
-				? acknowledgement({ phases: result })
-				: socket.emit("phasesFetched", result);
+			acknowledgement ? acknowledgement({ phases: result }) : socket.emit("phasesFetched", result);
 		});
 	}
 

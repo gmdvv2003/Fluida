@@ -13,8 +13,7 @@ const initialState = {
 	onDragMove: [],
 };
 
-const { setGlobalState: setGlobalDragState, useGlobalState: useGlobalDragState } =
-	createContainer(initialState);
+const { setGlobalState: setGlobalDragState, useGlobalState: useGlobalDragState } = createContainer(initialState);
 
 function invokeListeners(listeners, target, ...data) {
 	listeners.forEach((listener) => {
@@ -26,14 +25,9 @@ function invokeListeners(listeners, target, ...data) {
 
 function bindToListenerWrapper(key) {
 	return function (listener, target) {
-		setGlobalDragState(key, (previousListeners) => [
-			...(previousListeners || []),
-			{ listener, target },
-		]);
+		setGlobalDragState(key, (previousListeners) => [...(previousListeners || []), { listener, target }]);
 		return () => {
-			setGlobalDragState(key, (previousListeners) =>
-				previousListeners?.filter((listener) => listener.listener == listener)
-			);
+			setGlobalDragState(key, (previousListeners) => previousListeners?.filter((listener) => listener.listener == listener));
 		};
 	};
 }
@@ -46,14 +40,8 @@ export const onComponentDragEnd = bindToListenerWrapper("onDragEnd");
 let currentMouseMoveEventHandler = null;
 let currentMouseUpEventHandler = null;
 
-document.addEventListener(
-	"mousemove",
-	(event) => currentMouseMoveEventHandler && currentMouseMoveEventHandler(event)
-);
-document.addEventListener(
-	"mouseup",
-	(event) => currentMouseUpEventHandler && currentMouseUpEventHandler(event)
-);
+document.addEventListener("mousemove", (event) => currentMouseMoveEventHandler && currentMouseMoveEventHandler(event));
+document.addEventListener("mouseup", (event) => currentMouseUpEventHandler && currentMouseUpEventHandler(event));
 
 // Deixa disponível o estado de drag para os componentes.
 export const useDragState = () => {
@@ -63,9 +51,7 @@ export const useDragState = () => {
 // Contexto que permite arrastar um modal.
 const DragableModalContext = React.forwardRef(({ children, uuid, modal }, ref) => {
 	const [isDragging, setIsDragging] = useGlobalDragState("isDragging");
-	const [_, setCurrentComponentGettingDraggedUUID] = useGlobalDragState(
-		"currentComponentGettingDraggedUUID"
-	);
+	const [_, setCurrentComponentGettingDraggedUUID] = useGlobalDragState("currentComponentGettingDraggedUUID");
 
 	const [onDragBegin] = useGlobalDragState("onDragBegin");
 	const [onDragEnd] = useGlobalDragState("onDragEnd");
@@ -88,12 +74,20 @@ const DragableModalContext = React.forwardRef(({ children, uuid, modal }, ref) =
 	);
 
 	useEffect(() => {
+		/**
+		 *
+		 * @param {*} event
+		 */
 		function onMouseMove(event) {
 			invokeListeners(onDragMove, uuid, event);
 			event.preventDefault();
 			event.stopPropagation();
 		}
 
+		/**
+		 *
+		 * @param {} event
+		 */
 		function onMouseUp(event) {
 			invokeListeners(onDragEnd, uuid, event);
 
@@ -107,6 +101,11 @@ const DragableModalContext = React.forwardRef(({ children, uuid, modal }, ref) =
 			event.stopPropagation();
 		}
 
+		/**
+		 *
+		 * @param {*} event
+		 * @returns
+		 */
 		function onMouseDown(event) {
 			if (isDragging) {
 				return null;

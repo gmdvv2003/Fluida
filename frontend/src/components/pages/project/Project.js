@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 
 import { ReactComponent as AddButtonIcon } from "assets/action-icons/add-circle-unlined.svg";
 
@@ -9,6 +9,7 @@ import HomeHeader from "components/shared/login-registration/header-home/HeaderH
 import LazyLoader from "utilities/lazy-loader/LazyLoader";
 
 import Phase from "./templates/phase/Phase";
+import ConnectionFailure from "./ConnectionFailure";
 
 import "./Project.css";
 
@@ -65,7 +66,7 @@ class ProjectState {
 			// Caso contrário, é retornado o número total de fases local
 			if (!this.totalPhasesSynced && !sync) {
 				return this.#socket.emit("getTotalPhases", null, (response) => {
-					let retrievedCount = response?.amount?.totalPhases;
+					let retrievedCount = response?.amount;
 
 					// Se o número total de fases foi retornado, então o número total de fases foi sincronizado
 					if (retrievedCount != undefined) {
@@ -79,6 +80,10 @@ class ProjectState {
 
 			return resolve(this.totalPhases);
 		});
+	}
+
+	async getTotalCards(phaseId, sync = false) {
+		return 0;
 	}
 
 	/**
@@ -249,6 +254,14 @@ class ProjectState {
 			this.cardCreated([cardDTO], true);
 		});
 	}
+
+	newPhaseState(phaseDTO) {
+		return new PhaseState(phaseDTO);
+	}
+
+	newCardState(cardDTO) {
+		return new CardState(cardDTO);
+	}
 }
 
 function Project() {
@@ -269,18 +282,31 @@ function Project() {
 
 	const performLazyLoaderUpdateRef = useRef(null);
 
+	const [waitingForReconnect, setWaitingForReconnect] = useState(false);
+	const [redirectToHome, setRedirectToHome] = useState(false);
+
 	// ============================== LazyLoader update ============================== //
+	/**
+	 *
+	 */
 	function updateLazyLoader() {
 		performLazyLoaderUpdateRef.current?.();
 	}
 
 	// ============================== Criação de fases e cards ============================== //
+	/**
+	 *
+	 */
 	function handleCreateNewPhaseButtonClick() {
 		currentProjectSocket?.emit("createPhase", {
 			phaseName: "Nova Fase",
 		});
 	}
 
+	/**
+	 *
+	 * @param {*} phaseId
+	 */
 	function handleCreateNewPhaseCardButtonClick(phaseId) {
 		currentProjectSocket?.emit("createCard", {
 			phaseId,
@@ -289,6 +315,12 @@ function Project() {
 	}
 
 	// ============================== Construtor do placeholder da fase ============================== //
+	/**
+	 *
+	 * @param {*} setPlaceholder
+	 * @param {*} param1
+	 * @returns
+	 */
 	function constructPhasePlaceholder(setPlaceholder, { order }) {
 		return (
 			<div
@@ -419,7 +451,20 @@ function Project() {
 		document.title = `Fluida | ${projectName}`;
 
 		// Funções de resposta do servidor
-		const disconnect = () => setCurrentProjectSocket(null);
+		const disconnect = (reason) => {
+			if (!reason.active) {
+				// Remove a sessão do projeto
+				setProjectState(null);
+				setCurrentProjectSocket(null);
+				setRedirectToHome(true);
+			} else {
+				setWaitingForReconnect(true);
+			}
+		};
+
+		const connect = () => {
+			setWaitingForReconnect(false);
+		};
 
 		const phaseCreated = (...data) => newProjectState.phaseCreated(data);
 		const phaseUpdated = (...data) => newProjectState.phaseUpdated(data);
@@ -436,6 +481,7 @@ function Project() {
 
 		// Adiciona os listeners
 		socket.on("disconnect", disconnect);
+		socket.on("connect", connect);
 
 		socket.on("phaseCreated", phaseCreated);
 		socket.on("phaseUpdated", phaseUpdated);
@@ -456,6 +502,7 @@ function Project() {
 
 			// Remove os listeners
 			socket.off("disconnect", disconnect);
+			socket.off("connect", connect);
 
 			socket.off("phaseCreated", phaseCreated);
 			socket.off("phaseUpdated", phaseUpdated);
@@ -472,9 +519,12 @@ function Project() {
 		};
 	}, [projectId]);
 
-	return (
+	return redirectToHome ? (
+		<Navigate to="/" />
+	) : (
 		<div style={{ overflowX: "hidden" }}>
 			<HomeHeader />
+			<ConnectionFailure connectionFailure={waitingForReconnect} />
 			{projectState && (
 				<div className="P-background" ref={phasesContainerScrollBarRef}>
 					<div className="P-phases-container-holder">
@@ -491,9 +541,11 @@ function Project() {
 								// Função para construir os elementos
 								constructElement={(phase, _, isLoading, setReference) => (
 									<Phase
+										onCreateCardRequest={handleCreateNewPhaseCardButtonClick}
 										isLoading={isLoading}
 										phase={phase}
 										projectState={projectState}
+										currentProjectSocket={currentProjectSocket}
 										dragBegin={handlePhaseDragBegin}
 										dragEnd={handlePhaseDragEnd}
 										dragMove={handlePhaseDragMove}
@@ -509,17 +561,9 @@ function Project() {
 								// Funções de controle do conteúdo
 								fetchMore={(page) => {
 									return new Promise((resolve, reject) => {
-										return currentProjectSocket?.emit(
-											"fetchPhases",
-											{ page },
-											(response) => {
-												resolve(
-													response?.phases?.taken.map(
-														(taken) => new PhaseState(taken)
-													) || []
-												);
-											}
-										);
+										return currentProjectSocket?.emit("fetchPhases", { page }, (response) => {
+											resolve(response?.phases?.taken.map((taken) => new PhaseState(taken)) || []);
+										});
 									});
 								}}
 								getAvailableContentCountForFetch={async (sync = false) => {
@@ -536,10 +580,7 @@ function Project() {
 						</ol>
 
 						<div className="P-add-new-phase-button-container">
-							<button
-								className="P-add-new-phase-button"
-								onClick={handleCreateNewPhaseButtonClick}
-							>
+							<button className="P-add-new-phase-button" onClick={handleCreateNewPhaseButtonClick}>
 								<AddButtonIcon className="P-add-new-phase-button-icon" />
 							</button>
 						</div>

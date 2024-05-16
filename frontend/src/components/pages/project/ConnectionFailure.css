@@ -1,0 +1,68 @@
+:root {
+	--container-width: 600px;
+	--container-height: 60px;
+	--container-bottom-padding: 20px;
+	--container-border-padding: 6px;
+	--error-icon-size: 36px;
+}
+
+.PCF-background {
+	z-index: 100;
+	position: absolute;
+	transform: translate(calc(var(--container-width) * -1), calc(100vh - 100px - var(--header-height)));
+	width: var(--container-width);
+	height: var(--container-height);
+	background-color: rgb(210, 32, 32);
+	transition: transform 0.5s;
+}
+
+.PCF-container {
+	display: flex;
+	flex-direction: column;
+	padding: var(--container-border-padding);
+}
+
+.PCF-error-title {
+	color: white;
+}
+
+.PCF-error-description {
+	color: white;
+	font-size: small;
+	font-style: italic;
+}
+
+.PCF-alert-in {
+	transform: translate(0px, calc(100vh - 100px - var(--header-height)));
+}
+
+.PCF-alert-out {
+	transform: translate(calc(var(--container-width) * -1), calc(100vh - 100px - var(--header-height)));
+}
+
+.PCF-error-icon {
+	position: absolute;
+	width: calc(var(--error-icon-size) - var(--container-border-padding));
+	height: calc(var(--error-icon-size) - var(--container-border-padding));
+	top: calc(100% - var(--container-height) / 2 - var(--error-icon-size) / 2);
+	left: calc(100% - var(--error-icon-size) - 18px);
+	overflow: hidden;
+}
+
+@keyframes alert-in {
+	0% {
+		transform: translate(calc(var(--container-width) * -1), calc(100vh - 100px - var(--header-height)));
+	}
+	100% {
+		transform: translate(0px, calc(100vh - 100px - var(--header-height)));
+	}
+}
+
+@keyframes alert-out {
+	0% {
+		transform: translate(0px, calc(100vh - 100px - var(--header-height)));
+	}
+	100% {
+		transform: translate(calc(var(--container-width) * -1), calc(100vh - 100px - var(--header-height)));
+	}
+}

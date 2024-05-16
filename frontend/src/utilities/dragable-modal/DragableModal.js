@@ -1,20 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 
-import {
-	useDragState,
-	onComponentDragBegin,
-	onComponentDragMove,
-	onComponentDragEnd,
-	DragableModalContext,
-} from "./DragableModalContext";
+import { useDragState, onComponentDragBegin, onComponentDragMove, onComponentDragEnd, DragableModalContext } from "./DragableModalContext";
 
 const DragableModal = React.forwardRef(({ order, elements, callbacks }, ref) => {
 	const { _, useGlobalDragState } = useDragState();
 
 	const [isDragging, setIsDragging] = useGlobalDragState("isDragging");
-	const [currentComponentGettingDraggedUUID, __] = useGlobalDragState(
-		"currentComponentGettingDraggedUUID"
-	);
+	const [currentComponentGettingDraggedUUID, __] = useGlobalDragState("currentComponentGettingDraggedUUID");
 
 	const [position, setPosition] = useState([0, 0]);
 
@@ -53,33 +45,18 @@ const DragableModal = React.forwardRef(({ order, elements, callbacks }, ref) => 
 			onComponentDragMove(onDragMove, dragableDivUUID.current),
 
 			// Listeners externos
-			"dragBegin" in callbacks &&
-				dragableModalContextRef.current.onDragBegin(
-					wrapExternalDragListener(callbacks.dragBegin)
-				),
-
-			"dragEnd" in callbacks &&
-				dragableModalContextRef.current.onDragEnd(
-					wrapExternalDragListener(callbacks.dragEnd)
-				),
-
-			"dragMove" in callbacks &&
-				dragableModalContextRef.current.onDragMove(
-					wrapExternalDragListener(callbacks.dragMove)
-				),
+			"dragBegin" in callbacks && dragableModalContextRef.current.onDragBegin(wrapExternalDragListener(callbacks.dragBegin)),
+			"dragEnd" in callbacks && dragableModalContextRef.current.onDragEnd(wrapExternalDragListener(callbacks.dragEnd)),
+			"dragMove" in callbacks && dragableModalContextRef.current.onDragMove(wrapExternalDragListener(callbacks.dragMove)),
 		];
 
 		return () => {
 			listeners.forEach((remove) => remove != null && remove());
 		};
-	});
+	}, [callbacks]);
 
 	return (
-		<DragableModalContext
-			modal={dragableDivRef}
-			uuid={dragableDivUUID}
-			ref={dragableModalContextRef}
-		>
+		<DragableModalContext modal={dragableDivRef} uuid={dragableDivUUID} ref={dragableModalContextRef}>
 			{(() => {
 				const isDraggingThisModal = isDraggingThis();
 				return (

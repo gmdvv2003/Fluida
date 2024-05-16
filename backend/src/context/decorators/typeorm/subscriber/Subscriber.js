@@ -54,7 +54,7 @@ function Subscribe(dto, target) {
 			if (target[renameListenerToIdentifier(listener)] == undefined) {
 				target[renameListenerToIdentifier(listener)] = [target[method]];
 			} else {
-				target[renameListenerToIdentifier(listener)].slice(0, target[method]);
+				target[renameListenerToIdentifier(listener)].splice(0, 0, target[method]);
 			}
 		}
 	});
@@ -69,7 +69,9 @@ function Subscribe(dto, target) {
 						return Promise.resolve();
 					}
 
-					repository[index].apply(target, data).finally(() => execute(index + 1));
+					repository[index].apply(target, data).finally(() => {
+						execute(index + 1);
+					});
 				};
 
 				execute(0);

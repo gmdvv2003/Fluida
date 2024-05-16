@@ -1,13 +1,11 @@
 import "./HomeProjects.css";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { faCircleXmark, faUserLarge } from "@fortawesome/free-solid-svg-icons";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import EditCard from "../project/templates/edit-card/EditCard";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import HeaderHome from "../../shared/login-registration/header-home/HeaderHome.js";
-import TextInputField from "../../shared/text-input-field/TextInputField";
 import TextInputField from "../../shared/text-input-field/TextInputField";
 
 function HomeProjects() {
@@ -58,28 +56,15 @@ function HomeProjects() {
 		{ projectName: "Projeto 3" },
 		{ projectName: "Projeto 4" },
 	];
-		{ projectName: "Projeto 2" },
-		{ projectName: "Projeto 3" },
-		{ projectName: "Projeto 4" },
-		{ projectName: "Projeto 1" },
-		{ projectName: "Projeto 2" },
-		{ projectName: "Projeto 3" },
-		{ projectName: "Projeto 4" },
-	];
 
 	function handleNewProjectClick() {
-		setIsDialogOpen(true);
-	}
 		setIsDialogOpen(true);
 	}
 
 	function handleCloseDialog() {
 		setIsDialogOpen(false);
 	}
-		setIsDialogOpen(false);
-	}
 
-	function handleAddPhotoClick() {
 	function handleAddPhotoClick() {
 		setAddPhotoDialogOpen(true);
 	}
@@ -87,17 +72,10 @@ function HomeProjects() {
 	function handleCloseDialogAddPhoto() {
 		setAddPhotoDialogOpen(false);
 	}
-		setAddPhotoDialogOpen(false);
-	}
 
 	const handleImageChange = (event) => {
 		const file = event.target.files[0];
 		if (file) {
-			const reader = new FileReader();
-			reader.onloadend = () => {
-				setSelectedImage(reader.result);
-			};
-			reader.readAsDataURL(file);
 			const reader = new FileReader();
 			reader.onloadend = () => {
 				setSelectedImage(reader.result);
@@ -118,11 +96,6 @@ function HomeProjects() {
 	return (
 		<div>
 			<HeaderHome />
-			<div
-				className={`HP-container-user-projects ${
-					isDialogOpen || isDialogAddPhotoOpen ? "blur-background" : ""
-				}`}
-			>
 			<EditCard />
 			{/* <div
 				className={`HP-container-user-projects ${
@@ -310,4 +283,3 @@ function HomeProjects() {
 }
 
 export default HomeProjects;
-

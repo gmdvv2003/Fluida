@@ -51,7 +51,8 @@ class PhasesRepository extends Repository {
 			.into("Phases")
 			.values({
 				...phasesDTO,
-				order: () => "(COALESCE((SELECT MAX(`order`) FROM (SELECT * FROM `Phases` WHERE `projectId` = :projectId) AS _) + 1, 0))",
+				order: () =>
+					"(COALESCE((SELECT MAX(`order`) FROM (SELECT * FROM `Phases` WHERE `projectId` = :projectId) AS temporary) + 1, 1))",
 			})
 			.setParameter("projectId", phasesDTO.projectId)
 			.execute();

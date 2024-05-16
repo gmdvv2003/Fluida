@@ -64,11 +64,7 @@ export function ProjectAuthenticationProvider({ children }) {
 			}
 
 			// Realiza a requisição para participar do projeto
-			const response = await performAuthenticatedRequest(
-				ParticipateInProjectEndpoint,
-				"POST",
-				JSON.stringify({ projectId })
-			);
+			const response = await performAuthenticatedRequest(ParticipateInProjectEndpoint, "POST", JSON.stringify({ projectId }));
 			if (response.success) {
 				// Cria uma nova instância do socket com o token de participação
 				const socket = io(ProjectsSocketEndpoint, {
@@ -78,59 +74,56 @@ export function ProjectAuthenticationProvider({ children }) {
 					},
 				});
 
-				socket.on("error", (error) => {
+				/**
+				 *
+				 * @param {*} error
+				 */
+				function onError(error) {
 					console.error(`Erro no socket: ${error.message}`);
-				});
+				}
 
-				// Evento que roda quando ocorre um erro na conexão
-				socket.on("connect_error", (error) => {
-					let rejectPromise = false;
-
-					switch (error.message) {
-						case ("io server disconnect",
-						"io client disconnect",
-						"ping timeout",
-						"transport error"):
-							rejectPromise = true;
-							break;
-
-						case "transport close":
-							break;
-
-						default:
-							rejectPromise = true;
-							break;
-					}
-
-					if (rejectPromise) {
-						try {
-							socket.disconnect();
-						} catch (error) {
-							console.error(`Erro ao desconectar o socket: ${error.message}`);
-						}
-
-						reject(error);
-					}
-
+				/**
+				 *
+				 * @param {*} error
+				 */
+				function onConnectError(error) {
 					console.error(`Erro ao conectar no socket: ${error.message}`);
-				});
 
-				// Evento que roda quando a conexão é estabelecida
-				socket.on("connect", () => {
+					// Rejeita a promessa com o erro
+					reject(error);
+				}
+
+				/**
+				 *
+				 */
+				function onConnect() {
 					socket.emit("subscribeToProject", { projectId });
-				});
+				}
 
-				// Evento que roda quando a conexão é encerrada
-				socket.on("disconnect", () => {
-					setAuthenticatedProjectsSessions(
-						authenticatedProjectsSessions.filter(
-							(session) => session.projectId !== projectId
-						)
-					);
-				});
+				/**
+				 *
+				 * @param {*} reason
+				 */
+				function onDisconnect(reason) {
+					if (!reason.active) {
+						// Remove a sessão do projeto
+						setAuthenticatedProjectsSessions(
+							authenticatedProjectsSessions.filter((session) => session.projectId !== projectId)
+						);
 
-				// Evento que roda quando o usuário se inscreve no projeto
-				socket.on("subscribedToProject", () => {
+						// Disconecta os eventos do socket
+						socket.off("error", onError);
+						socket.off("connect_error", onConnectError);
+						socket.off("connect", onConnect);
+						socket.off("disconnect", onDisconnect);
+						socket.off("subscribedToProject", onSubscribedToProject);
+					}
+				}
+
+				/**
+				 *
+				 */
+				function onSubscribedToProject() {
 					setAuthenticatedProjectsSessions([
 						...authenticatedProjectsSessions,
 						{
@@ -141,7 +134,16 @@ export function ProjectAuthenticationProvider({ children }) {
 					]);
 
 					resolve({ success: true });
-				});
+				}
+
+				// Eventos do socket
+				socket.on("error", onError); // Evento que roda quando ocorre um erro no socket
+				socket.on("connect_error", onConnectError); // Evento que roda quando ocorre um erro ao conectar no socket
+				socket.on("connect", onConnect); // Evento que roda quando a conexão é estabelecida
+				socket.on("disconnect", onDisconnect); // Evento que roda quando a conexão é encerrada
+
+				// Eventos do projeto
+				socket.on("subscribedToProject", onSubscribedToProject); // Evento que roda quando o usuário se inscreve no projeto
 			}
 		});
 
@@ -150,12 +152,8 @@ export function ProjectAuthenticationProvider({ children }) {
 
 		return new Promise((resolve, reject) => {
 			promise
-				.then((response) => {
-					resolve(response);
-				})
-				.catch((error) => {
-					reject(error);
-				})
+				.then((response) => resolve(response))
+				.catch((error) => reject(error))
 				.finally(() => (projectsBeingValidated.current[projectId] = false));
 		});
 	}
