@@ -34,6 +34,15 @@ body {
 	font-family: Arial, Helvetica, sans-serif, Geneva, Verdana;
 }
 
+::-webkit-scrollbar {
+	width: 8px; /* Largura da barra de rolagem */
+}
+
+::-webkit-scrollbar-thumb {
+	border-radius: 32px; /* Raio da borda da parte deslizante */
+	background-color: #ebebeb; /* Cor da parte deslizante da barra de rolagem */
+}
+
 code {
 	font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
 }

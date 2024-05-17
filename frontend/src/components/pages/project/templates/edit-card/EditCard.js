@@ -26,17 +26,25 @@ function EditCard({
 	comments = [
 		{
 			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
-			comment: "Comentário teste"
+			comment: "Comentário teste",
 		},
 		{
 			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
-			comment: "Comentário teste"
+			comment: "Comentário teste",
 		},
 		{
 			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
-			comment: "Comentário teste"
+			comment: "Comentário teste",
 		},
-	]
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
+			comment: "Comentário teste",
+		},
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
+			comment: "Comentário teste",
+		},
+	],
 }) {
 	function teste() {
 		console.log("testando");
@@ -76,16 +84,12 @@ function EditCard({
 						</div>
 						<div className="EC-container-comentarios">
 							<div className="EC-label-comentarios">Comentários</div>
-								{comments.map((comment, index) => (
-									<div key={index} className="EC-container-comentario">
-										<div className="EC-comments-usericon">
-											{comment.userIcon}
-										</div>
-										<div className="EC-comments-comment">
-											{comment.comment}
-										</div>
-									</div>
-								))}
+							{comments.map((comment, index) => (
+								<div key={index} className="EC-container-comentario">
+									<div className="EC-comments-usericon">{comment.userIcon}</div>
+									<div className="EC-comments-comment">{comment.comment}</div>
+								</div>
+							))}
 						</div>
 					</div>
 					<div className="EC-container-interno-dialog-direita">
