@@ -5,7 +5,7 @@ import "./HeaderHome.css";
 import ConfigurationModal from "../configuration-modal/ConfigurationModal";
 import { ReactComponent as Logo } from "assets/icons/fluida-logo.svg";
 
-function HeaderHome() {
+function HeaderHome({ hideSearchBar }) {
 	const [modalIsOpen, setModalIsOpen] = useState(false);
 
 	function toggleModal() {
@@ -40,14 +40,18 @@ function HeaderHome() {
 					<Logo className="HH-header-home-logo" />
 				</div>
 				<div className="HH-input-buttons">
-					<div className="HH-input-container">
-						<input className="HH-input-search" type="text"></input>
-						<i className="HH-icon-search"></i>
-					</div>
+					{!hideSearchBar ? (
+						<div className="HH-input-container">
+							<input className="HH-input-search" type="text" />
+							<i className="HH-icon-search" />
+						</div>
+					) : (
+						<div className="HH-input-container" />
+					)}
 					<div className="HH-buttons-container">
-						<i className="HH-bell-icon"></i>
-						<i className="HH-settings-icon" onClick={toggleModal}></i>
-						<i className="HH-photo-icon" onClick={toggleModal}></i>
+						<i className="HH-bell-icon" />
+						<i className="HH-settings-icon" onClick={toggleModal} />
+						<i className="HH-photo-icon" onClick={toggleModal} />
 					</div>
 				</div>
 			</div>

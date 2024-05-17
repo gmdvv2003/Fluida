@@ -6,7 +6,7 @@ function Footer() {
 	return (
 		<div className="F-footer-container">
 			<Logo className="F-footer-logo" />
-			<a className="F-footer-copyright">Copyright @ 2024 Fluida</a>
+			<a className="F-footer-copyright">Copyright © 2024 Fluida</a>
 		</div>
 	);
 }
