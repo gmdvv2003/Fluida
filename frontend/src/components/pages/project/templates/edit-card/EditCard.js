@@ -1,7 +1,8 @@
 import "./EditCard.css";
 
+import React, { useState } from "react";
+
 import ModularButton from "components/shared/modular-button/ModularButton";
-import React from "react";
 import UserIcon from "components/shared/user-icon/UserIcon";
 
 const icon =
@@ -46,9 +47,24 @@ function EditCard({
 		},
 	],
 }) {
+	
+	const [fileNames, setFileNames] = useState([]);
+
 	function teste() {
 		console.log("testando");
 	}
+
+	function handleFileChange(event) {
+		const files = event.target.files;
+		const fileNamesArray = Array.from(files).map(file => file.name);
+		setFileNames(prevFileNames => [...prevFileNames, ...fileNamesArray]);
+	}
+
+	function removeFile(index) {
+		setFileNames(function(prevFileNames) {
+			return prevFileNames.filter((_, i) => i !== index);
+		});
+  	}
 
 	return (
 		<div className="EC-container">
@@ -66,13 +82,53 @@ function EditCard({
 							<input placeholder={placeholder} className="EC-input"></input>
 						</div>
 						<div className="EC-container-descricao">
-							<div className="EC-label-descricao">Descrição</div>
+							<div className="EC-label-descricao">
+								Descrição
+							</div>
 							<div className="EC-textarea-descricao">
 								<textarea
 									rows="8"
 									placeholder={description}
 									className="EC-textarea"
 								></textarea>
+							</div>
+						</div>
+						<div className="EC-container-anexo">
+							<div className="EC-label-anexo">
+								Anexo
+							</div>
+							<div className="EC-container-files">
+								<input 
+									type="file" 
+									id="fileUpload" 
+									style={{ display: 'none' }} 
+									multiple 
+									onChange={handleFileChange} 
+								/>
+								<ModularButton 
+									label="+ adicionar novo arquivo"
+									customClassName={"EC-botao-anexo"}
+									action={() => document.getElementById('fileUpload').click()}
+								/>
+								<div>
+									{fileNames.length > 0 ? (
+										fileNames.map((name, index) =>
+											<div key={index} className="EC-container-file">
+												<div className="EC-label-file">{name}</div>
+												<div>
+													<ModularButton
+														label="X"
+														customClassName={"EC-button-remover"}
+														action={() => removeFile(index)}
+													/>
+												</div>
+											</div>
+											)
+											
+									) : (
+										<div className="EC-label-anexo">Nenhum arquivo anexado!</div>
+									)}
+								</div>
 							</div>
 						</div>
 						<div className="EC-container-data">
@@ -102,7 +158,7 @@ function EditCard({
 								<ModularButton
 									label="Membros"
 									customClassName={"EC-button"}
-									action={teste}
+									action={() => teste()}
 								/>
 								<ModularButton
 									label="Etiquetas"
