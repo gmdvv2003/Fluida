@@ -2,9 +2,25 @@
 	display: flex;
 	position: fixed;
 	justify-content: center;
-	align-items: center;
+	padding-top: 30px;
 	width: 100%;
 	height: calc(100vh - var(--header-height));
+}
+
+.outroContainer{
+	display: flex;
+	justify-content: flex-end;
+	width: 70%;
+	height: 100%;
+}
+
+.testeContainer{
+	display: flex;
+	width: 100%;
+}
+
+.containerDialog{
+	width: 30%;
 }
 
 .EC-container-dialog {
@@ -14,7 +30,7 @@
 	border: 1px solid #dedede;
 	border-radius: 8px;
 	background-color: #ffffff;
-	width: 35%;
+	width: 55%;
 	height: 90%;
 }
 
@@ -58,7 +74,7 @@
 	border-bottom-left-radius: 8px;
 	width: 100%;
 	height: 100%;
-	overflow: auto;
+	overflow-x: hidden;
 }
 
 .EC-container-interno-dialog-esquerda {
@@ -222,7 +238,6 @@
 .EC-container-actions {
 	display: flex;
 	flex-direction: column;
-	align-items: center; /* Centraliza verticalmente */
 }
 
 .EC-label-action {
@@ -268,7 +283,21 @@
 }
 
 .EC-actions-buttons {
-	width: 100%;
+  	position: relative;
+}
+
+.teste {
+  	position: relative;
+}
+
+.EC-dialog-members {
+	margin-top: 131px;
+	margin-left: -20px;
+	border-radius: 4px;
+  	background-color: blue;
+	padding: 8px;
+	width: 200px;
+	height: 250px;
 }
 
 .EC-container-comentarios {
@@ -316,6 +345,7 @@
 	cursor: pointer;
 	margin-bottom: 5px;
 	border: 1px solid rgba(0, 0, 0, 0.139);
+	border-radius: 4px;
 	padding: 5px;
 	width: 100%;
 	height: 25px;
