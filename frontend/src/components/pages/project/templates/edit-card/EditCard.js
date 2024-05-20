@@ -64,77 +64,62 @@ function EditCard({
 		{
 			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
 			comment: "Comentário teste",
-			name: "Usuário 1"
 		},
 		{
 			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
 			comment: "Comentário teste",
-			name: "Usuário 2"
 		},
 		{
 			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
 			comment: "Comentário teste",
-			name: "Usuário 3"
 		},
 		{
 			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
 			comment: "Comentário teste",
-			name: "Usuário 4"
 		},
 		{
 			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
 			comment: "Comentário teste",
-			name: "Usuário 5"
 		},
 		{
 			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
 			comment: "Comentário teste",
-			name: "Usuário 1"
 		},
 		{
 			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
 			comment: "Comentário teste",
-			name: "Usuário 2"
 		},
 		{
 			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
 			comment: "Comentário teste",
-			name: "Usuário 3"
 		},
 		{
 			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
 			comment: "Comentário teste",
-			name: "Usuário 4"
 		},
 		{
 			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
 			comment: "Comentário teste",
-			name: "Usuário 5"
 		},
 		{
 			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
 			comment: "Comentário teste",
-			name: "Usuário 1"
 		},
 		{
 			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
 			comment: "Comentário teste",
-			name: "Usuário 2"
 		},
 		{
 			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
 			comment: "Comentário teste",
-			name: "Usuário 3"
 		},
 		{
 			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
 			comment: "Comentário teste",
-			name: "Usuário 4"
 		},
 		{
 			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
 			comment: "Comentário teste",
-			name: "Usuário 5"
 		},
 	],
 }) {
