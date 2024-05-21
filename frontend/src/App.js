@@ -12,12 +12,8 @@ import Configurations from "components/pages/configurations/Configurations";
 
 const Registration = lazy(() => import("components/pages/registration/Registration"));
 const Login = lazy(() => import("components/pages/login/Login"));
-const SendPasswordReset = lazy(() =>
-	import("components/pages/login-password-reset/SendPasswordReset")
-);
-const LoginPasswordReset = lazy(() =>
-	import("components/pages/login-password-reset/LoginPasswordReset")
-);
+const SendPasswordReset = lazy(() => import("components/pages/login-password-reset/SendPasswordReset"));
+const LoginPasswordReset = lazy(() => import("components/pages/login-password-reset/LoginPasswordReset"));
 const ValidateEmail = lazy(() => import("components/pages/validate-email/ValidateEmail"));
 
 const HomeProjects = lazy(() => import("components/pages/home-projects/HomeProjects"));

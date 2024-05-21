@@ -6,7 +6,9 @@ import { ReactComponent as AddButtonIcon } from "assets/action-icons/add-circle-
 import { useProjectAuthentication } from "context/ProjectAuthenticationContext";
 
 import HomeHeader from "components/shared/login-registration/header-home/HeaderHome";
+
 import LazyLoader from "utilities/lazy-loader/LazyLoader";
+import DragableModalDropLocationWithLazyLoader from "utilities/dragable-modal/drop-location/DragableModalDropLocationWithLazyLoader";
 
 import Phase from "./templates/phase/Phase";
 import ConnectionFailure from "./ConnectionFailure";
@@ -82,6 +84,12 @@ class ProjectState {
 		});
 	}
 
+	/**
+	 *
+	 * @param {*} phaseId
+	 * @param {*} sync
+	 * @returns
+	 */
 	async getTotalCards(phaseId, sync = false) {
 		return 0;
 	}
@@ -255,10 +263,20 @@ class ProjectState {
 		});
 	}
 
+	/**
+	 *
+	 * @param {*} phaseDTO
+	 * @returns
+	 */
 	newPhaseState(phaseDTO) {
 		return new PhaseState(phaseDTO);
 	}
 
+	/**
+	 *
+	 * @param {*} cardDTO
+	 * @returns
+	 */
 	newCardState(cardDTO) {
 		return new CardState(cardDTO);
 	}
@@ -312,126 +330,6 @@ function Project() {
 			phaseId,
 			cardName: "Novo Card",
 		});
-	}
-
-	// ============================== Construtor do placeholder da fase ============================== //
-	/**
-	 *
-	 * @param {*} setPlaceholder
-	 * @param {*} param1
-	 * @returns
-	 */
-	function constructPhasePlaceholder(setPlaceholder, { order }) {
-		return (
-			<div
-				className="PP-background PP-background-placeholder"
-				style={{ order: order + 1 }}
-				ref={(element) => setPlaceholder(element)}
-			/>
-		);
-	}
-
-	// ============================== Drag das fases ============================== //
-	/**
-	 *
-	 * @param {*} clientX
-	 * @param {*} clientY
-	 * @returns
-	 */
-	function getNewPhaseOrderIndex(clientX) {
-		// TODO: Não utilizar valores fixos
-		return Math.max(0, Math.floor((clientX - 20) / (320 + 20)));
-	}
-
-	/**
-	 *
-	 * @param {*} ref
-	 * @returns
-	 */
-	function getPhaseFromRef(ref) {
-		return ref.current?.children?.[0];
-	}
-
-	/**
-	 *
-	 * @param {*} ref
-	 * @returns
-	 */
-	function getComponentDataFromRef(ref) {
-		return lazyLoaderRef.current?.getComponentDataFromRef(getPhaseFromRef(ref));
-	}
-
-	/**
-	 *
-	 * @param {*} ref
-	 * @returns
-	 */
-	function getAssociatedPlaceholder(ref) {
-		return lazyLoaderRef.current?.getAssociatedPlaceholder(ref);
-	}
-
-	/**
-	 *
-	 * @param {*} ref
-	 * @param {*} _
-	 * @param {*} event
-	 */
-	function handlePhaseDragBegin(ref, _, event) {
-		const { current, data, index } = getComponentDataFromRef(ref);
-		lazyLoaderRef.current?.associatePlaceholder(
-			current,
-			lazyLoaderRef.current?.addPlaceholder(index, constructPhasePlaceholder, data?.phaseDTO)
-		);
-	}
-
-	/**
-	 *
-	 * @param {*} ref
-	 * @param {*} _
-	 * @param {*} event
-	 */
-	function handlePhaseDragEnd(ref, _, event) {
-		// Pega o componente associado ao ref
-		const { current, data } = getComponentDataFromRef(ref);
-
-		// Pega o UUID do placeholder associado ao elemento
-		const { uuid } = getAssociatedPlaceholder(current);
-
-		// Remove o placeholder associado ao elemento
-		lazyLoaderRef.current?.removePlaceholder(uuid);
-
-		// Novo índice de ordem da fase
-		let newOrderIndex = getNewPhaseOrderIndex(event.clientX);
-		newOrderIndex += newOrderIndex >= data?.phaseDTO?.order ? 1 : 0;
-
-		// Manda um evento para o servidor para mover a fase
-		currentProjectSocket?.emit("movePhase", {
-			phaseId: data?.phaseDTO?.phaseId,
-			targetPositionIndex: newOrderIndex,
-		});
-	}
-
-	/**
-	 *
-	 * @param {*} ref
-	 * @param {*} _
-	 * @param {*} event
-	 */
-	function handlePhaseDragMove(ref, _, event) {
-		// Pega o componente associado ao ref
-		const { current, data } = getComponentDataFromRef(ref);
-
-		// Pega o placeholder associado ao elemento
-		const { getReference } = getAssociatedPlaceholder(current);
-
-		const { clientX } = event;
-
-		// Novo índice de ordem da fase
-		let newOrderIndex = getNewPhaseOrderIndex(clientX);
-		newOrderIndex += newOrderIndex >= data?.phaseDTO?.order ? 1 : 0;
-
-		// Atualiza a ordem da fase
-		getReference().style.order = newOrderIndex;
 	}
 
 	// ============================== Socket ============================== //
@@ -562,7 +460,9 @@ function Project() {
 								fetchMore={(page) => {
 									return new Promise((resolve, reject) => {
 										return currentProjectSocket?.emit("fetchPhases", { page }, (response) => {
-											resolve(response?.phases?.taken.map((taken) => new PhaseState(taken)) || []);
+											resolve(
+												response?.phases?.taken.map((taken) => new PhaseState(taken)) || []
+											);
 										});
 									});
 								}}
