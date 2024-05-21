@@ -25,14 +25,16 @@
 		"mysql2": "^3.9.4",
 		"nodemailer": "^6.9.13",
 		"socket.io": "^4.7.5",
+		"swagger-jsdoc": "^6.2.8",
+		"swagger-ui-express": "^5.0.0",
 		"typeorm": "^0.3.20",
 		"uuid": "^9.0.1"
 	},
 	"devDependencies": {
-		"rimraf": "^3.0.2",
 		"@babel/cli": "^7.24.1",
 		"@babel/core": "^7.24.4",
 		"@babel/plugin-proposal-decorators": "^7.24.1",
-		"@babel/preset-env": "^7.24.4"
+		"@babel/preset-env": "^7.24.4",
+		"rimraf": "^3.0.2"
 	}
 }
