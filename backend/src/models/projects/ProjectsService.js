@@ -36,6 +36,11 @@ class ProjectsService extends Service {
 	}
 
 	// ==================================== Métodos Seguros ==================================== //
+
+	async getProjectsUserId(userId) {
+		return await this.ProjectsRepository.getProjectsUserId(userId);
+	}
+
 	/**
 	 * Retorna o total de fases em um projeto.
 	 *
@@ -63,8 +68,8 @@ class ProjectsService extends Service {
 	 * @param {string} projectName
 	 * @returns {ProjectsDTO}
 	 */
-	async createProject(createdBy, projectName) {
-		return await this.ProjectsRepository.createProject(
+	async createProjectAuthenticated(createdBy, projectName) {
+		return await this.ProjectsRepository.createProjectAuthenticated(
 			new ProjectsDTO({ createdBy, projectName })
 		);
 	}

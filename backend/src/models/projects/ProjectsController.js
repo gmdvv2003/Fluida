@@ -37,6 +37,35 @@ class ProjectsController extends Controller {
 	}
 
 	// ==================================== Métodos Seguros ==================================== //
+
+	/**
+	 * Retorna os projetos do usuário
+	 *
+	 * @param {Request} request
+	 * @param {Response} response
+	 */
+	async getProjectsOfUser(request, response) {
+		const { userId } = request.body;
+		if (!userId) {
+			return response.status(400).json({ message: "ID de usuário não informado" });
+		}
+
+		try {
+			const projects = await this.Service.getProjectsUserId(userId);
+
+			if (!projects || projects.length === 0) {
+				return response
+					.status(404)
+					.json({ message: "Nenhum projeto encontrado para este usuário" });
+			}
+
+			return response.status(200).json(projects);
+		} catch (error) {
+			console.error("Erro ao buscar projetos do usuário:", error);
+			return response.status(500).json({ message: "Erro ao buscar projetos do usuário" });
+		}
+	}
+
 	/**
 	 * Realiza a criação de um novo projeto
 	 *
@@ -52,13 +81,14 @@ class ProjectsController extends Controller {
 		}
 
 		const result = this.Service.createProjectAuthenticated(userId, projectName);
-		if (!result.success) {
-			return response.status(400).json({ message: result.message });
-		}
-
-		response
+		if (result) {
+			return response
 			.status(201)
 			.json({ message: "Projeto criado com sucesso.", successfullyCreated: true });
+		} else {
+			response.status(400).json({ message: result});
+		}
+		
 	}
 
 	/**

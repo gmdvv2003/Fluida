@@ -4,6 +4,7 @@ const Route = require("../../context/route/Route");
 module.exports = function (app, io, projectsController) {
 	// ==================================== Rotas Publicas ==================================== //
 	// ==================================== Rotas Seguras ==================================== //
+	
 	app.post(
 		"/projects/createProject",
 		Route.newRoute(
@@ -14,6 +15,7 @@ module.exports = function (app, io, projectsController) {
 			projectsController.getService("users").sessionValidator
 		)
 	);
+
 	app.delete(
 		"/projects/deleteProject/:projectId",
 		Route.newRoute(
@@ -46,6 +48,17 @@ module.exports = function (app, io, projectsController) {
 			projectsController.getService("users").sessionValidator
 		)
 	);
+
+	app.get(
+		"/projects/getProjectsOfUser",
+		Route.newRoute(
+			{ secure: true },
+			projectsController.getProjectsOfUser,
+			projectsController,
+			["userId"],
+			projectsController.getService("users").sessionValidator
+		)
+	)
 	// ==================================== Rotas Intermediárias ==================================== //
 	app.put(
 		"/projects/validateInvite",

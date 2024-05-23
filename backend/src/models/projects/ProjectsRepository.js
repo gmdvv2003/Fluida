@@ -57,7 +57,7 @@ class ProjectsRepository extends Repository {
 	 * @returns {InsertResult}
 	 */
 	@Validate({ NAME: "projectName", TYPE: "string", LENGTH: 100 })
-	async createProject(projectsDTO) {
+	async createProjectAuthenticated(projectsDTO) {
 		return await this.Repository.createQueryBuilder("Projects")
 			.insert()
 			.into("Projects")
@@ -91,6 +91,12 @@ class ProjectsRepository extends Repository {
 			.set({ totalPhases: () => "totalPhases + 1" })
 			.where("projectId = :projectId", { projectId })
 			.execute();
+	}
+
+	async getProjectsUserId(userId){
+		return await this.Repository.createQueryBuilder("Projects")
+			.where(`createdBy = ${userId}`)
+        	.getMany();
 	}
 }
 
