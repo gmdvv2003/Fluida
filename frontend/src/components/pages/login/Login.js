@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { ReactComponent as EmailIcon } from "assets/action-icons/email.svg";
 import { ReactComponent as GoogleIcon } from "assets/action-icons/google-icon.svg";
+
 import Header from "components/shared/login-registration/header/Header";
 import Background from "components/shared/login-registration/background/Background";
 import InputFieldError from "components/shared/login-registration/error/InputFieldError";
@@ -13,6 +14,7 @@ import Loading from "components/shared/loading/Loading";
 import PasswordField from "./input-types/PasswordField";
 import TextInputField from "components/shared/text-input-field/TextInputField";
 import ActionButton from "components/shared/action-button/ActionButton";
+
 import { useAuthentication } from "context/AuthenticationContext";
 
 function Login() {
@@ -32,6 +34,8 @@ function Login() {
 	const [emailFilled, setEmailFilled] = useState(false);
 	const [passwordFilled, setPasswordFilled] = useState(false);
 
+	const [ignoreRedirect, setIgnoreRedirect] = useState(false);
+
 	const { login } = useAuthentication();
 
 	async function handleOnLoginButton() {
@@ -49,7 +53,7 @@ function Login() {
 			setWaitingForValidation(true);
 
 			// Realiza a requisição para o back
-			const response = await login(enteredEmail, enteredPassword);
+			const response = await login(enteredEmail, enteredPassword, { ignoreRedirect });
 			if (response.success) {
 				setWrongCredentials(response.data?.wrongEmailAndOrPassword);
 			} else {
@@ -73,6 +77,9 @@ function Login() {
 
 	useEffect(() => {
 		document.title = "Fluida | Login";
+
+		const searchParameters = new URLSearchParams(window.location.search);
+		setIgnoreRedirect(searchParameters.has("ignoreRedirect"));
 
 		const unbindEmailChangeSubscription =
 			emailFieldReference.current.onTextChange(handleOnEmailChange);

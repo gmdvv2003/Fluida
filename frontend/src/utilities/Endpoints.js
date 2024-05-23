@@ -66,5 +66,8 @@ export const RegisterUserEndpoint = Endpoint.new("/users/register");
 // Participate
 export const ParticipateInProjectEndpoint = Endpoint.new("/projects/participate");
 
+// Project Invitations
+export const AcceptProjectInvitationEndpoint = Endpoint.new("/projects/validateInvite");
+
 // Projects Socket Endpoint
 export const ProjectsSocketEndpoint = FunctionlessEndpoint.new("/projects");

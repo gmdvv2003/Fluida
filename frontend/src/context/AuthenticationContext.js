@@ -16,6 +16,9 @@ export function AuthenticationProvider({ children }) {
 	});
 	const [loadingUser, setLoadingUser] = useState(false);
 
+	const [onLoginCallback, setOnLoginCallback] = useState(null);
+	const [onLogoutCallback, setOnLogoutCallback] = useState(null);
+
 	/**
 	 * Realiza o login do usuário
 	 *
@@ -23,7 +26,7 @@ export function AuthenticationProvider({ children }) {
 	 * @param {string} password
 	 * @returns {Object}
 	 */
-	async function login(email, password) {
+	async function login(email, password, { ignoreRedirect = false }) {
 		if (currentUserSession) {
 			return { success: false };
 		}
@@ -35,9 +38,16 @@ export function AuthenticationProvider({ children }) {
 				userId: response.data?.userId,
 			});
 
-			if (response.data?.redirect) {
+			if (response.data?.redirect && !ignoreRedirect) {
 				window.location.href = response.data.redirect;
 			}
+
+			if (onLoginCallback) {
+				onLoginCallback();
+			}
+
+			// Limpa o callback de login
+			setOnLoginCallback(null);
 		}
 
 		return response;
@@ -56,7 +66,18 @@ export function AuthenticationProvider({ children }) {
 		// Limpa a sessão do usuário
 		setCurrentUserSession(null);
 
-		return await performAuthenticatedRequest(PerformLogoutEndpoint, "POST", JSON.stringify({ userId: currentUserSession.userId }));
+		if (onLogoutCallback) {
+			onLogoutCallback();
+		}
+
+		// Limpa o callback de logout
+		setOnLogoutCallback(null);
+
+		return await performAuthenticatedRequest(
+			PerformLogoutEndpoint,
+			"POST",
+			JSON.stringify({ userId: currentUserSession.userId })
+		);
 	}
 
 	/**
@@ -72,13 +93,31 @@ export function AuthenticationProvider({ children }) {
 			return { success: false };
 		}
 
-		return await endpoint(method, body, { Authorization: currentUserSession.session });
+		const response = await endpoint(method, body, {
+			Authorization: currentUserSession.session,
+		});
+
+		if (response.status == 401) {
+			// Limpa a sessão do usuário
+			logout();
+		}
+
+		return response;
 	}
 
 	useEffect(() => {}, []);
 
 	return (
-		<AuthenticationContext.Provider value={{ currentUserSession, login, logout, performAuthenticatedRequest }}>
+		<AuthenticationContext.Provider
+			value={{
+				currentUserSession,
+				login,
+				logout,
+				performAuthenticatedRequest,
+				setOnLoginCallback,
+				setOnLogoutCallback,
+			}}
+		>
 			{!loadingUser && children}
 		</AuthenticationContext.Provider>
 	);

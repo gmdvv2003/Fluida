@@ -4,11 +4,14 @@ import Header from "components/shared/login-registration/header/Header";
 import Loading from "components/shared/loading/Loading";
 import ActionFeedback from "components/shared/action-feedback/ActionFeedback";
 
+import { useAuthentication } from "context/AuthenticationContext";
 import { ValidateEmailEndpoint } from "utilities/Endpoints";
 
 function ValidateEmail() {
 	const [waitingForValidation, setWaitingForValidation] = useState(true);
 	const [emailValidatedSuccessfully, setEmailValidatedSuccessfully] = useState(false);
+
+	const { login, currentUserSession } = useAuthentication();
 
 	function successed() {
 		return (
@@ -51,24 +54,29 @@ function ValidateEmail() {
 	useEffect(() => {
 		document.title = "Fluida | Validate your Email";
 
-		const searchParameters = new URLSearchParams(window.location.search);
-		if (!searchParameters.has("token")) {
-			setWaitingForValidation(false);
-		} else {
-			setWaitingForValidation(true);
-
-			// Pega o token da url
-			const token = searchParameters.get("token");
-
-			// Realiza a requisição para o back
-			const response = ValidateEmailEndpoint("PUT", JSON.stringify({ token: token }));
-			if (response.success) {
-				setEmailValidatedSuccessfully(response.data?.isValidated);
+		if (currentUserSession) {
+			const searchParameters = new URLSearchParams(window.location.search);
+			if (!searchParameters.has("token")) {
+				setWaitingForValidation(false);
 			} else {
-				console.error(`Falha ao validar email. Erro: ${response.error}`);
-			}
+				setWaitingForValidation(true);
 
+				// Pega o token da url
+				const token = searchParameters.get("token");
+
+				// Realiza a requisição para o back
+				const response = ValidateEmailEndpoint("PUT", JSON.stringify({ token: token }));
+				if (response.success) {
+					setEmailValidatedSuccessfully(response.data?.isValidated);
+				} else {
+					console.error(`Falha ao validar email. Erro: ${response.error}`);
+				}
+
+				setWaitingForValidation(false);
+			}
+		} else {
 			setWaitingForValidation(false);
+			setEmailValidatedSuccessfully(false);
 		}
 	}, []);
 

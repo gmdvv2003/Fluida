@@ -160,18 +160,20 @@ class ProjectsController extends Controller {
 	 * @param {Response} response
 	 */
 	validateInvite(request, response) {
-		const { token } = request.body;
-		if (!token) {
-			return response.status(400).json({ message: "Token não informado." });
+		const { invitation } = request.body;
+		if (!invitation) {
+			return response.status(400).json({ message: "Convite não informado." });
 		}
 
 		try {
-			const success = this.#ProjectInvitationComponent.validateEmailInvitation(token);
+			const success = this.#ProjectInvitationComponent.validateEmailInvitation(invitation);
 			if (!success) {
-				return response.status(400).json({ message: "Token inválido." });
+				return response.status(400).json({ message: "Convie inválido." });
 			}
 
-			response.status(200).json({ message: "Token validado com sucesso." });
+			response
+				.status(200)
+				.json({ message: "Convie validado com sucesso.", inviteValidated: true });
 		} catch (error) {
 			return response
 				.status(400)
