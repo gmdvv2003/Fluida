@@ -1,7 +1,8 @@
 import "./EditCard.css";
 
+import React, { useState } from "react";
+
 import ModularButton from "components/shared/modular-button/ModularButton";
-import React from "react";
 import UserIcon from "components/shared/user-icon/UserIcon";
 
 const icon =
@@ -11,17 +12,53 @@ function EditCard({
 	cardId = "3618267",
 	phase = "teste",
 	placeholder = "Placeholder de teste",
+	placeholderMembers = "Pesquisar Membros",
 	description = "Teste",
 	members = [
-		<UserIcon userIcon64={icon} scale="33px" />,
-		<UserIcon userIcon64={icon} scale="33px" />,
-		<UserIcon userIcon64={icon} scale="33px" />,
-		<UserIcon userIcon64={icon} scale="33px" />,
-		<UserIcon userIcon64={icon} scale="33px" />,
-		<UserIcon userIcon64={icon} scale="33px" />,
-		<UserIcon userIcon64={icon} scale="33px" />,
-		<UserIcon userIcon64={icon} scale="33px" />,
-		<UserIcon userIcon64={icon} scale="33px" />,
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="33px" />,
+			name: "Usuário 1"
+		},
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="33px" />,
+			name: "Usuário 1"
+		},
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="33px" />,
+			name: "Usuário 1"
+		},
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="33px" />,
+			name: "Usuário 1"
+		},
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="33px" />,
+			name: "Usuário 1"
+		},
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="33px" />,
+			name: "Usuário 1"
+		},
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="33px" />,
+			name: "Usuário 1"
+		},
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="33px" />,
+			name: "Usuário 1"
+		},
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="33px" />,
+			name: "Usuário 1"
+		},
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="33px" />,
+			name: "Usuário 1"
+		},
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="33px" />,
+			name: "Usuário 1"
+		}
 	],
 	comments = [
 		{
@@ -44,91 +81,229 @@ function EditCard({
 			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
 			comment: "Comentário teste",
 		},
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
+			comment: "Comentário teste",
+		},
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
+			comment: "Comentário teste",
+		},
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
+			comment: "Comentário teste",
+		},
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
+			comment: "Comentário teste",
+		},
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
+			comment: "Comentário teste",
+		},
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
+			comment: "Comentário teste",
+		},
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
+			comment: "Comentário teste",
+		},
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
+			comment: "Comentário teste",
+		},
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
+			comment: "Comentário teste",
+		},
+		{
+			userIcon: <UserIcon userIcon64={icon} scale="25px" />,
+			comment: "Comentário teste",
+		},
 	],
 }) {
+	
+	const [fileNames, setFileNames] = useState([]);
+
+	const [isDialogMembersOpen, setDialogMembers] = useState(false);
+
 	function teste() {
 		console.log("testando");
 	}
 
+	function handleFileChange(event) {
+		const files = event.target.files;
+		const fileNamesArray = Array.from(files).map(file => file.name);
+		setFileNames(prevFileNames => [...prevFileNames, ...fileNamesArray]);
+	}
+
+	function removeFile(index) {
+		setFileNames(function(prevFileNames) {
+			return prevFileNames.filter((_, i) => i !== index);
+		});
+  	}
+
 	return (
 		<div className="EC-container">
-			<div className="EC-container-dialog">
-				<div className="EC-container-header">
-					<div className="EC-header-card">CARD #{cardId}</div>
-					<div className="EC-header-phase">
-						<div className="EC-header-phase-label">Fase </div>
-						<div className="EC-header-phase-phase">{phase}</div>
-					</div>
-				</div>
-				<div className="EC-container-interno-dialog">
-					<div className="EC-container-interno-dialog-esquerda">
-						<div className="EC-div-input">
-							<input placeholder={placeholder} className="EC-input"></input>
-						</div>
-						<div className="EC-container-descricao">
-							<div className="EC-label-descricao">Descrição</div>
-							<div className="EC-textarea-descricao">
-								<textarea
-									rows="8"
-									placeholder={description}
-									className="EC-textarea"
-								></textarea>
+				<div className="EC-container-externo">
+					<div className="EC-container-card">
+						<div className="EC-container-header">
+							<div className="EC-header-card">CARD #{cardId}</div>
+							<div className="EC-header-phase">
+								<div className="EC-header-phase-label">Fase </div>
+								<div className="EC-header-phase-phase">{phase}</div>
 							</div>
 						</div>
-						<div className="EC-container-data">
-							<div className="EC-label-data">Data</div>
-							<div className="EC-data">
-								<div className="EC-dateday">10/03/2024</div>
-								<div>00:00</div>
-							</div>
-						</div>
-						<div className="EC-container-comentarios">
-							<div className="EC-label-comentarios">Comentários</div>
-							{comments.map((comment, index) => (
-								<div key={index} className="EC-container-comentario">
-									<div className="EC-comments-usericon">{comment.userIcon}</div>
-									<div className="EC-comments-comment">{comment.comment}</div>
+						<div className="EC-container-interno-card">
+							<div className="EC-container-interno-card-esquerda">
+								<div className="EC-div-input">
+									<input placeholder={placeholder} className="EC-input"></input>
 								</div>
-							))}
-						</div>
-					</div>
-					<div className="EC-container-interno-dialog-direita">
-						<div className="EC-container-members">
-							<div className="EC-div-input-members">{members}</div>
-						</div>
-						<div className="EC-container-actions">
-							<div className="EC-label-action">Ações</div>
-							<div className="EC-actions-buttons">
-								<ModularButton
-									label="Membros"
-									customClassName={"EC-button"}
-									action={teste}
-								/>
-								<ModularButton
-									label="Etiquetas"
-									customClassName={"EC-button"}
-									action={teste}
-								/>
-								<ModularButton
-									label="Data"
-									customClassName={"EC-button"}
-									action={teste}
-								/>
-								<ModularButton
-									label="Mover"
-									customClassName={"EC-button"}
-									action={teste}
-								/>
-								<ModularButton
-									label="Excluir este card"
-									customClassName={"EC-button"}
-									action={teste}
-								/>
+								<div className="EC-container-descricao">
+									<div className="EC-label-descricao">
+										Descrição
+									</div>
+									<div className="EC-textarea-descricao">
+										<textarea
+											rows="8"
+											placeholder={description}
+											className="EC-textarea"
+										></textarea>
+									</div>
+								</div>
+								<div className="EC-container-anexo">
+									<div className="EC-label-anexo">
+										Anexo
+									</div>
+									<div className="EC-container-files">
+										<input
+											type="file"
+											id="fileUpload"
+											style={{ display: 'none' }}
+											multiple
+											onChange={handleFileChange}
+										/>
+										<ModularButton
+											label="+ adicionar novo arquivo"
+											customClassName={"EC-botao-anexo"}
+											action={() => document.getElementById('fileUpload').click()}
+										/>
+										<div>
+											{fileNames.length > 0 ? (
+												fileNames.map((name, index) =>
+													<div key={index} className="EC-container-file">
+														<div className="EC-label-file">{name}</div>
+														<div>
+															<ModularButton
+																label="X"
+																customClassName={"EC-button-remover"}
+																action={() => removeFile(index)}
+															/>
+														</div>
+													</div>
+													)
+					
+											) : (
+												<div className="EC-label-anexo">Nenhum arquivo anexado!</div>
+											)}
+										</div>
+									</div>
+								</div>
+								<div className="EC-container-data">
+									<div className="EC-label-data">Data</div>
+									<div className="EC-data">
+										<div className="EC-dateday">10/03/2024</div>
+										<div>00:00</div>
+									</div>
+								</div>
+								<div className="EC-container-comentarios">
+									<div className="EC-label-comentarios">Comentários</div>
+									{comments.map((comment, index) => (
+										<div key={index} className="EC-container-comentario">
+											<div className="EC-comments-usericon">{comment.userIcon}</div>
+											<div className="EC-comments-comment">{comment.comment}</div>
+										</div>
+									))}
+								</div>
+							</div>
+							<div className="EC-container-interno-card-direita">
+								<div className="EC-container-members">
+									<div className="EC-div-input-members">
+										{members.map((member, index) => (
+										<div key={index}>
+											<div>{member.userIcon}</div>
+										</div>
+										))}
+									</div>
+								</div>
+								<div className="EC-container-actions">
+									<div className="EC-label-action">Ações</div>
+									<div className="EC-container-buttons-actions">
+										<div className="EC-actions-buttons">
+											<ModularButton
+												label="Membros"
+												customClassName={"EC-button"}
+												action={() => setDialogMembers(!isDialogMembersOpen)}
+											/>
+											<ModularButton
+												label="Etiquetas"
+												customClassName={"EC-button"}
+												action={teste}
+											/>
+											<ModularButton
+												label="Data"
+												customClassName={"EC-button"}
+												action={teste}
+											/>
+											<ModularButton
+												label="Mover"
+												customClassName={"EC-button"}
+												action={teste}
+											/>
+											<ModularButton
+												label="Excluir este card"
+												customClassName={"EC-button"}
+												action={teste}
+											/>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
+				<div className="EC-dialog">
+					{isDialogMembersOpen && (
+						<div className="EC-dialog-members-container">
+							<div className="EC-container-header-dialog">
+								<div className="EC-label-members">Membros</div>
+								<div className="EC-label-members-button">
+									<ModularButton 
+										label="X"
+										customClassName={"EC-button-remover"}
+										action={() => setDialogMembers(!isDialogMembersOpen)}
+									/>
+								</div>
+							</div>
+							<div className="EC-container-icons-members">
+								<div className="EC-input-search-members">
+									<input className="EC-input-members" placeholder={placeholderMembers}></input>
+								</div>
+								<div className="EC-members">
+									<div className="EC-member">
+										{members.map((member, index) => (
+										<div key={index} className="EC-container-member">
+											<div className="EC-member-photo">{member.userIcon}</div>
+											<div className="EC-member-name-label">{member.name}</div>
+										</div>
+									))}
+									</div>
+								</div>
+							</div>
+						</div>
+					)}
+				</div>
 		</div>
 	);
 }

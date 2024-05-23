@@ -47,6 +47,16 @@ module.exports = function (app, io, usersController) {
 		"/users/requestPasswordReset",
 		Route.newRoute({ secure: false }, usersController.requestPasswordReset, usersController)
 	);
+
+	/**
+	 * @openapi
+	 * /:
+	 *   get:
+	 *     description: Welcome to swagger-jsdoc!
+	 *     responses:
+	 *       200:
+	 *         description: Returns a mysterious string.
+	 */
 	app.put(
 		"/users/resetPassword",
 		Route.newRoute({ secure: false }, usersController.resetPassword, usersController)

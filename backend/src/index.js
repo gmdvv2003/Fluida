@@ -18,6 +18,17 @@ const CORS_ORIGIN = process.env.NODE_ENVIRONMENT == "development" ? "*" : urls._
 // Inicializando o express
 const app = express();
 
+const swaggerSpec = require("./SwaggerModule"); // Importa a especificação Swagger
+const swaggerUi = require("swagger-ui-express");
+
+// Configura o Swagger UI para servir a documentação
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+app.listen(3001, () => {
+	console.log("Server is running on http://localhost:3000");
+	console.log("Swagger UI is available on http://localhost:3000/api-docs");
+});
+
 // Inicializando o servidor HTTP
 const server = http.createServer(app);
 
@@ -51,7 +62,11 @@ app.use((request, response, next) => {
 if (process.env.HTTP_WATCHER == 1) {
 	// Middleware para logar as requisições
 	app.use((request, _, next) => {
-		console.log(`\nRequisição: [${request.method}] ${request.url}, Body: ${JSON.stringify(request.body)}\n`);
+		console.log(
+			`\nRequisição: [${request.method}] ${request.url}, Body: ${JSON.stringify(
+				request.body
+			)}\n`
+		);
 
 		next();
 	});
