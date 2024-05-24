@@ -50,6 +50,14 @@ class ProjectsRepository extends Repository {
 			.getOne();
 	}
 
+	
+	async getProjectByName(projectName) {
+		return await this.Repository.createQueryBuilder("Projects")
+			.where("projectName = :projectName", { projectName })
+			.getOne();
+	}
+
+
 	/**
 	 * Insere um projeto no banco de dados.
 	 *

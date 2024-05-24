@@ -80,15 +80,16 @@ class ProjectsController extends Controller {
 				.json({ message: "Usuário ou nome do projeto não informado." });
 		}
 
-		const result = this.Service.createProjectAuthenticated(userId, projectName);
-		if (result) {
+		try {
+			const result = await this.Service.createProjectAuthenticated(userId, projectName);
 			return response
-			.status(201)
-			.json({ message: "Projeto criado com sucesso.", successfullyCreated: true });
-		} else {
-			response.status(400).json({ message: result});
+				.status(result.status)
+				.json(result.body);
+		} catch (error) {
+			return response
+				.status(500)
+				.json({ message: "Ocorreu um erro ao criar o projeto." });
 		}
-		
 	}
 
 	/**

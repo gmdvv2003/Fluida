@@ -21,7 +21,7 @@ class Endpoint {
 			pathname: path,
 		});
 
-		return async (method, body = [], header = []) => {
+		return async (method, body, header = []) => {
 			return await new Promise((resolve, _) => {
 				fetch(formattedUrl, {
 					...SETTINGS,
@@ -62,6 +62,10 @@ export const ResetPasswordEndpoint = Endpoint.new("/users/resetPassword");
 
 // Registration
 export const RegisterUserEndpoint = Endpoint.new("/users/register");
+
+// Project
+export const CreateProjectByUserEndpoint = Endpoint.new("/projects/createProject")
+export const GetProjectsByUserIdEndpoint = Endpoint.new("/projects/getProjectsOfUser")
 
 // Participate
 export const ParticipateInProjectEndpoint = Endpoint.new("/projects/participate");

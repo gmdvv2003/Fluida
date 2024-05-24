@@ -37,6 +37,12 @@ class ProjectsService extends Service {
 
 	// ==================================== Métodos Seguros ==================================== //
 
+	/**
+	 * Retorna os projetos do usuário logado
+	 * 
+	 * @param {number} userId 
+	 * @returns {ProjectsDTO}
+	 */
 	async getProjectsUserId(userId) {
 		return await this.ProjectsRepository.getProjectsUserId(userId);
 	}
@@ -69,9 +75,31 @@ class ProjectsService extends Service {
 	 * @returns {ProjectsDTO}
 	 */
 	async createProjectAuthenticated(createdBy, projectName) {
-		return await this.ProjectsRepository.createProjectAuthenticated(
+		
+		/**
+		 * Checa a existência de projeto com o mesmo nome
+		 */
+		const existingProject = await this.ProjectsRepository.getProjectByName(projectName);
+		
+		if(existingProject) {
+			return {
+				status: 400,
+				body: { message: "Projeto já existe com esse nome" }
+			};
+		}
+
+		const newProject = await this.ProjectsRepository.createProjectAuthenticated(
 			new ProjectsDTO({ createdBy, projectName })
 		);
+
+		return {
+			status: 201,
+			body: {
+				message: "Projeto cadastrado com sucesso",
+				projectName: projectName
+			},
+			project: newProject
+		};
 	}
 
 	/**
