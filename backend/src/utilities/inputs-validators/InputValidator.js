@@ -4,14 +4,14 @@ const PasswordValidator = require("./models/PasswordTypeValidator");
 const PhoneNumberValidator = require("./models/PhoneNumberTypeValidator");
 
 class InputValidator {
-	#validatorFunction;
+	validatorFunction;
 
 	constructor(validatorFunction) {
-		this.#validatorFunction = validatorFunction;
+		this.validatorFunction = validatorFunction;
 	}
 
 	validate(input) {
-		return this.#validatorFunction(input);
+		return this.validatorFunction(input);
 	}
 }
 

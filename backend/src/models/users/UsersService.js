@@ -3,8 +3,15 @@ const Service = require("../__types/Service");
 const UsersDTO = require("./UsersDTO");
 const UsersRepository = require("./UsersRepository");
 
-const { UserNotFound, WrongPassword, UserNotVerified, UserAlreadyLogged } = require("../../context/exceptions/users-repository/Exceptions");
-const { InvalidInputParameter } = require("../../context/exceptions/repository-input-validator/Exceptions");
+const {
+	UserNotFound,
+	WrongPassword,
+	UserNotVerified,
+	UserAlreadyLogged,
+} = require("../../context/exceptions/users-repository/Exceptions");
+const {
+	InvalidInputParameter,
+} = require("../../context/exceptions/repository-input-validator/Exceptions");
 
 // HashMap para armazenar as sessões ativas (facilita a busca de sessões ativas)
 const ACTIVE_SESSIONS = new Map();
@@ -29,6 +36,7 @@ class UsersService extends Service {
 	sessionValidator(authorization, decoded) {
 		const { userId } = decoded;
 
+		// TODO: Não esquecer de remover essa linha
 		if (1 < 2) {
 			return true;
 		}
@@ -71,18 +79,41 @@ class UsersService extends Service {
 	 * @param {string} email
 	 * @param {string} phoneNumber
 	 * @param {string} password
-	 * @returns {UsersDTO}
+	 * @returns {Object}
 	 */
 	async register(firstName, lastName, email, phoneNumber, password) {
+		const userDTO = new UsersDTO({ firstName, lastName, email, phoneNumber, password });
+
 		try {
-			const user = await this.#UsersRepository.register(new UsersDTO({ firstName, lastName, email, phoneNumber, password }));
-			return { success: true, user: user };
+			const { raw } = await this.#UsersRepository.register(userDTO);
+			if (raw?.affectedRows != 1) {
+				return { success: false, message: "Erro ao registrar usuário." };
+			}
+
+			return { success: true, user: userDTO };
 		} catch (error) {
 			if (error instanceof InvalidInputParameter) {
 				return { success: false, message: "Parâmetros inválidos." };
 			}
 
-			return { success: false, message: "Erro desconhecido." };
+			return { success: false, message: `Erro desconhecido. Erro: ${error}` };
+		}
+	}
+
+	/**
+	 * Verifica se um email já está em uso.
+	 *
+	 * @param {string} email
+	 * @returns {Object}
+	 */
+	async isEmailInUse(email) {
+		try {
+			return {
+				success: true,
+				isEmailInUse: await this.#UsersRepository.isEmailInUse(new UsersDTO({ email })),
+			};
+		} catch (error) {
+			return { success: false, message: `Erro desconhecido. Erro: ${error}` };
 		}
 	}
 
@@ -111,7 +142,7 @@ class UsersService extends Service {
 				return { success: false, message: "Usuário já logado." };
 			}
 
-			return { success: false, message: "Erro desconhecido." };
+			return { success: false, message: `Erro desconhecido. Erro: ${error}` };
 		}
 	}
 

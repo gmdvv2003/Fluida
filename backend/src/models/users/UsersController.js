@@ -30,7 +30,7 @@ class UsersController extends Controller {
 	 * @param {Response} response
 	 */
 	async getUsers(_, response) {
-		response.status(200).json(this.Service.getUsers());
+		response.status(200).json(await this.Service.getUsers());
 	}
 
 	/**
@@ -42,7 +42,7 @@ class UsersController extends Controller {
 	async getUserById(request, response) {
 		const { userId } = request.params;
 
-		const user = this.Service.getUserById(userId);
+		const user = await this.Service.getUserById(userId);
 		if (!user) {
 			return response.status(404).json({ message: "Usuário não encontrado." });
 		}
@@ -59,7 +59,13 @@ class UsersController extends Controller {
 	async register(request, response) {
 		const { firstName, lastName, email, phoneNumber, password } = request.body;
 
-		const result = this.Service.register(firstName, lastName, email, phoneNumber, password);
+		const result = await this.Service.register(
+			firstName,
+			lastName,
+			email,
+			phoneNumber,
+			password
+		);
 		if (!result.success) {
 			return response.status(400).json({ message: result.message });
 		}
@@ -77,6 +83,26 @@ class UsersController extends Controller {
 		response
 			.status(201)
 			.json({ successfullyRegistered: true, message: "Usuário cadastrado com sucesso." });
+	}
+
+	/**
+	 * Indica se um email já está em uso
+	 *
+	 * @param {Request} request
+	 * @param {Response} response
+	 */
+	async isEmailInUse(request, response) {
+		const { email } = request.body;
+		if (!email) {
+			return response.status(400).json({ message: "Email não encontrado na requisição." });
+		}
+
+		const result = await this.Service.isEmailInUse(email);
+		if (!result.success) {
+			return response.status(400).json({ message: result.message });
+		}
+
+		response.status(200).json({ isEmailInUse: result.isEmailInUse });
 	}
 
 	/**

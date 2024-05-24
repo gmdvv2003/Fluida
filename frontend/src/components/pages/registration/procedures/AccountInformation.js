@@ -15,6 +15,8 @@ import PhoneNumberInputTypeValidator from "utilities/inputs-validators/models/Ph
 import TextInputField from "../../../shared/text-input-field/TextInputField";
 import ActionButton from "components/shared/action-button/ActionButton";
 
+import { IsEmailInUseEndpoint } from "utilities/Endpoints";
+
 const AccountInformation = React.forwardRef(
 	({ nextProcedure, previousProcedure, setState }, ref) => {
 		const emailFieldReference = useRef(null);
@@ -22,10 +24,10 @@ const AccountInformation = React.forwardRef(
 		const lastNameFieldReference = useRef(null);
 		const phoneNumberReference = useRef(null);
 
-		const [enteredEmail, setEnteredEmail] = useState("stefanimada@gmail.com");
-		const [enteredFirstName, setEnteredFirstName] = useState("sdasd");
-		const [enteredLastName, setEnteredLastName] = useState("asdasd");
-		const [enteredPhoneNumber, setEnteredPhoneNumber] = useState("43234234234");
+		const [enteredEmail, setEnteredEmail] = useState("");
+		const [enteredFirstName, setEnteredFirstName] = useState("");
+		const [enteredLastName, setEnteredLastName] = useState("");
+		const [enteredPhoneNumber, setEnteredPhoneNumber] = useState("");
 
 		const [invalidEmail, setInvalidEmail] = useState(false);
 		const [invalidFirstName, setInvalidFirstName] = useState(false);
@@ -33,6 +35,7 @@ const AccountInformation = React.forwardRef(
 		const [invalidPhoneNumber, setInvalidPhoneNumber] = useState(false);
 
 		const [hasInvalidFields, setHasInvalidFields] = useState(false);
+		const [emailInUse, setEmailInUse] = useState(false);
 
 		function handleOnEmailChange(event) {
 			setInvalidEmail(!EmailInputTypeValidator.validate(event.target.value));
@@ -64,7 +67,7 @@ const AccountInformation = React.forwardRef(
 			phoneNumberReference.current.ref.current.value = formattedPhoneNumber;
 		}
 
-		function handleOnContinueButton() {
+		async function handleOnContinueButton() {
 			if (
 				!invalidEmail &&
 				!invalidFirstName &&
@@ -79,7 +82,17 @@ const AccountInformation = React.forwardRef(
 				setState("firstName", enteredFirstName);
 				setState("lastName", enteredLastName);
 				setState("phoneNumber", enteredPhoneNumber);
-				nextProcedure();
+
+				// Verifica se o email já está em uso
+				const response = await IsEmailInUseEndpoint(
+					"POST",
+					JSON.stringify({ email: enteredEmail })
+				);
+				setEmailInUse(response.data?.isEmailInUse);
+
+				if (!response.data?.isEmailInUse && response?.status === 200) {
+					nextProcedure();
+				}
 			} else {
 				setHasInvalidFields(true);
 			}
@@ -129,6 +142,8 @@ const AccountInformation = React.forwardRef(
 										/>
 									</InputFieldContainer>
 								</div>
+
+								{emailInUse && <InputFieldError error="Email já em uso." />}
 
 								{invalidEmail && enteredEmail.length > 0 && (
 									<InputFieldError error="Email inválido." />

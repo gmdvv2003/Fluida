@@ -46,6 +46,7 @@ module.exports = function (app, io, projectsController) {
 			projectsController.getService("users").sessionValidator
 		)
 	);
+
 	// ==================================== Rotas Intermediárias ==================================== //
 	app.put(
 		"/projects/validateInvite",

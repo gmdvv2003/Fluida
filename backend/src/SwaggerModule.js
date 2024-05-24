@@ -9,7 +9,8 @@ const options = {
 			description: "API documentation for your Node.js application Fluida",
 		},
 	},
-	apis: ["./models/users/users.routes.js"], // Path to the API routes
+	apis: [`${__dirname}\\models\\users\\users.routes.js`], // Path to the API routes
 };
+
 const swaggerSpec = swaggerJSDoc(options);
 module.exports = swaggerSpec;

@@ -8,6 +8,10 @@ module.exports = function (app, io, usersController) {
 		Route.newRoute({ secure: false }, usersController.register, usersController)
 	);
 	app.post(
+		"/users/isEmailInUse",
+		Route.newRoute({ secure: false }, usersController.isEmailInUse, usersController)
+	);
+	app.post(
 		"/users/login",
 		Route.newRoute({ secure: false }, usersController.login, usersController)
 	);

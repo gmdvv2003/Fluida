@@ -2,10 +2,12 @@ import { createSearchParams, useNavigate } from "react-router-dom";
 import { useAuthentication } from "context/AuthenticationContext";
 
 function PrivateRoute({ children }) {
-	const { currentUserSession, setOnLoginCallback } = useAuthentication();
-	if (!currentUserSession) {
-		const navigate = useNavigate();
+	// Utiliza o hook de navegação
+	const navigate = useNavigate();
 
+	const { currentUserSession, setOnLoginCallback } = useAuthentication();
+
+	if (!currentUserSession) {
 		// Define o callback de login para o redirecionamento
 		setOnLoginCallback(() => {
 			const searchParameters = new URLSearchParams(window.location.search);

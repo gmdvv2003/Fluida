@@ -3,8 +3,9 @@ const nodemailer = require("nodemailer");
 const handlebars = require("handlebars");
 
 const EMAIL_SENDERS = {
-	ResetPassword: "./senders/ResetPassword",
-	ValidateEmail: "./senders/ValidateEmail",
+	ProjectInvitation: require("./senders/ProjectInvitation.js"),
+	ResetPassword: require("./senders/ResetPassword.js"),
+	ValidateEmail: require("./senders/ValidateEmail.js"),
 };
 
 // Prepara o transporte de emails pelo servidor SMTP
@@ -47,13 +48,12 @@ class EmailTransporter {
 			throw new Error("Invalid email sender type.");
 		}
 
-		const { to, subject, text, replacer, template } = require(`${EMAIL_SENDERS[sender]}.js`)(
-			...data
-		);
+		// Pegar as informações do recipeinte do email
+		const { to, subject, text, replacer, template } = EMAIL_SENDERS[sender](...data);
 
 		return new Promise((resolve, reject) => {
 			readHTMLTemplateFile(
-				__dirname + `\\senders\\templates\\${template}`,
+				__dirname + `\\..\\..\\..\\html\\${template}`,
 				async function (error, html) {
 					if (error) {
 						return reject(error);

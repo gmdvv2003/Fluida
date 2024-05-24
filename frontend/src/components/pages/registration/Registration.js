@@ -9,6 +9,7 @@ import PasswordCreation from "./procedures/PasswordCreation";
 import ActionFeedback from "components/shared/action-feedback/ActionFeedback";
 
 import { RegisterUserEndpoint } from "utilities/Endpoints";
+import { useNavigate } from "react-router-dom";
 
 function Registration() {
 	const [currentProcedure, setCurrentProcedure] = useState(0);
@@ -16,6 +17,8 @@ function Registration() {
 	const [waitingForRegistration, setWaitingForRegistration] = useState(false);
 	const [finishedRegistrationProcess, setFinishedRegistrationProcess] = useState(false);
 	const [successfullyRegistered, setSuccessfullyRegistered] = useState(false);
+
+	const navigate = useNavigate();
 
 	const accountInformationFieldsProvider = {
 		email: useState(false),
@@ -157,7 +160,7 @@ function Registration() {
 
 						// Caso algum campo não esteja preenchido, redireciona para a tela de cadastro
 						if (!allValid) {
-							document.location.href = "/registration";
+							navigate("/registration", { replace: true });
 						} else {
 							finalizeRegistration();
 						}

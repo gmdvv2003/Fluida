@@ -7,8 +7,9 @@ import Header from "components/shared/login-registration/header/Header";
 import InputFieldError from "components/shared/login-registration/error/InputFieldError";
 import ActionButton from "components/shared/action-button/ActionButton";
 import LoadingDots from "components/shared/loading/LoadingDots";
-import { RequestPasswordResetEndpoint } from "utilities/Endpoints";
 import TextInputField from "../../shared/text-input-field/TextInputField";
+
+import { RequestPasswordResetEndpoint } from "utilities/Endpoints";
 
 function SendPasswordReset() {
 	const emailFieldReference = useRef(null);

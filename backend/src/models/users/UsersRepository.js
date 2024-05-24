@@ -62,6 +62,20 @@ class UsersRepository extends Repository {
 	}
 
 	/**
+	 * Indica se um email já está em uso no banco de dados.
+	 *
+	 * @param {UsersDTO} usersDTO
+	 * @returns {boolean}
+	 */
+	async isEmailInUse(usersDTO) {
+		const user = await this.Repository.createQueryBuilder("Users")
+			.where(`email = :email`, usersDTO)
+			.getOne();
+
+		return user != undefined;
+	}
+
+	/**
 	 * Realiza o login de um usuário no banco de dados.
 	 *
 	 * @param {UsersDTO} usersDTO
