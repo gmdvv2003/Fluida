@@ -3,7 +3,6 @@ const Service = require("../__types/Service");
 const ProjectsDTO = require("./ProjectsDTO");
 const ProjectsRepository = require("./ProjectsRepository");
 
-const ProjectsInvitationService = require("./relationship/projects-invitations/ProjectsInvitationsService");
 const ProjectsMembersService = require("./relationship/projects-members/ProjectsMembersService");
 const ProjectsChatsService = require("./relationship/projects-chats/ProjectsChatsService");
 const ProjectsPhasesService = require("./relationship/projects-phases/ProjectsPhasesService");
@@ -13,7 +12,6 @@ const { UpdateResult } = require("typeorm");
 class ProjectsService extends Service {
 	ProjectsRepository;
 
-	ProjectsInvitationService;
 	ProjectsMembersService;
 	ProjectsChatsService;
 	ProjectsPhasesService;
@@ -23,19 +21,27 @@ class ProjectsService extends Service {
 		this.ProjectsRepository = new ProjectsRepository(this);
 
 		// Inicializa os serviços de relacionamento
-		this.ProjectsInvitationService = new ProjectsInvitationService();
 		this.ProjectsMembersService = new ProjectsMembersService();
 		this.ProjectsChatsService = new ProjectsChatsService();
 		this.ProjectsPhasesService = new ProjectsPhasesService();
 
 		// Define o serviço pai
-		this.ProjectsInvitationService.setService(this);
 		this.ProjectsMembersService.setService(this);
 		this.ProjectsChatsService.setService(this);
 		this.ProjectsPhasesService.setService(this);
 	}
 
-	// ==================================== Métodos Seguros ==================================== //
+	// ==================================== Métodos Públicos ==================================== //
+	/**
+	 * Retorna os projetos do usuário logado
+	 *
+	 * @param {number} userId
+	 * @returns {ProjectsDTO}
+	 */
+	async getProjectsOfUser(userId) {
+		return await this.ProjectsRepository.getProjectsOfUser(userId);
+	}
+
 	/**
 	 * Retorna o total de fases em um projeto.
 	 *
@@ -56,6 +62,7 @@ class ProjectsService extends Service {
 		return await this.ProjectsRepository.getProjectById(projectId);
 	}
 
+	// ==================================== Métodos Seguros ==================================== //
 	/**
 	 * Realiza a criação de um projeto.
 	 *
@@ -64,9 +71,30 @@ class ProjectsService extends Service {
 	 * @returns {ProjectsDTO}
 	 */
 	async createProject(createdBy, projectName) {
-		return await this.ProjectsRepository.createProject(
+		/**
+		 * Checa a existência de projeto com o mesmo nome
+		 */
+		const existingProject = await this.ProjectsRepository.getProjectByName(projectName);
+
+		if (existingProject) {
+			return {
+				status: 400,
+				body: { message: "Projeto já existe com esse nome" },
+			};
+		}
+
+		const newProject = await this.ProjectsRepository.createProject(
 			new ProjectsDTO({ createdBy, projectName })
 		);
+
+		return {
+			status: 201,
+			body: {
+				message: "Projeto cadastrado com sucesso",
+				projectName: projectName,
+			},
+			project: newProject,
+		};
 	}
 
 	/**

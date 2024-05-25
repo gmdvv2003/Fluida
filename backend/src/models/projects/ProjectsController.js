@@ -37,6 +37,35 @@ class ProjectsController extends Controller {
 	}
 
 	// ==================================== Métodos Seguros ==================================== //
+
+	/**
+	 * Retorna os projetos do usuário
+	 *
+	 * @param {Request} request
+	 * @param {Response} response
+	 */
+	async getProjectsOfUserAuthenticated(request, response) {
+		const { userId } = request.body;
+		if (!userId) {
+			return response.status(400).json({ message: "ID de usuário não informado" });
+		}
+
+		try {
+			const projects = await this.Service.getProjectsOfUser(userId);
+
+			if (!projects || projects.length === 0) {
+				return response
+					.status(404)
+					.json({ message: "Nenhum projeto encontrado para este usuário" });
+			}
+
+			return response.status(200).json(projects);
+		} catch (error) {
+			console.error("Erro ao buscar projetos do usuário:", error);
+			return response.status(500).json({ message: "Erro ao buscar projetos do usuário" });
+		}
+	}
+
 	/**
 	 * Realiza a criação de um novo projeto
 	 *
@@ -51,14 +80,12 @@ class ProjectsController extends Controller {
 				.json({ message: "Usuário ou nome do projeto não informado." });
 		}
 
-		const result = this.Service.createProjectAuthenticated(userId, projectName);
-		if (!result.success) {
-			return response.status(400).json({ message: result.message });
+		try {
+			const result = await this.Service.createProjectAuthenticated(userId, projectName);
+			return response.status(result.status).json(result.body);
+		} catch (error) {
+			return response.status(500).json({ message: "Ocorreu um erro ao criar o projeto." });
 		}
-
-		response
-			.status(201)
-			.json({ message: "Projeto criado com sucesso.", successfullyCreated: true });
 	}
 
 	/**
@@ -152,28 +179,51 @@ class ProjectsController extends Controller {
 			.json({ message: "Convite enviado com sucesso.", successfullyInvited: true });
 	}
 
-	// ==================================== Métodos Intermediários ==================================== //
 	/**
-	 * Valida um convite de email para participação de um projeto
+	 * Cria um link de convite para participação em um projeto público
 	 *
 	 * @param {Request} request
 	 * @param {Response} response
 	 */
-	validateInvite(request, response) {
-		const { invitation } = request.body;
+	async createPublicProjectInvitationLinkAuthenticated(request, response) {
+		const { projectId } = request.body;
+		if (!projectId) {
+			return response.status(400).json({ message: "Projeto não informado." });
+		}
+
+		const invitationLink =
+			this.#ProjectInvitationComponent.createProjectInvitationLink(projectId);
+		if (!invitationLink) {
+			return response.status(400).json({ message: "Erro ao criar link de convite." });
+		}
+
+		return response.status(200).json({ invitationLink: invitationLink });
+	}
+
+	/**
+	 * Valida um convite (privado e público) para participação de um projeto
+	 *
+	 * @param {Request} request
+	 * @param {Response} response
+	 */
+	validateInviteAuthenticated(request, response) {
+		const { userId, invitation } = request.body;
 		if (!invitation) {
 			return response.status(400).json({ message: "Convite não informado." });
 		}
 
 		try {
-			const success = this.#ProjectInvitationComponent.validateEmailInvitation(invitation);
+			const success = this.#ProjectInvitationComponent.validateEmailInvitation(
+				userId,
+				invitation
+			);
 			if (!success) {
-				return response.status(400).json({ message: "Convie inválido." });
+				return response.status(400).json({ message: "Convite inválido." });
 			}
 
 			response
 				.status(200)
-				.json({ message: "Convie validado com sucesso.", inviteValidated: true });
+				.json({ message: "Convite validado com sucesso.", inviteValidated: true });
 		} catch (error) {
 			return response
 				.status(400)

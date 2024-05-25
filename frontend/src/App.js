@@ -19,6 +19,9 @@ const ValidateEmail = lazy(() => import("components/pages/validate-email/Validat
 const HomeProjects = lazy(() => import("components/pages/home-projects/HomeProjects"));
 const Project = lazy(() => import("components/pages/project/Project"));
 const LandingPage = lazy(() => import("components/pages/landing-page/LandingPage"));
+const AcceptProjectInvitation = lazy(() =>
+	import("components/pages/accept-project-invitation/AcceptProjectInvitation")
+);
 
 function App() {
 	return (
@@ -86,7 +89,9 @@ function App() {
 							path="/home"
 							element={
 								<PrivateRoute>
-									<HomeProjects />
+									<Suspense fallback={<Loading />}>
+										<HomeProjects />
+									</Suspense>
 								</PrivateRoute>
 							}
 						/>
@@ -95,7 +100,9 @@ function App() {
 							path="/configurations"
 							element={
 								<PrivateRoute>
-									<Configurations />
+									<Suspense fallback={<Loading />}>
+										<Configurations />
+									</Suspense>
 								</PrivateRoute>
 							}
 						/>
@@ -103,11 +110,26 @@ function App() {
 						<Route
 							path="/project/:projectId/:cardId?"
 							element={
-								// <PrivateRoute>
-								<ParticipateInProject>
-									<Project />
-								</ParticipateInProject>
-								// </PrivateRoute>
+								<PrivateRoute>
+									<ParticipateInProject>
+										<Suspense fallback={<Loading />}>
+											<Project />
+										</Suspense>
+									</ParticipateInProject>
+								</PrivateRoute>
+							}
+						/>
+
+						<Route
+							path="/validate-project-invite"
+							element={
+								<PrivateRoute>
+									<AcceptProjectInvitation>
+										<Suspense fallback={<Loading />}>
+											<Project />
+										</Suspense>
+									</AcceptProjectInvitation>
+								</PrivateRoute>
 							}
 						/>
 					</Routes>

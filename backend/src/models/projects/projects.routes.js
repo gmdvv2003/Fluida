@@ -4,6 +4,7 @@ const Route = require("../../context/route/Route");
 module.exports = function (app, io, projectsController) {
 	// ==================================== Rotas Publicas ==================================== //
 	// ==================================== Rotas Seguras ==================================== //
+
 	app.post(
 		"/projects/createProject",
 		Route.newRoute(
@@ -14,6 +15,7 @@ module.exports = function (app, io, projectsController) {
 			projectsController.getService("users").sessionValidator
 		)
 	);
+
 	app.delete(
 		"/projects/deleteProject/:projectId",
 		Route.newRoute(
@@ -47,10 +49,26 @@ module.exports = function (app, io, projectsController) {
 		)
 	);
 
-	// ==================================== Rotas Intermediárias ==================================== //
+	app.get(
+		"/projects/getProjectsOfUser",
+		Route.newRoute(
+			{ secure: true },
+			projectsController.getProjectsOfUserAuthenticated,
+			projectsController,
+			["userId"],
+			projectsController.getService("users").sessionValidator
+		)
+	);
+
 	app.put(
 		"/projects/validateInvite",
-		Route.newRoute({ secure: false }, projectsController.validateInvite, projectsController)
+		Route.newRoute(
+			{ secure: true },
+			projectsController.validateInviteAuthenticated,
+			projectsController,
+			["userId"],
+			projectsController.getService("users").sessionValidator
+		)
 	);
 
 	// ==================================== Rotas do Socket ==================================== //

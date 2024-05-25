@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 
 import Loading from "components/shared/loading/Loading";
 import Header from "components/shared/login-registration/header/Header";
+import ActionFeedback from "components/shared/action-feedback/ActionFeedback";
 
 import { AcceptProjectInvitationEndpoint } from "utilities/Endpoints";
 
@@ -54,10 +55,7 @@ function AcceptProjectInvitation() {
 			const invitation = searchParameters.get("invitation");
 
 			// Realiza a requisição para o back
-			const response = AcceptProjectInvitationEndpoint(
-				"PUT",
-				JSON.stringify({ invitation: invitation })
-			);
+			const response = AcceptProjectInvitationEndpoint("PUT", JSON.stringify({ invitation: invitation }));
 			if (response.success) {
 				successfullyInvited(response.data?.inviteValidated);
 			} else {

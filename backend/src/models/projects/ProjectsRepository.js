@@ -39,6 +39,17 @@ class ProjectsRepository extends Repository {
 	}
 
 	/**
+	 *
+	 * @param {*} userId
+	 * @returns
+	 */
+	async getProjectsOfUser(userId) {
+		return await this.Repository.createQueryBuilder("Projects")
+			.where(`createdBy = ${userId}`)
+			.getMany();
+	}
+
+	/**
 	 * Retorna um projeto pelo id
 	 *
 	 * @param {number} projectId
@@ -47,6 +58,17 @@ class ProjectsRepository extends Repository {
 	async getProjectById(projectId) {
 		return await this.Repository.createQueryBuilder("Projects")
 			.where(`projectId = :projectId`, { projectId })
+			.getOne();
+	}
+
+	/**
+	 *
+	 * @param {} projectName
+	 * @returns
+	 */
+	async getProjectByName(projectName) {
+		return await this.Repository.createQueryBuilder("Projects")
+			.where("projectName = :projectName", { projectName })
 			.getOne();
 	}
 

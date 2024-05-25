@@ -3,74 +3,101 @@ import "./HomeProjects.css";
 import React, { useEffect, useRef, useState } from "react";
 import { faCircleXmark, faUserLarge } from "@fortawesome/free-solid-svg-icons";
 
-import EditCard from "../project/templates/edit-card/EditCard";
+import { CreateProjectByUserEndpoint } from "utilities/Endpoints";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { GetProjectsByUserId } from "functionalities/GetProjectsByUserId";
 import HeaderHome from "../../shared/login-registration/header-home/HeaderHome.js";
 import TextInputField from "../../shared/text-input-field/TextInputField";
+import { useAuthentication } from "context/AuthenticationContext";
 
 function HomeProjects() {
-	const username = "variableUserName";
-	const [isDialogOpen, setIsDialogOpen] = useState(false);
-	const [isDialogAddPhotoOpen, setAddPhotoDialogOpen] = useState(false);
-	const [selectedImage, setSelectedImage] = useState(null);
-	const fileInputRef = useRef(null);
 
-	const projects = [
-		{ projectName: "Projeto 1" },
-		{ projectName: "Projeto 2" },
-		{ projectName: "Projeto 3" },
-		{ projectName: "Projeto 4" },
-		{ projectName: "Projeto 1" },
-		{ projectName: "Projeto 2" },
-		{ projectName: "Projeto 3" },
-		{ projectName: "Projeto 4" },
-		{ projectName: "Projeto 1" },
-		{ projectName: "Projeto 2" },
-		{ projectName: "Projeto 3" },
-		{ projectName: "Projeto 4" },
-		{ projectName: "Projeto 1" },
-		{ projectName: "Projeto 2" },
-		{ projectName: "Projeto 3" },
-		{ projectName: "Projeto 4" },
-		{ projectName: "Projeto 1" },
-		{ projectName: "Projeto 2" },
-		{ projectName: "Projeto 3" },
-		{ projectName: "Projeto 4" },
-		{ projectName: "Projeto 1" },
-		{ projectName: "Projeto 2" },
-		{ projectName: "Projeto 3" },
-		{ projectName: "Projeto 4" },
-		{ projectName: "Projeto 2" },
-		{ projectName: "Projeto 3" },
-		{ projectName: "Projeto 4" },
-		{ projectName: "Projeto 1" },
-		{ projectName: "Projeto 2" },
-		{ projectName: "Projeto 3" },
-		{ projectName: "Projeto 4" },
-		{ projectName: "Projeto 1" },
-		{ projectName: "Projeto 2" },
-		{ projectName: "Projeto 3" },
-		{ projectName: "Projeto 4" },
-		{ projectName: "Projeto 1" },
-		{ projectName: "Projeto 2" },
-		{ projectName: "Projeto 3" },
-		{ projectName: "Projeto 4" },
-	];
+	const { currentUserSession, performAuthenticatedRequest } = useAuthentication();
+
+	const username = "variableUserName";
+
+	const [isDialogOpen, setIsDialogOpen] = 				useState(false);
+	const [isDialogAddPhotoOpen, setAddPhotoDialog] = 	useState(false);
+	const [selectedImage, setSelectedImage] = 				useState(null);
+	const [enteredProjectName, setProjectName] = 			useState("");
+	const [projects, setProjects] = 						useState([]);
+
+	// const hasFetchedProjects = 		useRef(false);
+	const fileInputRef = 			useRef(null);
+	const projectNameReference = 	useRef(null);
+	
+
+	useEffect(() => {
+		
+        document.title = "Fluida | Home";
+
+		fetchProjects();
+
+    }, []);
+
+	useEffect(() => {
+
+		handleInputChange();
+
+    });
 
 	function handleNewProjectClick() {
 		setIsDialogOpen(true);
 	}
 
+
 	function handleCloseDialog() {
 		setIsDialogOpen(false);
 	}
 
-	function handleAddPhotoClick() {
-		setAddPhotoDialogOpen(true);
+	/**
+	 * Abre o dialog de adicionar foto ao usuário
+	 */
+	function handleAddPhotoClick(boolean) {
+		setAddPhotoDialog(boolean);
 	}
 
-	function handleCloseDialogAddPhoto() {
-		setAddPhotoDialogOpen(false);
+	/**
+	 * Busca os projetos relacionados ao id do usuário
+	 */
+	async function fetchProjects() {
+		const response = await GetProjectsByUserId(performAuthenticatedRequest);
+		if (response.success) {
+			setProjects(response.data);
+		} else {
+			console.log("Erro ao obter projetos:", response.error);
+		}
+	}
+
+	/**
+	 * Atualiza o valor do input de novo projeto
+	 */
+	async function handleInputChange(){
+		if (projectNameReference.current) {
+            const unsubscribe = projectNameReference.current.onTextChange((event) => {
+                setProjectName(event.target.value);
+				console.log(enteredProjectName)
+            });
+
+            return () => unsubscribe();
+        }
+	}
+
+	/**
+	 * Realiza o cadastro de um projeto para o usuário logado
+	 */
+	async function handleOnCreateProjectButton() {
+		
+		const response = await performAuthenticatedRequest(
+			CreateProjectByUserEndpoint,
+			"POST",
+			JSON.stringify({ 
+				userId: currentUserSession.userId, projectName: enteredProjectName 
+			})
+		);
+		
+		console.log(response.data.message)
+
 	}
 
 	const handleImageChange = (event) => {
@@ -89,24 +116,17 @@ function HomeProjects() {
 		fileInputRef.current.click();
 	};
 
-	useEffect(() => {
-		document.title = "Fluida | Home";
-	});
-
 	return (
 		<div>
 			<HeaderHome />
-
-			 <EditCard />
-			
-			{/* <div
+			<div
 				className={`HP-container-user-projects ${
 					isDialogOpen || isDialogAddPhotoOpen ? "blur-background" : ""
 				}`}
 			>
 				<div className="HP-container-user">
 					<div className="HP-container-image-label">
-						<i className="HP-user-image" onClick={handleAddPhotoClick}></i>
+						<i className="HP-user-image" onClick={() => handleAddPhotoClick(true)}></i>
 						<p className="HP-label">
 							<span className="username-style">{`@${username}`}</span>, bem-vindo de
 							volta!
@@ -120,15 +140,12 @@ function HomeProjects() {
 					<div className="HP-container-project">
 						<div className="HP-project">
 							<div className="HP-grid-container">
-								{projects.map((project) => (
-									<div key={project} className="HP-grid-item">
+								{projects.map((project, index) => (
+									<div key={project.id || index} className="HP-grid-item">
 										<div className="HP-project-name">{project.projectName}</div>
 									</div>
 								))}
-								<div
-									className="HP-grid-item-new-project"
-									onClick={handleNewProjectClick}
-								>
+								<div className="HP-grid-item-new-project" onClick={handleNewProjectClick}>
 									<div className="HP-container-new-project">
 										<i className="HP-add-new-project"></i>
 										<div className="HP-label-new-project">
@@ -162,10 +179,11 @@ function HomeProjects() {
 								}}
 								name="project"
 								placeholder="Nome do projeto"
+								ref={projectNameReference}
 							/>
 						</div>
 						<div className="HP-container-button-new-project">
-							<button className="HP-button-new-project">Criar novo projeto</button>
+							<button className="HP-button-new-project" onClick={() => handleOnCreateProjectButton()}>Criar novo projeto</button>
 						</div>
 					</div>
 				</div>
@@ -175,7 +193,7 @@ function HomeProjects() {
 					<div className="HP-container-user-photo">
 						<div className="HP-container-close-user-photo">
 							<FontAwesomeIcon
-								onClick={handleCloseDialogAddPhoto}
+								onClick={() => handleAddPhotoClick(false)}
 								icon={faCircleXmark}
 								size="xl"
 								style={{ color: "#8c8c8c", cursor: "pointer", borderRadius: "50%" }}
@@ -218,8 +236,7 @@ function HomeProjects() {
 						</div>
 					</div>
 				</div>
-			)} */}
-			
+			)} 
 		</div>
 	);
 }

@@ -10,71 +10,63 @@ class ProjectInvitationComponent {
 	}
 
 	/**
-	 * Envia um email de convite para um usuário participar de um projeto
+	 * Retorna um link de convite para um projeto se possível
 	 *
-	 * @param {number} userIdToInvite
 	 * @param {number} projectId
+	 * @param {number?} targetUserId
+	 * @returns {string | boolean}
 	 */
-	async sendProjectEmailInvitation(userIdToInvite, projectId) {
-		// Verifica se o usuário existe
-		const user = this.Controller.getService("users").getUserById(userIdToInvite);
-		if (!user) {
-			return { success: false, message: "Usuário não encontrado." };
-		}
+	createProjectInvitationLink(projectId, targetUserId = false) {
+		const jwtSignOptions = { projectId, targetUserId, isPublicInvite: !targetUserId };
 
 		// Verifica se o projeto existe
 		const project = this.Controller.Service.getProjectById(projectId);
 		if (!project) {
-			return { success: false, message: "Projeto não encontrado." };
-		}
-
-		// Verifica se o usuário já é membro do projeto
-		const isMemberOfProject = this.Controller.ProjectMembersInterface.isUserMemberOfProject(
-			userIdToInvite,
-			projectId
-		);
-		if (isMemberOfProject) {
-			return { success: false, message: "Usuário já é membro do projeto." };
-		}
-
-		// Verifica se o usuário já foi convidado para o projeto
-		const isUserInvited = this.Controller.ProjectInvitationsInterface.isUserInvitedToProject(
-			userIdToInvite,
-			projectId
-		);
-		if (isUserInvited) {
-			return { success: false, message: "Usuário já foi convidado para o projeto." };
-		}
-
-		if (!this.project.ProjectInvitationsInterface.addInvitation(userIdToInvite, projectId)) {
-			return { success: false, message: "Erro ao adicionar convite no banco de dados." };
+			return false;
 		}
 
 		// Cria um token de validação para o convite
-		const token = jwt.sign(
-			{ userId: userIdToInvite, projectId: projectId },
-			process.env.JWT_PRIVATE_KEY,
-			{
-				algorithm: "RS256",
-			}
-		);
+		const token = jwt.sign(jwtSignOptions, process.env.JWT_PRIVATE_KEY, {
+			algorithm: "RS256",
+		});
 
 		// Url que irá redirecionar o usuário para a página de validação do convite
-		const invitationUrl = global.__URLS__.validateInvitation.edit({
+		const invitationLink = global.__URLS__.validateInvitation.edit({
 			query: {
 				token: token,
 			},
 		});
 
-		return await EmailTransporter.send("ValidateInvitation", user, invitationUrl);
+		return invitationLink;
+	}
+
+	/**
+	 * Envia um email de convite para um usuário participar de um projeto
+	 *
+	 * @param {number} userIdToInvite
+	 * @param {number} projectId
+	 */
+	async sendProjectEmailInvitation(projectId, userIdToInvite) {
+		const user = this.Controller.getService("users").getUserById(userIdToInvite);
+		if (!user) {
+			return { success: false, message: "Usuário não encontrado." };
+		}
+
+		const invitationLink = this.createProjectInvitationLink(projectId, userIdToInvite);
+		if (!invitationLink) {
+			return { success: false, message: "Erro ao criar link de convite." };
+		}
+
+		return await EmailTransporter.send("ValidateInvitation", user, invitationLink);
 	}
 
 	/**
 	 * Valida um token de convite de participação de um projeto
 	 *
 	 * @param {string} validationToken
+	 * @returns {boolean}
 	 */
-	validateEmailInvitation(validationToken) {
+	validateProjectInvitation(userIdRequestingValidation, validationToken) {
 		return jwt.verify(
 			validationToken,
 			process.env.JWT_PUBLIC_KEY,
@@ -83,22 +75,35 @@ class ProjectInvitationComponent {
 					return false;
 				}
 
-				// Verifica se o usuário existe
-				const user = this.Controller.getService("users").getUserById(decoded.userId);
-				if (!user) {
+				const { projectId, userId, isPublicInvite } = decoded;
+
+				// Verifica se o projeto existe
+				const project = this.Controller.Service.getProjectById(projectId);
+				if (!project) {
 					return false;
 				}
 
-				// Verifica se o projeto existe
-				const project = this.Controller.Service.getProjectById(decoded.projectId);
-				if (!project) {
+				if (!isPublicInvite) {
+					// Verifica se o usuário existe e é o mesmo que está tentando validar o convite
+					const user = this.Controller.getService("users").getUserById(userId);
+					if (!user || user.userId !== userIdRequestingValidation) {
+						return false;
+					}
+				}
+
+				const isMemberOfProject =
+					this.Controller.ProjectMembersInterface.isUserMemberOfProject(
+						userIdRequestingValidation,
+						projectId
+					);
+				if (isMemberOfProject) {
 					return false;
 				}
 
 				// Adiciona o usuário ao projeto
 				this.Controller.ProjectMembersInterface.addUserToProject(
-					decoded.userId,
-					decoded.projectId
+					userIdRequestingValidation,
+					projectId
 				);
 
 				return true;
