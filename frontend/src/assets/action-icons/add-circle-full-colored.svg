@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 22.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Camada_1" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns"
+	 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 800 800"
+	 style="enable-background:new 0 0 800 800;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#285CF0;}
+	.st1{fill:#FFFFFF;}
+</style>
+<title>plus-circle</title>
+<desc>Created with Sketch Beta.</desc>
+<g id="Icon-Set-Filled" transform="translate(-466.000000, -1089.000000)" sketch:type="MSLayerGroup">
+	<g id="XMLID_1_">
+		<g>
+			<path class="st0" d="M866,1089c220.9,0,400,179,400,400s-179.1,400-400,400s-400-179-400-400S645.1,1089,866,1089z M1041,1489
+				c0-13.8-11.2-25-25-25H891v-125c0-13.8-11.2-25-25-25s-25,11.3-25,25v125H716c-13.8,0-25,11.3-25,25s11.2,25,25,25h125v125
+				c0,13.8,11.2,25,25,25s25-11.3,25-25v-125h125C1029.8,1514,1041,1502.8,1041,1489z"/>
+			<path class="st1" d="M1016,1464c13.8,0,25,11.3,25,25s-11.2,25-25,25H891v125c0,13.8-11.2,25-25,25s-25-11.3-25-25v-125H716
+				c-13.8,0-25-11.3-25-25s11.2-25,25-25h125v-125c0-13.8,11.2-25,25-25s25,11.3,25,25v125H1016z"/>
+		</g>
+		<g>
+		</g>
+	</g>
+</g>
+</svg>

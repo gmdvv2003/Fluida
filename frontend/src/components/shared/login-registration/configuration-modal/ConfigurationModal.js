@@ -5,7 +5,7 @@ function ConfigurationModal() {
 		<div className="CM-fluida-container">
 			<div className="CM-option-account-container">
 				<h1 className="CM-title-option">CONTA</h1>
-				<a className="CM-text-option" href="/configurations">
+				<a className="CM-text-option" href="/account-configurations">
 					Gerenciar conta
 				</a>
 				<hr className="CM-hr-divider" />

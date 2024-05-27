@@ -1,0 +1,22 @@
+.options-list-selector-container {
+	display: flex;
+	background-color: var(--background-elements-color);
+	border-radius: var(--border-radius);
+}
+
+.options-list-selector {
+	box-sizing: border-box;
+	border: none;
+	border-radius: 8px;
+	background-color: transparent;
+	width: max-content;
+	height: 50px;
+	font-size: var(--login-registration-placeholder-font-size);
+	cursor: pointer;
+	text-align: center;
+	appearance: none;
+}
+
+.options-list-selector:focus {
+	outline: none;
+}

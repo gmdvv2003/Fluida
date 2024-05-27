@@ -7,6 +7,9 @@ import { useProjectAuthentication } from "context/ProjectAuthenticationContext";
 
 import HomeHeader from "components/shared/login-registration/header-home/HeaderHome";
 
+import EditCard from "./edit-card/EditCard";
+import ProjectUsers from "./project-users/ProjectUsers";
+
 import LazyLoader from "utilities/lazy-loader/LazyLoader";
 import DragableModalDropLocationWithLazyLoader from "utilities/dragable-modal/drop-location/DragableModalDropLocationWithLazyLoader";
 
@@ -444,9 +447,9 @@ function Project() {
 										phase={phase}
 										projectState={projectState}
 										currentProjectSocket={currentProjectSocket}
-										dragBegin={handlePhaseDragBegin}
-										dragEnd={handlePhaseDragEnd}
-										dragMove={handlePhaseDragMove}
+										// dragBegin={handlePhaseDragBegin}
+										// dragEnd={handlePhaseDragEnd}
+										// dragMove={handlePhaseDragMove}
 										ref={(element) => setReference(element)}
 									/>
 								)}

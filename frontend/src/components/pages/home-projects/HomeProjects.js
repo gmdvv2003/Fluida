@@ -11,40 +11,33 @@ import TextInputField from "../../shared/text-input-field/TextInputField";
 import { useAuthentication } from "context/AuthenticationContext";
 
 function HomeProjects() {
-
 	const { currentUserSession, performAuthenticatedRequest } = useAuthentication();
 
 	const username = "variableUserName";
 
-	const [isDialogOpen, setIsDialogOpen] = 				useState(false);
-	const [isDialogAddPhotoOpen, setAddPhotoDialog] = 	useState(false);
-	const [selectedImage, setSelectedImage] = 				useState(null);
-	const [enteredProjectName, setProjectName] = 			useState("");
-	const [projects, setProjects] = 						useState([]);
+	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const [isDialogAddPhotoOpen, setAddPhotoDialog] = useState(false);
+	const [selectedImage, setSelectedImage] = useState(null);
+	const [enteredProjectName, setProjectName] = useState("");
+	const [projects, setProjects] = useState([]);
 
 	// const hasFetchedProjects = 		useRef(false);
-	const fileInputRef = 			useRef(null);
-	const projectNameReference = 	useRef(null);
-	
+	const fileInputRef = useRef(null);
+	const projectNameReference = useRef(null);
 
 	useEffect(() => {
-		
-        document.title = "Fluida | Home";
+		document.title = "Fluida | Home";
 
 		fetchProjects();
-
-    }, []);
+	}, []);
 
 	useEffect(() => {
-
 		handleInputChange();
-
-    });
+	});
 
 	function handleNewProjectClick() {
 		setIsDialogOpen(true);
 	}
-
 
 	function handleCloseDialog() {
 		setIsDialogOpen(false);
@@ -72,32 +65,31 @@ function HomeProjects() {
 	/**
 	 * Atualiza o valor do input de novo projeto
 	 */
-	async function handleInputChange(){
+	async function handleInputChange() {
 		if (projectNameReference.current) {
-            const unsubscribe = projectNameReference.current.onTextChange((event) => {
-                setProjectName(event.target.value);
-				console.log(enteredProjectName)
-            });
+			const unsubscribe = projectNameReference.current.onTextChange((event) => {
+				setProjectName(event.target.value);
+				console.log(enteredProjectName);
+			});
 
-            return () => unsubscribe();
-        }
+			return () => unsubscribe();
+		}
 	}
 
 	/**
 	 * Realiza o cadastro de um projeto para o usuário logado
 	 */
 	async function handleOnCreateProjectButton() {
-		
 		const response = await performAuthenticatedRequest(
 			CreateProjectByUserEndpoint,
 			"POST",
-			JSON.stringify({ 
-				userId: currentUserSession.userId, projectName: enteredProjectName 
+			JSON.stringify({
+				userId: currentUserSession.userId,
+				projectName: enteredProjectName,
 			})
 		);
-		
-		console.log(response.data.message)
 
+		console.log(response.data.message);
 	}
 
 	const handleImageChange = (event) => {
@@ -128,15 +120,16 @@ function HomeProjects() {
 					<div className="HP-container-image-label">
 						<i className="HP-user-image" onClick={() => handleAddPhotoClick(true)}></i>
 						<p className="HP-label">
-							<span className="username-style">{`@${username}`}</span>, bem-vindo de
-							volta!
+							<span className="username-style">{`@${username}`}</span>, bem-vindo de volta!
 						</p>
 					</div>
 				</div>
+
 				<div className="HP-container-projects">
 					<div className="HP-container-label-your-projects">
 						<div className="HP-label">Seus projetos</div>
 					</div>
+
 					<div className="HP-container-project">
 						<div className="HP-project">
 							<div className="HP-grid-container">
@@ -148,9 +141,7 @@ function HomeProjects() {
 								<div className="HP-grid-item-new-project" onClick={handleNewProjectClick}>
 									<div className="HP-container-new-project">
 										<i className="HP-add-new-project"></i>
-										<div className="HP-label-new-project">
-											Criar novo projeto
-										</div>
+										<div className="HP-label-new-project">Criar novo projeto</div>
 									</div>
 								</div>
 							</div>
@@ -158,6 +149,7 @@ function HomeProjects() {
 					</div>
 				</div>
 			</div>
+
 			{isDialogOpen && (
 				<div className="HP-dialog-overlay">
 					<div className="HP-dialog-new-project-container">
@@ -169,6 +161,7 @@ function HomeProjects() {
 								style={{ color: "#8c8c8c", cursor: "pointer", borderRadius: "50%" }}
 							/>
 						</div>
+
 						<div>
 							<TextInputField
 								style={{
@@ -182,12 +175,16 @@ function HomeProjects() {
 								ref={projectNameReference}
 							/>
 						</div>
+
 						<div className="HP-container-button-new-project">
-							<button className="HP-button-new-project" onClick={() => handleOnCreateProjectButton()}>Criar novo projeto</button>
+							<button className="HP-button-new-project" onClick={() => handleOnCreateProjectButton()}>
+								Criar novo projeto
+							</button>
 						</div>
 					</div>
 				</div>
 			)}
+
 			{isDialogAddPhotoOpen && (
 				<div className="HP-dialog-overlay">
 					<div className="HP-container-user-photo">
@@ -199,6 +196,7 @@ function HomeProjects() {
 								style={{ color: "#8c8c8c", cursor: "pointer", borderRadius: "50%" }}
 							/>
 						</div>
+
 						<div className="HP-container-username-label">
 							<div className="HP-username-label">
 								<span className="HP-hello">Olá,</span>{" "}
@@ -206,14 +204,11 @@ function HomeProjects() {
 							</div>
 							<div className="HP-welcome">Seja bem-vindo ao Fluida.</div>
 						</div>
+
 						<div className="HP-container-photo">
 							<div className="HP-user-photo-container" onClick={handleDivClick}>
 								{selectedImage ? (
-									<img
-										src={selectedImage}
-										alt="Selected"
-										className="photoSelected"
-									/>
+									<img src={selectedImage} alt="Selected" className="photoSelected" />
 								) : (
 									<FontAwesomeIcon
 										icon={faUserLarge}
@@ -221,6 +216,7 @@ function HomeProjects() {
 										className="photo"
 									/>
 								)}
+
 								<input
 									type="file"
 									accept="image/*"
@@ -231,12 +227,13 @@ function HomeProjects() {
 							</div>
 							<div className="HP-label-new-photo">Adicione uma foto.</div>
 						</div>
+
 						<div className="HP-container-button-add-photo">
 							<button className="HP-button-add-photo">Continuar</button>
 						</div>
 					</div>
 				</div>
-			)} 
+			)}
 		</div>
 	);
 }

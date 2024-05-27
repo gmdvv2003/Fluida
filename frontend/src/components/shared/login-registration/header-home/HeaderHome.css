@@ -70,6 +70,16 @@
 	height: 100%;
 }
 
+.HH-userIcons-container {
+	display: flex;
+}
+
+.HH-userIcons-container > :nth-child(n) {
+	margin-right: -15px;
+	border: 1px solid rgb(255, 255, 255);
+	border-radius: 50%;
+}
+
 .HH-bell-icon {
 	display: flex;
 	cursor: pointer;
@@ -97,6 +107,14 @@
 	content: url("./../../../../assets/action-icons/add-circle-full.svg");
 }
 
+.HH-user-in-project-icon {
+	cursor: pointer;
+	margin-right: 10px;
+	border-radius: 50%;
+	padding: 1px;
+	height: 20px;
+	content: url("./../../../../assets/action-icons/add-circle-full-colored.svg");
+}
 .HH-input-buttons {
 	display: flex;
 	justify-content: space-between;

@@ -1,0 +1,32 @@
+.C-button {
+	position: fixed;
+	transform: translateY(15px);
+	background-color: #000000;
+	border: none;
+	border-radius: 8px;
+	height: 5px;
+	width: 60px;
+	margin-top: 5px;
+}
+
+.C-button-text {
+	color: gray;
+}
+
+.C-button-text-selected {
+	font-weight: bold !important;
+	color: black !important;
+}
+
+.C-header-configurations-container {
+	display: flex;
+	gap: 40px;
+	margin: 20px 20px 20px 15px;
+}
+
+.AC-header-option-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+}
