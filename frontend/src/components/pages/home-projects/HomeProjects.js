@@ -9,8 +9,11 @@ import { GetProjectsByUserId } from "functionalities/GetProjectsByUserId";
 import HeaderHome from "../../shared/login-registration/header-home/HeaderHome.js";
 import TextInputField from "../../shared/text-input-field/TextInputField";
 import { useAuthentication } from "context/AuthenticationContext";
+import { useNavigate } from "react-router-dom";
 
 function HomeProjects() {
+	const navigate = useNavigate();
+
 	const { currentUserSession, performAuthenticatedRequest } = useAuthentication();
 
 	const username = "variableUserName";
@@ -89,7 +92,11 @@ function HomeProjects() {
 			})
 		);
 
-		console.log(response.data.message);
+		if (response.status === 201) {
+			fetchProjects();
+		} else {
+			console.log(response.data.message);
+		}
 	}
 
 	const handleImageChange = (event) => {
@@ -120,7 +127,8 @@ function HomeProjects() {
 					<div className="HP-container-image-label">
 						<i className="HP-user-image" onClick={() => handleAddPhotoClick(true)}></i>
 						<p className="HP-label">
-							<span className="username-style">{`@${username}`}</span>, bem-vindo de volta!
+							<span className="username-style">{`@${username}`}</span>, bem-vindo de
+							volta!
 						</p>
 					</div>
 				</div>
@@ -134,14 +142,26 @@ function HomeProjects() {
 						<div className="HP-project">
 							<div className="HP-grid-container">
 								{projects.map((project, index) => (
-									<div key={project.id || index} className="HP-grid-item">
+									<div
+										key={project.id || index}
+										className="HP-grid-item"
+										onClick={() => {
+											document.location.href = `/project/${project.projectId}`;
+										}}
+										role="button"
+									>
 										<div className="HP-project-name">{project.projectName}</div>
 									</div>
 								))}
-								<div className="HP-grid-item-new-project" onClick={handleNewProjectClick}>
+								<div
+									className="HP-grid-item-new-project"
+									onClick={handleNewProjectClick}
+								>
 									<div className="HP-container-new-project">
 										<i className="HP-add-new-project"></i>
-										<div className="HP-label-new-project">Criar novo projeto</div>
+										<div className="HP-label-new-project">
+											Criar novo projeto
+										</div>
 									</div>
 								</div>
 							</div>
@@ -177,7 +197,10 @@ function HomeProjects() {
 						</div>
 
 						<div className="HP-container-button-new-project">
-							<button className="HP-button-new-project" onClick={() => handleOnCreateProjectButton()}>
+							<button
+								className="HP-button-new-project"
+								onClick={() => handleOnCreateProjectButton()}
+							>
 								Criar novo projeto
 							</button>
 						</div>
@@ -208,7 +231,11 @@ function HomeProjects() {
 						<div className="HP-container-photo">
 							<div className="HP-user-photo-container" onClick={handleDivClick}>
 								{selectedImage ? (
-									<img src={selectedImage} alt="Selected" className="photoSelected" />
+									<img
+										src={selectedImage}
+										alt="Selected"
+										className="photoSelected"
+									/>
 								) : (
 									<FontAwesomeIcon
 										icon={faUserLarge}
