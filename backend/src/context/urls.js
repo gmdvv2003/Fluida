@@ -8,6 +8,7 @@ if (process.env.NODE_ENVIRONMENT == "production") {
 } else {
 	OPTIONS.protocol = "http";
 	OPTIONS.hostname = "localhost";
+	OPTIONS.port = process.env.WEB_PORT;
 }
 
 class Url {

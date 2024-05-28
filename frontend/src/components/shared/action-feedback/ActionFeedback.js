@@ -1,4 +1,5 @@
 import "./ActionFeedback.css";
+import "../login-registration/container/Container.css";
 
 function Title({ text }) {
 	return <h1 className="AF-form-title">{text}</h1>;
