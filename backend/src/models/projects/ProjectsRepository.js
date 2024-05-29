@@ -61,9 +61,10 @@ class ProjectsRepository extends Repository {
 	 * @param {} projectName
 	 * @returns
 	 */
-	async getProjectByName(projectName) {
+	async getProjectByName(createdBy, projectName) {
 		return await this.Repository.createQueryBuilder("Projects")
 			.where("projectName = :projectName", { projectName })
+			.andWhere("createdBy = :createdBy", { createdBy })
 			.getOne();
 	}
 

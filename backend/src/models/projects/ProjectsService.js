@@ -70,11 +70,14 @@ class ProjectsService extends Service {
 	 * @param {string} projectName
 	 * @returns {ProjectsDTO}
 	 */
-	async createProject(createdBy, projectName) {
+	async createProjectAuthenticated(createdBy, projectName) {
 		/**
 		 * Checa a existência de projeto com o mesmo nome
 		 */
-		const existingProject = await this.ProjectsRepository.getProjectByName(projectName);
+		const existingProject = await this.ProjectsRepository.getProjectByName(
+			createdBy,
+			projectName
+		);
 
 		if (existingProject) {
 			return {
@@ -83,9 +86,19 @@ class ProjectsService extends Service {
 			};
 		}
 
-		const newProject = await this.ProjectsRepository.createProject(
-			new ProjectsDTO({ createdBy, projectName })
-		);
+		let newProject;
+
+		try {
+			newProject = await this.ProjectsRepository.createProject(
+				new ProjectsDTO({ createdBy, projectName })
+			);
+		} catch (error) {
+			console.error("Erro ao criar o projeto: ", error);
+			return {
+				status: 500,
+				body: { message: "Erro ao criar o projeto" },
+			};
+		}
 
 		return {
 			status: 201,
