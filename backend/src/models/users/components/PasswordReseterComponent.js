@@ -1,6 +1,7 @@
 const EmailTransporter = require("../../../context/nodemailer/EmailTransporter");
 
 const Session = require("../../../context/session/Session");
+const UsersDTO = require("../UsersDTO");
 
 class PasswordReseterComponent {
 	Controller;
@@ -16,7 +17,7 @@ class PasswordReseterComponent {
 	 * @returns {Promise} Promise contendo informação sobre se o email foi enviado com sucesso
 	 */
 	async requestPasswordReset(email) {
-		const user = this.Controller.Service.getUserByEmail(email);
+		const user = this.Controller.Service.getUserByEmail(new UsersDTO({ email }));
 		if (!user || !user.emailVerified) {
 			return { success: false };
 		}
@@ -45,34 +46,29 @@ class PasswordReseterComponent {
 	 * @returns {Object} Estrutura que diz se a ação foi bem sucedida ou não
 	 */
 	resetPassword(resetPasswordToken, newPassword) {
-		return jwt.verify(
-			resetPasswordToken,
-			process.env.JWT_PUBLIC_KEY,
-			function (error, decoded) {
-				if (error) {
-					return { success: false };
-				}
+		const [validated, { email }] = Session.validate(resetPasswordToken);
+		if (!validated) {
+			return { success: false };
+		}
 
-				// Verifica se o usuário existe e se o token de reset de senha é válido
-				const user = this.Controller.Service.getUserByEmail(decoded.email);
-				if (!user || user.passwordResetToken != resetPasswordToken) {
-					return { success: false };
-				}
+		// Verifica se o usuário existe e se o token de reset de senha é válido
+		const user = this.Controller.Service.getUserByEmail(new UsersDTO({ email }));
+		if (!user || user.passwordResetToken != resetPasswordToken) {
+			return { success: false };
+		}
 
-				// TODO: Atualmente a senha no banco de dados esta descriptografada, então a comparação é feita diretamente
-				if (user.password === newPassword) {
-					return { success: false, samePasswordAsBefore: true };
-				}
+		// TODO: Atualmente a senha no banco de dados esta descriptografada, então a comparação é feita diretamente
+		if (user.password === newPassword) {
+			return { success: false, samePasswordAsBefore: true };
+		}
 
-				// Atualiza a senha do usuário
-				user.password = newPassword;
+		// Atualiza a senha do usuário
+		user.password = newPassword;
 
-				// Remove o token de reset de senha
-				user.passwordResetToken = undefined;
+		// Remove o token de reset de senha
+		user.passwordResetToken = undefined;
 
-				return { success: true };
-			}.bind(this)
-		);
+		return { success: true };
 	}
 }
 
