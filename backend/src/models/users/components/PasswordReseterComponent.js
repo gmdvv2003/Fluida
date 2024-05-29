@@ -3,10 +3,10 @@ const EmailTransporter = require("../../../context/nodemailer/EmailTransporter")
 const Session = require("../../../context/session/Session");
 
 class PasswordReseterComponent {
-	controller;
+	Controller;
 
 	constructor(controller) {
-		this.controller = controller;
+		this.Controller = controller;
 	}
 
 	/**
@@ -16,7 +16,7 @@ class PasswordReseterComponent {
 	 * @returns {Promise} Promise contendo informação sobre se o email foi enviado com sucesso
 	 */
 	async requestPasswordReset(email) {
-		const user = this.controller.UsersService.getUserByEmail(email);
+		const user = this.Controller.Service.getUserByEmail(email);
 		if (!user || !user.emailVerified) {
 			return { success: false };
 		}
@@ -54,7 +54,7 @@ class PasswordReseterComponent {
 				}
 
 				// Verifica se o usuário existe e se o token de reset de senha é válido
-				const user = this.controller.UsersService.getUserByEmail(decoded.email);
+				const user = this.Controller.Service.getUserByEmail(decoded.email);
 				if (!user || user.passwordResetToken != resetPasswordToken) {
 					return { success: false };
 				}

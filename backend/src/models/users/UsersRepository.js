@@ -13,6 +13,7 @@ const {
 	UserNotVerified,
 	UserAlreadyLogged,
 } = require("../../context/exceptions/users-repository/Exceptions");
+const { UpdateResult } = require("typeorm");
 
 class UsersRepository extends Repository {
 	constructor(service) {
@@ -26,9 +27,7 @@ class UsersRepository extends Repository {
 	 * @returns {UsersDTO}
 	 */
 	async getUserByEmail(usersDTO) {
-		return await this.Repository.createQueryBuilder("Users")
-			.where(`email = :email`, usersDTO)
-			.getOne();
+		return await this.Repository.createQueryBuilder("Users").where(`email = :email`, usersDTO).getOne();
 	}
 
 	/**
@@ -38,9 +37,21 @@ class UsersRepository extends Repository {
 	 * @returns {UsersDTO}
 	 */
 	async getUserById(usersDTO) {
+		return await this.Repository.createQueryBuilder("Users").where(`userId = :userId`, usersDTO).getOne();
+	}
+
+	/**
+	 * Atualiza um usuário no banco de dados.
+	 *
+	 * @param {UsersDTO} usersDTO
+	 * @returns {UpdateResult}
+	 */
+	async updateUser(usersDTO) {
 		return await this.Repository.createQueryBuilder("Users")
+			.update()
+			.set(usersDTO)
 			.where(`userId = :userId`, usersDTO)
-			.getOne();
+			.execute();
 	}
 
 	/**
@@ -54,11 +65,7 @@ class UsersRepository extends Repository {
 	@Validate({ NAME: "phoneNumber", TYPE: "string", LENGTH: 20, VALIDATOR: "phone" })
 	@Validate({ NAME: "password", TYPE: "string", LENGTH: 40, VALIDATOR: "password" })
 	async register(usersDTO) {
-		return await this.Repository.createQueryBuilder("Users")
-			.insert()
-			.into("Users")
-			.values(usersDTO)
-			.execute();
+		return await this.Repository.createQueryBuilder("Users").insert().into("Users").values(usersDTO).execute();
 	}
 
 	/**
@@ -68,10 +75,7 @@ class UsersRepository extends Repository {
 	 * @returns {boolean}
 	 */
 	async isEmailInUse(usersDTO) {
-		const user = await this.Repository.createQueryBuilder("Users")
-			.where(`email = :email`, usersDTO)
-			.getOne();
-
+		const user = await this.Repository.createQueryBuilder("Users").where(`email = :email`, usersDTO).getOne();
 		return user != undefined;
 	}
 
@@ -98,12 +102,11 @@ class UsersRepository extends Repository {
 		}
 
 		// Verifica se o usuário já está logado
-		if (user.sessionToken != undefined) {
+		if (user.sessionToken != null && user.sessionToken != "") {
 			throw new UserAlreadyLogged();
 		}
 
 		const session = Session.newSession({ userId: user.userId, email: user.email });
-		console.log(`Nova sessão criada para o email: ${user.email} JWT: ${session}`);
 
 		// Atualiza o token de sessão do usuário no banco de dados
 		await this.Repository.createQueryBuilder("Users")
@@ -136,9 +139,8 @@ class UsersRepository extends Repository {
 			.where(`userId = :userId`, usersDTO)
 			.execute();
 
-		updateQuery
-			.then(() => console.log(`Sessão encerrada para o email: ${user.email}`))
-			.catch(() => console.error(`Falha ao encerrar sessão para o email: ${user.email}`));
+		// Para caso haja algum erro ao encerrar a sessão
+		updateQuery.catch(() => console.error(`Falha ao encerrar sessão para o email: ${user.email}`));
 
 		return user;
 	}

@@ -9,9 +9,7 @@ const {
 	UserNotVerified,
 	UserAlreadyLogged,
 } = require("../../context/exceptions/users-repository/Exceptions");
-const {
-	InvalidInputParameter,
-} = require("../../context/exceptions/repository-input-validator/Exceptions");
+const { InvalidInputParameter } = require("../../context/exceptions/repository-input-validator/Exceptions");
 
 // HashMap para armazenar as sessões ativas (facilita a busca de sessões ativas)
 const ACTIVE_SESSIONS = new Map();
@@ -35,11 +33,6 @@ class UsersService extends Service {
 	 */
 	sessionValidator(authorization, decoded) {
 		const { userId } = decoded;
-
-		// TODO: Não esquecer de remover essa linha
-		if (1 < 2) {
-			return true;
-		}
 
 		const session = ACTIVE_SESSIONS.get(userId);
 		if (!session) {
@@ -67,6 +60,16 @@ class UsersService extends Service {
 	 */
 	async getUserById(userId) {
 		return await this.#UsersRepository.getUserById(userId);
+	}
+
+	/**
+	 * Atualiza um usuário no banco de dados.
+	 *
+	 * @param {UsersDTO} userDTO
+	 * @returns {UsersDTO}
+	 */
+	async updateUser(userDTO) {
+		return await this.#UsersRepository.updateUser(userDTO);
 	}
 
 	// ==================================== Métodos Abertos ==================================== //

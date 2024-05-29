@@ -25,9 +25,9 @@ const AcceptProjectInvitation = lazy(() =>
 
 function App() {
 	return (
-		<AuthenticationProvider>
-			<ProjectAuthenticationProvider>
-				<BrowserRouter>
+		<BrowserRouter>
+			<AuthenticationProvider>
+				<ProjectAuthenticationProvider>
 					<Routes>
 						{/* Rotas Públicas */}
 						<Route
@@ -99,7 +99,7 @@ function App() {
 						<Route
 							path="/configurations"
 							element={
-								<PrivateRoute>
+								<PrivateRoute redirectAutomatically={true}>
 									<Suspense fallback={<Loading />}>
 										<Configurations />
 									</Suspense>
@@ -110,7 +110,7 @@ function App() {
 						<Route
 							path="/project/:projectId/:cardId?"
 							element={
-								<PrivateRoute>
+								<PrivateRoute redirectAutomatically={true}>
 									<ParticipateInProject>
 										<Suspense fallback={<Loading />}>
 											<Project />
@@ -123,7 +123,7 @@ function App() {
 						<Route
 							path="/validate-project-invite"
 							element={
-								<PrivateRoute>
+								<PrivateRoute redirectAutomatically={true}>
 									<AcceptProjectInvitation>
 										<Suspense fallback={<Loading />}>
 											<Project />
@@ -133,9 +133,9 @@ function App() {
 							}
 						/>
 					</Routes>
-				</BrowserRouter>
-			</ProjectAuthenticationProvider>
-		</AuthenticationProvider>
+				</ProjectAuthenticationProvider>
+			</AuthenticationProvider>
+		</BrowserRouter>
 	);
 }
 

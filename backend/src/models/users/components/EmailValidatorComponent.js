@@ -1,15 +1,13 @@
-const jwt = require("jsonwebtoken");
-
 const EmailTransporter = require("../../../context/nodemailer/EmailTransporter");
 const UserDTO = require("../UsersDTO");
 
 const Session = require("../../../context/session/Session");
 
 class EmailValidatorComponent {
-	controller;
+	Controller;
 
 	constructor(controller) {
-		this.controller = controller;
+		this.Controller = controller;
 	}
 
 	/**
@@ -29,6 +27,15 @@ class EmailValidatorComponent {
 		// Associa o token ao usuário
 		user.emailValidationToken = token;
 
+		try {
+			const { affected } = await this.Controller.Service.updateUser(user);
+			if (affected < 1) {
+				return false;
+			}
+		} catch {
+			return false;
+		}
+
 		// URL que ira redirecionar o usuário para a página de validação de email
 		const validationUrl = global.__URLS__.validateEmail.edit({
 			query: {
@@ -45,27 +52,31 @@ class EmailValidatorComponent {
 	 * @param {UserDTO} validationToken
 	 * @returns Estrutura que diz se a ação foi bem sucedida ou não
 	 */
-	validateValidationEmail(validationToken) {
-		return jwt.verify(
-			validationToken,
-			process.env.JWT_PUBLIC_KEY,
-			function (error, decoded) {
-				if (error) {
-					return false;
-				}
+	async validateValidationEmail(validationToken) {
+		const [validated, { userId }] = Session.validate(validationToken);
+		if (!validated) {
+			return false;
+		}
 
-				// Verifica se o usuário existe e se o email foi validado
-				const user = this.controller.UsersService.getUserById(decoded.userId);
-				if (!user || user.emailVerified || user.emailValidationToken != validationToken) {
-					return false;
-				}
+		// Verifica se o usuário existe e se o email foi validado
+		const user = await this.Controller.Service.getUserById(new UserDTO({ userId }));
+		if (!user || user.emailVerified || user.emailValidationToken != validationToken) {
+			return false;
+		}
 
-				// Troca o valor que indica que o email foi validado
-				user.emailVerified = true;
+		// Troca o valor que indica que o email foi validado
+		user.emailVerified = true;
 
-				return true;
-			}.bind(this)
-		);
+		try {
+			const { affected } = await this.Controller.Service.updateUser(user);
+			if (affected < 1) {
+				return false;
+			}
+		} catch {
+			return false;
+		}
+
+		return true;
 	}
 }
 

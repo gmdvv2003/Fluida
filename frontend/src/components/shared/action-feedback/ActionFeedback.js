@@ -1,4 +1,5 @@
 import "./ActionFeedback.css";
+import "../login-registration/container/Container.css";
 
 function Title({ text }) {
 	return <h1 className="AF-form-title">{text}</h1>;
@@ -12,10 +13,12 @@ function Description({ text }) {
 	return <p className="AF-form-description">{text}</p>;
 }
 
-function Button({ text }) {
+function Button({ text, onClick = () => {} }) {
 	return (
 		<div className="AF-button-container">
-			<button className="AF-button">{text}</button>
+			<button className="AF-button" onClick={onClick}>
+				{text}
+			</button>
 		</div>
 	);
 }

@@ -17,6 +17,7 @@ import Phase from "./templates/phase/Phase";
 import ConnectionFailure from "./ConnectionFailure";
 
 import "./Project.css";
+import Backdrop from "components/shared/backdrop/Backdrop";
 
 class CardState {
 	cardDTO;
@@ -43,6 +44,9 @@ class ProjectState {
 	#socket;
 	#projectStateUpdated;
 
+	members = [];
+	membersMap = {};
+
 	phases = [];
 	phasesMap = {};
 
@@ -51,7 +55,7 @@ class ProjectState {
 	// Indica se o número total de fases foi sincronizado com o servidor
 	totalPhasesSynced = false;
 
-	constructor(socket, projectStateUpdated) {
+	constructor(socket, projectStateUpdated = () => {}) {
 		// Fetch das fases inicial
 		socket.emit("fetchPhases", { page: 0 });
 
@@ -288,6 +292,9 @@ class ProjectState {
 function Project() {
 	const [currentProjectSocket, setCurrentProjectSocket] = useState(null);
 
+	const [isEditCardModalVisible, setIsEditCardModalVisible] = useState(false);
+	const [isProjectUsersModalVisible, setIsProjectUsersModalVisible] = useState(false);
+
 	const { projectId, cardId } = useParams();
 	const { getProjectSession } = useProjectAuthentication();
 
@@ -306,12 +313,14 @@ function Project() {
 	const [waitingForReconnect, setWaitingForReconnect] = useState(false);
 	const [redirectToHome, setRedirectToHome] = useState(false);
 
-	// ============================== LazyLoader update ============================== //
-	/**
-	 *
-	 */
-	function updateLazyLoader() {
-		performLazyLoaderUpdateRef.current?.();
+	// ============================== Edição de um card ============================== //
+	function toggleEditCardModal() {
+		setIsEditCardModalVisible(!isEditCardModalVisible);
+	}
+
+	// ============================== Usuários do projeto ============================== //
+	function toggleProjectUsersModal() {
+		setIsProjectUsersModalVisible(!isProjectUsersModalVisible);
 	}
 
 	// ============================== Criação de fases e cards ============================== //
@@ -346,7 +355,7 @@ function Project() {
 		const { socket, projectName } = project;
 		setCurrentProjectSocket(socket);
 
-		const newProjectState = new ProjectState(socket, () => updateLazyLoader());
+		const newProjectState = new ProjectState(socket);
 		setProjectState(newProjectState);
 
 		document.title = `Fluida | ${projectName}`;
@@ -424,8 +433,14 @@ function Project() {
 		<Navigate to="/" />
 	) : (
 		<div style={{ overflowX: "hidden" }}>
-			<HomeHeader />
+			<HomeHeader onUsersInProjectClick={toggleProjectUsersModal} />
 			<ConnectionFailure connectionFailure={waitingForReconnect} />
+
+			{isEditCardModalVisible && <EditCard />}
+
+			{isProjectUsersModalVisible && <ProjectUsers />}
+			<Backdrop show={isProjectUsersModalVisible} onClick={toggleProjectUsersModal} />
+
 			{projectState && (
 				<div className="P-background" ref={phasesContainerScrollBarRef}>
 					<div className="P-phases-container-holder">

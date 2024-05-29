@@ -25,6 +25,14 @@ module.exports = new EntitySchema({
 			nullable: false,
 			type: "int",
 		},
+
+		// roles BIT(4) NOT NULL DEFAULT B'0000'
+		// roles: {
+		// 	nullable: false,
+		// 	type: "bit",
+		// 	length: 4,
+		// 	default: "B'0000'",
+		// },
 	},
 
 	relations: {

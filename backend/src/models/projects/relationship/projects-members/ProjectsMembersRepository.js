@@ -62,6 +62,12 @@ class ProjectsMembersRepository extends Repository {
 		return { repository: this.Repository, query: query };
 	}
 
+	async getRolesOfUserInProject(userId, projectId) {}
+
+	async awardRoleToUserInProject(userId, projectId, role) {}
+
+	async removeRoleFromUserInProject(userId, projectId, role) {}
+
 	/**
 	 * Insere um usuário como membro de um projeto no banco de dados.
 	 *

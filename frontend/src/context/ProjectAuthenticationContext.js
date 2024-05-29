@@ -73,7 +73,7 @@ export function ProjectAuthenticationProvider({ children }) {
 				// Cria uma nova instância do socket com o token de participação
 				const socket = io(ProjectsSocketEndpoint, {
 					auth: {
-						sessionToken: currentUserSession?.session,
+						sessionToken: currentUserSession?.sessionToken,
 						socketToken: response.data?.participationToken,
 					},
 				});
@@ -112,9 +112,7 @@ export function ProjectAuthenticationProvider({ children }) {
 					if (!reason.active) {
 						// Remove a sessão do projeto
 						setAuthenticatedProjectsSessions(
-							authenticatedProjectsSessions.filter(
-								(session) => session.projectId !== projectId
-							)
+							authenticatedProjectsSessions.filter((session) => session.projectId !== projectId)
 						);
 
 						// Disconecta os eventos do socket

@@ -46,11 +46,7 @@ function HeaderHome({ hideSearchBar, hideUsersInProject, onUsersInProjectClick }
 				<div className="HH-input-buttons">
 					{!hideSearchBar ? (
 						<div className="HH-input-container">
-							<input
-								className="HH-input-search"
-								type="text"
-								autoComplete="offwwwwwwww"
-							/>
+							<input className="HH-input-search" type="text" autoComplete="off" />
 							<i className="HH-icon-search" />
 						</div>
 					) : (
@@ -66,10 +62,7 @@ function HeaderHome({ hideSearchBar, hideUsersInProject, onUsersInProjectClick }
 									<UserIcon userIcon64={icon} scale="33px" />
 									<UserIcon userIcon64={icon} scale="33px" />
 								</div>
-								<i
-									className="HH-user-in-project-icon"
-									onClick={onUsersInProjectClick}
-								/>
+								<i className="HH-user-in-project-icon" onClick={onUsersInProjectClick} />
 							</div>
 						)}
 

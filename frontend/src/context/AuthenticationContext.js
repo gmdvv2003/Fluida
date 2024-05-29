@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useRef, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { PerformLoginEndpoint, PerformLogoutEndpoint } from "utilities/Endpoints";
 
@@ -9,15 +10,13 @@ export function useAuthentication() {
 }
 
 export function AuthenticationProvider({ children }) {
-	const [currentUserSession, setCurrentUserSession] = useState({
-		session:
-			"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdtLmRhZ2hsaWFuQGdtYWlsLmNvbSIsInVzZXJJZCI6MSwiaWF0IjoxNzE0NTIwNDM3LCJleHAiOjQ5MTQ1MTcyMzcsImF1ZCI6WyJBbGwiXSwiaXNzIjoiRmx1aWRhIn0.GVUyQYQA6gNkUm5aKmooD_6TiCacGWsAnsDd295TtDmbOccKTnpWhf5tvF9Nk1CrocP_OnC6cqCdyXPsRm6joCF2Watth3jj4yODuujDSkWV2OKp7TkglwbdyWokCjqqA0l4eiwo0Py82RnYZsYRUkAG6z4R7TUW9lBYDpNlBJqCw75l91P1M8ZltIbCOtBr1wJmw9wvIDldGPK50zdIkNCuo4CsksHA7iwaAd80nTHZjasJoOeOSOeePY4aZtpkJVFwhmbtIe5yM3TdeH5s-qC9CjezfU_aV_D2vVYt5XSeZXwuUpYqb3WkVfgNAB2DP6cxeO2icaQyuVSk1MvPOQ",
-		userId: 1,
-	});
+	const [currentUserSession, setCurrentUserSession] = useState(null);
 	const [loadingUser, setLoadingUser] = useState(false);
 
-	const [onLoginCallback, setOnLoginCallback] = useState(null);
-	const [onLogoutCallback, setOnLogoutCallback] = useState(null);
+	const onLoginCallbackReference = useRef(null);
+	const onLogoutCallbackReference = useRef(null);
+
+	const navigate = useNavigate();
 
 	/**
 	 * Realiza o login do usuário
@@ -26,28 +25,28 @@ export function AuthenticationProvider({ children }) {
 	 * @param {string} password
 	 * @returns {Object}
 	 */
-	async function login(email, password, { ignoreRedirect = false }) {
+	async function login(email, password, { ignoreRedirect = true }) {
 		if (currentUserSession) {
 			return { success: false };
 		}
 
-		const response = PerformLoginEndpoint("POST", JSON.stringify({ email, password }));
+		const response = await PerformLoginEndpoint("POST", JSON.stringify({ email, password }));
 		if (response.success) {
 			setCurrentUserSession({
-				session: response.data?.session,
+				sessionToken: response.data?.sessionToken,
 				userId: response.data?.userId,
 			});
 
 			if (response.data?.redirect && !ignoreRedirect) {
-				window.location.href = response.data.redirect;
+				navigate(new URL(response.data.redirect).pathname, { replace: true });
 			}
 
-			if (onLoginCallback) {
-				onLoginCallback();
+			if (onLoginCallbackReference.current) {
+				onLoginCallbackReference.current();
 			}
 
 			// Limpa o callback de login
-			setOnLoginCallback(null);
+			onLoginCallbackReference.current = null;
 		}
 
 		return response;
@@ -66,18 +65,15 @@ export function AuthenticationProvider({ children }) {
 		// Limpa a sessão do usuário
 		setCurrentUserSession(null);
 
-		if (onLogoutCallback) {
-			onLogoutCallback();
+		if (onLogoutCallbackReference.current) {
+			onLogoutCallbackReference.current();
 		}
 
 		// Limpa o callback de logout
-		setOnLogoutCallback(null);
+		onLogoutCallbackReference.current = null;
 
-		return await performAuthenticatedRequest(
-			PerformLogoutEndpoint,
-			"POST",
-			JSON.stringify({ userId: currentUserSession.userId })
-		);
+		// Realiza o logout no servidor e redireciona para a página de login
+		await performAuthenticatedRequest(PerformLogoutEndpoint, "POST", null, true).finally(() => navigate("/login"));
 	}
 
 	/**
@@ -88,16 +84,17 @@ export function AuthenticationProvider({ children }) {
 	 * @param {Object} body
 	 * @returns {Object}
 	 */
-	async function performAuthenticatedRequest(endpoint, method, body) {
+	async function performAuthenticatedRequest(endpoint, method, body, ignoreLogout = false) {
+		console.log(currentUserSession);
 		if (!currentUserSession) {
 			return { success: false };
 		}
 
 		const response = await endpoint(method, body, {
-			Authorization: currentUserSession.session,
+			Authorization: currentUserSession.sessionToken,
 		});
 
-		if (response.status == 401) {
+		if (response.status == 401 && !ignoreLogout) {
 			// Limpa a sessão do usuário
 			logout();
 		}
@@ -114,8 +111,8 @@ export function AuthenticationProvider({ children }) {
 				login,
 				logout,
 				performAuthenticatedRequest,
-				setOnLoginCallback,
-				setOnLogoutCallback,
+				onLoginCallbackReference,
+				onLogoutCallbackReference,
 			}}
 		>
 			{!loadingUser && children}

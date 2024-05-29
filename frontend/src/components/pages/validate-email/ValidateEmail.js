@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import Header from "components/shared/login-registration/header/Header";
 import Loading from "components/shared/loading/Loading";
@@ -8,10 +9,14 @@ import { useAuthentication } from "context/AuthenticationContext";
 import { ValidateEmailEndpoint } from "utilities/Endpoints";
 
 function ValidateEmail() {
+	const { currentUserSession } = useAuthentication();
+
 	const [waitingForValidation, setWaitingForValidation] = useState(true);
 	const [emailValidatedSuccessfully, setEmailValidatedSuccessfully] = useState(false);
 
-	const { login, currentUserSession } = useAuthentication();
+	const setNavigate = useNavigate();
+
+	const firstCall = useRef(true);
 
 	function successed() {
 		return (
@@ -23,7 +28,7 @@ function ValidateEmail() {
 						type: "description",
 						text: "Agora que sua conta foi verificada, você esta livre para logar em sua conta e começar a sua jornada explorando a nossa plataforma!",
 					},
-					{ type: "button", text: "Logar" },
+					{ type: "button", text: "Logar", onClick: () => setNavigate("/login") },
 				]}
 			/>
 		);
@@ -54,30 +59,39 @@ function ValidateEmail() {
 	useEffect(() => {
 		document.title = "Fluida | Validate your Email";
 
-		if (currentUserSession) {
-			const searchParameters = new URLSearchParams(window.location.search);
-			if (!searchParameters.has("token")) {
-				setWaitingForValidation(false);
-			} else {
-				setWaitingForValidation(true);
+		async function validate() {
+			if (firstCall.current) {
+				// Garante que o useEffect só será chamado uma vez (StrictMode)
+				firstCall.current = false;
 
-				// Pega o token da url
-				const token = searchParameters.get("token");
+				if (currentUserSession) {
+					const searchParameters = new URLSearchParams(window.location.search);
+					if (!searchParameters.has("token")) {
+						setWaitingForValidation(false);
+					} else {
+						setWaitingForValidation(true);
 
-				// Realiza a requisição para o back
-				const response = ValidateEmailEndpoint("PUT", JSON.stringify({ token: token }));
-				if (response.success) {
-					setEmailValidatedSuccessfully(response.data?.isValidated);
+						// Pega o token da url
+						const token = searchParameters.get("token");
+
+						// Realiza a requisição para o back
+						const response = await ValidateEmailEndpoint("PUT", JSON.stringify({ token: token }));
+						if (response.success) {
+							setEmailValidatedSuccessfully(response.data?.isValidated);
+						} else {
+							console.error(`Falha ao validar email. Erro: ${response.error}`);
+						}
+
+						setWaitingForValidation(false);
+					}
 				} else {
-					console.error(`Falha ao validar email. Erro: ${response.error}`);
+					setWaitingForValidation(false);
+					setEmailValidatedSuccessfully(false);
 				}
-
-				setWaitingForValidation(false);
 			}
-		} else {
-			setWaitingForValidation(false);
-			setEmailValidatedSuccessfully(false);
 		}
+
+		validate();
 	}, []);
 
 	return (

@@ -9,6 +9,7 @@ import { GetProjectsByUserId } from "functionalities/GetProjectsByUserId";
 import HeaderHome from "../../shared/login-registration/header-home/HeaderHome.js";
 import TextInputField from "../../shared/text-input-field/TextInputField";
 import { useAuthentication } from "context/AuthenticationContext";
+import { useNavigate } from "react-router-dom";
 
 function HomeProjects() {
 	const { currentUserSession, performAuthenticatedRequest } = useAuthentication();
@@ -84,7 +85,6 @@ function HomeProjects() {
 			CreateProjectByUserEndpoint,
 			"POST",
 			JSON.stringify({
-				userId: currentUserSession.userId,
 				projectName: enteredProjectName,
 			})
 		);
@@ -110,7 +110,7 @@ function HomeProjects() {
 
 	return (
 		<div>
-			<HeaderHome />
+			<HeaderHome hideUsersInProject={true} />
 			<div
 				className={`HP-container-user-projects ${
 					isDialogOpen || isDialogAddPhotoOpen ? "blur-background" : ""
@@ -134,8 +134,15 @@ function HomeProjects() {
 						<div className="HP-project">
 							<div className="HP-grid-container">
 								{projects.map((project, index) => (
-									<div key={project.id || index} className="HP-grid-item">
-										<div className="HP-project-name">{project.projectName}</div>
+									<div key={project.projectId || index} className="HP-grid-item">
+										<div
+											className="HP-project-name"
+											onClick={() => {
+												document.location.href = `/project/${project.projectId}`;
+											}}
+										>
+											{project.projectName}
+										</div>
 									</div>
 								))}
 								<div className="HP-grid-item-new-project" onClick={handleNewProjectClick}>

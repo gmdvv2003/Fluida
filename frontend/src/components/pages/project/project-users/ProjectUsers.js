@@ -12,7 +12,7 @@ import { ReactComponent as Lens } from "assets/action-icons/lens.svg";
 
 function ProjectUsers({ projectUsers = [] }) {
 	const [showInvitationLink, setShowInvitationLink] = useState(false);
-	const [invitationLinkSent, setInvitationLinkSent] = useState(true);
+	const [invitationLinkSent, setInvitationLinkSent] = useState(false);
 
 	function handleClipboardButtonClick() {
 		setTimeout(() => {

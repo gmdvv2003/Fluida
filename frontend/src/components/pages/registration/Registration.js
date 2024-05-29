@@ -1,6 +1,6 @@
 import "../validate-email/ValidateEmail.css";
 
-import { useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 
 import AccountInformation from "./procedures/AccountInformation";
 import Header from "components/shared/login-registration/header/Header";
@@ -18,6 +18,8 @@ function Registration() {
 	const [finishedRegistrationProcess, setFinishedRegistrationProcess] = useState(false);
 	const [successfullyRegistered, setSuccessfullyRegistered] = useState(false);
 
+	const registrationFinalized = useRef(true);
+
 	const navigate = useNavigate();
 
 	const accountInformationFieldsProvider = {
@@ -33,33 +35,37 @@ function Registration() {
 			return null;
 		}
 
-		let { email, firstName, lastName, phoneNumber, password } =
-			accountInformationFieldsProvider;
+		if (registrationFinalized.current) {
+			// Evita que a função seja chamada mais de uma vez (StrictMode)
+			registrationFinalized.current = false;
 
-		email = email[0];
-		firstName = firstName[0];
-		lastName = lastName[0];
-		phoneNumber = phoneNumber[0];
-		password = password[0];
+			let { email, firstName, lastName, phoneNumber, password } = accountInformationFieldsProvider;
 
-		setWaitingForRegistration(true);
+			email = email[0];
+			firstName = firstName[0];
+			lastName = lastName[0];
+			phoneNumber = phoneNumber[0];
+			password = password[0];
 
-		// Realiza a requisição para o back
-		const response = await RegisterUserEndpoint(
-			"POST",
-			JSON.stringify({ email, firstName, lastName, phoneNumber, password })
-		);
+			setWaitingForRegistration(true);
 
-		// Verifica se a requisição foi bem sucedida
-		if (response.success) {
-			setSuccessfullyRegistered(response.data?.successfullyRegistered);
-		} else {
-			console.error(`Falha ao cadastrar conta. Erro: ${response.error}`);
+			// Realiza a requisição para o back
+			const response = await RegisterUserEndpoint(
+				"POST",
+				JSON.stringify({ email, firstName, lastName, phoneNumber, password })
+			);
+
+			// Verifica se a requisição foi bem sucedida
+			if (response.success) {
+				setSuccessfullyRegistered(response.data?.successfullyRegistered);
+			} else {
+				console.error(`Falha ao cadastrar conta. Erro: ${response.error}`);
+			}
+
+			// Finaliza o processo de cadastro
+			setFinishedRegistrationProcess(true);
+			setWaitingForRegistration(false);
 		}
-
-		// Finaliza o processo de cadastro
-		setFinishedRegistrationProcess(true);
-		setWaitingForRegistration(false);
 	}
 
 	function nextProcedure() {

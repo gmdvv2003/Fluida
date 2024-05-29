@@ -36,25 +36,16 @@ class Session {
 	static validate(token, expectedToken = null) {
 		return jwt.verify(token, publicKey, JWT_OPTIONS, function (error, decoded) {
 			if (error) {
-				return [false, null];
+				return [false, {}];
 			}
 
 			// Verifica se o token decoded é o esperado
 			if (expectedToken !== null && token !== expectedToken) {
-				return [false, null];
+				return [false, {}];
 			}
 
 			return [true, decoded];
 		});
-	}
-
-	/**
-	 * Invalida a sessão de um usuário
-	 *
-	 * @param {UserEntity} user
-	 */
-	static invalidate(user) {
-		user.session = null;
 	}
 }
 

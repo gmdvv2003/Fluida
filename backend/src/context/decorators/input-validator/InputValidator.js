@@ -1,3 +1,4 @@
+const { log } = require("handlebars");
 const {
 	EmailTypeValidator,
 	NameTypeValidator,
@@ -15,16 +16,19 @@ const INPUT_TYPES_VALIDATORS_MAP = {
 	phone: PhoneNumberTypeValidator.validate.bind(PhoneNumberTypeValidator),
 
 	// Validadors de tipos de entrada simples
-	string: function (input, { length }) {
-		return !length || input.length <= length;
+	string: function (input, { LENGTH }) {
+		return !LENGTH || input.length <= LENGTH;
 	},
 };
 
+/**
+ * Valida os campos de entrada de uma função
+ */
 function Validate({ NAME, TYPE, VALIDATOR, INDEX = 0, ...OPTIONS }) {
 	return (handler) =>
 		async function (...data) {
 			// Pega o input
-			const input = data[INDEX];
+			let input = data[INDEX];
 
 			VALIDATOR = VALIDATOR || TYPE;
 

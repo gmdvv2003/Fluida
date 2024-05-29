@@ -1,32 +1,39 @@
 import { createSearchParams, useNavigate } from "react-router-dom";
 import { useAuthentication } from "context/AuthenticationContext";
+import { useEffect } from "react";
 
-function PrivateRoute({ children }) {
+function PrivateRoute({ children, redirectAutomatically = false }) {
 	// Utiliza o hook de navegação
 	const navigate = useNavigate();
 
-	const { currentUserSession, setOnLoginCallback } = useAuthentication();
+	const { currentUserSession, onLoginCallbackReference } = useAuthentication();
 
-	if (!currentUserSession) {
-		// Define o callback de login para o redirecionamento
-		setOnLoginCallback(() => {
-			const searchParameters = new URLSearchParams(window.location.search);
-			if (searchParameters.has("redirectTo")) {
-				return navigate(atob(searchParameters.get("redirectTo")));
+	useEffect(() => {
+		if (!currentUserSession) {
+			// Define o callback de login para o redirecionamento
+			onLoginCallbackReference.current = () => {
+				const searchParameters = new URLSearchParams(window.location.search);
+				if (searchParameters.has("redirectTo")) {
+					navigate(atob(searchParameters.get("redirectTo")));
+				}
+			};
+
+			if (redirectAutomatically) {
+				// Redireciona para a página de login com a url atual como parâmetro
+				navigate({
+					pathname: "/login",
+					search: createSearchParams({
+						ignoreRedirect: false,
+						redirectTo: btoa(window.location.pathname),
+					}).toString(),
+				});
+			} else {
+				navigate("/login");
 			}
-		});
+		}
+	}, []);
 
-		// Redireciona para a página de login com a url atual como parâmetro
-		return navigate({
-			pathname: "/login",
-			search: createSearchParams({
-				ignoreRedirect: true,
-				redirectTo: btoa(window.location.pathname),
-			}),
-		});
-	}
-
-	return children;
+	return currentUserSession && children;
 }
 
 export default PrivateRoute;
