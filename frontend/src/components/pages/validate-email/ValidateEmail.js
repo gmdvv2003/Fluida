@@ -9,8 +9,6 @@ import { useAuthentication } from "context/AuthenticationContext";
 import { ValidateEmailEndpoint } from "utilities/Endpoints";
 
 function ValidateEmail() {
-	const { currentUserSession } = useAuthentication();
-
 	const [waitingForValidation, setWaitingForValidation] = useState(true);
 	const [emailValidatedSuccessfully, setEmailValidatedSuccessfully] = useState(false);
 
@@ -64,29 +62,24 @@ function ValidateEmail() {
 				// Garante que o useEffect só será chamado uma vez (StrictMode)
 				firstCall.current = false;
 
-				if (currentUserSession) {
-					const searchParameters = new URLSearchParams(window.location.search);
-					if (!searchParameters.has("token")) {
-						setWaitingForValidation(false);
-					} else {
-						setWaitingForValidation(true);
-
-						// Pega o token da url
-						const token = searchParameters.get("token");
-
-						// Realiza a requisição para o back
-						const response = await ValidateEmailEndpoint("PUT", JSON.stringify({ token: token }));
-						if (response.success) {
-							setEmailValidatedSuccessfully(response.data?.isValidated);
-						} else {
-							console.error(`Falha ao validar email. Erro: ${response.error}`);
-						}
-
-						setWaitingForValidation(false);
-					}
-				} else {
+				const searchParameters = new URLSearchParams(window.location.search);
+				if (!searchParameters.has("token")) {
 					setWaitingForValidation(false);
-					setEmailValidatedSuccessfully(false);
+				} else {
+					setWaitingForValidation(true);
+
+					// Pega o token da url
+					const token = searchParameters.get("token");
+
+					// Realiza a requisição para o back
+					const response = await ValidateEmailEndpoint("PUT", JSON.stringify({ token: token }));
+					if (response.success) {
+						setEmailValidatedSuccessfully(response.data?.isValidated);
+					} else {
+						console.error(`Falha ao validar email. Erro: ${response.error}`);
+					}
+
+					setWaitingForValidation(false);
 				}
 			}
 		}
