@@ -147,7 +147,7 @@ class UsersService extends Service {
 						phoneNumber: user.phoneNumber,
 						email: user.email,
 					},
-					user.email + user.password
+					email + password
 				),
 				sessionToken: user.sessionToken,
 			};

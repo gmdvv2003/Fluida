@@ -55,9 +55,7 @@ export function AuthenticationProvider({ children }) {
 					// Limpa o callback de login
 					onLoginCallbackReference.current = null;
 				})
-				.catch((error) => {
-					console.log(error);
-				});
+				.catch(() => logout);
 		}
 
 		return response;

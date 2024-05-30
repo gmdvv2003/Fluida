@@ -67,7 +67,7 @@ class UsersRepository extends Repository {
 	@Validate({ NAME: "phoneNumber", TYPE: "string", LENGTH: 20, VALIDATOR: "phone" })
 	@Validate({ NAME: "password", TYPE: "string", LENGTH: 40, VALIDATOR: "password" })
 	async register(usersDTO) {
-		const hash = await bcrypt.hash(usersDTO.password, process.env.PASSWORD_SALT_ROUNDS);
+		const hash = await bcrypt.hash(usersDTO.password, Number(process.env.PASSWORD_SALT_ROUNDS));
 		return await this.Repository.createQueryBuilder("Users")
 			.insert()
 			.into("Users")
