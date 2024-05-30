@@ -1,3 +1,5 @@
+const bcrypt = require("bcrypt");
+
 const Session = require("../../context/session/Session");
 
 const Repository = require("../__types/Repository");
@@ -65,7 +67,12 @@ class UsersRepository extends Repository {
 	@Validate({ NAME: "phoneNumber", TYPE: "string", LENGTH: 20, VALIDATOR: "phone" })
 	@Validate({ NAME: "password", TYPE: "string", LENGTH: 40, VALIDATOR: "password" })
 	async register(usersDTO) {
-		return await this.Repository.createQueryBuilder("Users").insert().into("Users").values(usersDTO).execute();
+		const hash = await bcrypt.hash(usersDTO.password, process.env.PASSWORD_SALT_ROUNDS);
+		return await this.Repository.createQueryBuilder("Users")
+			.insert()
+			.into("Users")
+			.values({ ...usersDTO, password: hash })
+			.execute();
 	}
 
 	/**
@@ -92,7 +99,7 @@ class UsersRepository extends Repository {
 		}
 
 		// Verifica se a senha está correta
-		if (user.password != usersDTO.password) {
+		if (!bcrypt.compare(usersDTO.password, user.password)) {
 			throw new WrongPassword();
 		}
 

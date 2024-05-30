@@ -1,5 +1,5 @@
 const EmailTransporter = require("../../../context/nodemailer/EmailTransporter");
-const UserDTO = require("../UsersDTO");
+const UsersDTO = require("../UsersDTO");
 
 const Session = require("../../../context/session/Session");
 
@@ -13,7 +13,7 @@ class EmailValidatorComponent {
 	/**
 	 * Envia um email de validação para o usuário
 	 *
-	 * @param {UserDTO} user
+	 * @param {UsersDTO} user
 	 * @returns Promise contendo informação sobre se o email foi enviado com sucesso
 	 */
 	async sendValidationEmail(user) {
@@ -49,7 +49,7 @@ class EmailValidatorComponent {
 	/**
 	 * Valida um token de validação de email para um usuário
 	 *
-	 * @param {UserDTO} validationToken
+	 * @param {UsersDTO} validationToken
 	 * @returns Estrutura que diz se a ação foi bem sucedida ou não
 	 */
 	async validateValidationEmail(validationToken) {
@@ -59,7 +59,7 @@ class EmailValidatorComponent {
 		}
 
 		// Verifica se o usuário existe e se o email foi validado
-		const user = await this.Controller.Service.getUserById(new UserDTO({ userId }));
+		const user = await this.Controller.Service.getUserById(new UsersDTO({ userId }));
 		if (!user || user.emailVerified || user.emailValidationToken != validationToken) {
 			return false;
 		}

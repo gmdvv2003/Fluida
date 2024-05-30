@@ -11,6 +11,8 @@ const {
 } = require("../../context/exceptions/users-repository/Exceptions");
 const { InvalidInputParameter } = require("../../context/exceptions/repository-input-validator/Exceptions");
 
+const PBKDF2Encrypt = require("../../utilities/PBKDF2Encrypt/PBKDF2Encrypt");
+
 // HashMap para armazenar as sessões ativas (facilita a busca de sessões ativas)
 const ACTIVE_SESSIONS = new Map();
 
@@ -130,8 +132,25 @@ class UsersService extends Service {
 	async login(email, password) {
 		try {
 			const user = await this.#UsersRepository.login(new UsersDTO({ email, password }));
+
+			// Adiciona a sessão a lista de sessões ativas
 			ACTIVE_SESSIONS.set(user.userId, user.sessionToken);
-			return { success: true, userId: user.userId, sessionToken: user.sessionToken };
+
+			// Criptografa informações sensíveis que serão enviadas ao frontend
+			return {
+				success: true,
+				data: PBKDF2Encrypt.encryptData(
+					{
+						userId: user.userId,
+						firstName: user.firstName,
+						lastName: user.lastName,
+						phoneNumber: user.phoneNumber,
+						email: user.email,
+					},
+					user.email + user.password
+				),
+				sessionToken: user.sessionToken,
+			};
 		} catch (error) {
 			if (error instanceof UserNotFound || error instanceof WrongPassword) {
 				return { success: false, message: "Usuário ou senha incorretos." };

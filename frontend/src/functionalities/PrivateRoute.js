@@ -1,6 +1,7 @@
-import { createSearchParams, useNavigate } from "react-router-dom";
-import { useAuthentication } from "context/AuthenticationContext";
 import { useEffect } from "react";
+import { createSearchParams, useNavigate } from "react-router-dom";
+
+import { useAuthentication } from "context/AuthenticationContext";
 
 function PrivateRoute({ children, redirectAutomatically = false }) {
 	// Utiliza o hook de navegação
@@ -10,6 +11,11 @@ function PrivateRoute({ children, redirectAutomatically = false }) {
 
 	useEffect(() => {
 		if (!currentUserSession) {
+			const searchParameters = new URLSearchParams(window.location.search);
+			if (searchParameters.has("ignoreRedirect")) {
+				return undefined;
+			}
+
 			// Define o callback de login para o redirecionamento
 			onLoginCallbackReference.current = () => {
 				const searchParameters = new URLSearchParams(window.location.search);

@@ -5,14 +5,13 @@ import Header from "components/shared/login-registration/header/Header";
 import Loading from "components/shared/loading/Loading";
 import ActionFeedback from "components/shared/action-feedback/ActionFeedback";
 
-import { useAuthentication } from "context/AuthenticationContext";
 import { ValidateEmailEndpoint } from "utilities/Endpoints";
 
 function ValidateEmail() {
 	const [waitingForValidation, setWaitingForValidation] = useState(true);
 	const [emailValidatedSuccessfully, setEmailValidatedSuccessfully] = useState(false);
 
-	const setNavigate = useNavigate();
+	const navigate = useNavigate();
 
 	const firstCall = useRef(true);
 
@@ -26,7 +25,7 @@ function ValidateEmail() {
 						type: "description",
 						text: "Agora que sua conta foi verificada, você esta livre para logar em sua conta e começar a sua jornada explorando a nossa plataforma!",
 					},
-					{ type: "button", text: "Logar", onClick: () => setNavigate("/login") },
+					{ type: "button", text: "Logar", onClick: () => navigate("/login") },
 				]}
 			/>
 		);

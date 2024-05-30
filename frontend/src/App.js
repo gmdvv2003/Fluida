@@ -1,11 +1,13 @@
 import { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Router } from "react-router-dom";
 
 import { AuthenticationProvider } from "context/AuthenticationContext";
 import { ProjectAuthenticationProvider } from "context/ProjectAuthenticationContext";
 
 import PrivateRoute from "functionalities/PrivateRoute";
 import ParticipateInProject from "functionalities/ParticipateInProject";
+import LoginRoutePrivacy from "functionalities/LoginRoutePrivacy";
+import LoginRedirect from "functionalities/LoginRedirect";
 
 import Loading from "components/shared/loading/Loading";
 import Configurations from "components/pages/configurations/Configurations";
@@ -19,15 +21,14 @@ const ValidateEmail = lazy(() => import("components/pages/validate-email/Validat
 const HomeProjects = lazy(() => import("components/pages/home-projects/HomeProjects"));
 const Project = lazy(() => import("components/pages/project/Project"));
 const LandingPage = lazy(() => import("components/pages/landing-page/LandingPage"));
-const AcceptProjectInvitation = lazy(() =>
-	import("components/pages/accept-project-invitation/AcceptProjectInvitation")
-);
+const AcceptProjectInvitation = lazy(() => import("components/pages/accept-project-invitation/AcceptProjectInvitation"));
 
 function App() {
 	return (
-		<BrowserRouter>
-			<AuthenticationProvider>
-				<ProjectAuthenticationProvider>
+		<AuthenticationProvider>
+			<ProjectAuthenticationProvider>
+				<BrowserRouter>
+					<LoginRedirect />
 					<Routes>
 						{/* Rotas Públicas */}
 						<Route
@@ -51,9 +52,11 @@ function App() {
 						<Route
 							path="/login"
 							element={
-								<Suspense fallback={<Loading />}>
-									<Login />
-								</Suspense>
+								<LoginRoutePrivacy>
+									<Suspense fallback={<Loading />}>
+										<Login />
+									</Suspense>
+								</LoginRoutePrivacy>
 							}
 						/>
 
@@ -133,9 +136,9 @@ function App() {
 							}
 						/>
 					</Routes>
-				</ProjectAuthenticationProvider>
-			</AuthenticationProvider>
-		</BrowserRouter>
+				</BrowserRouter>
+			</ProjectAuthenticationProvider>
+		</AuthenticationProvider>
 	);
 }
 

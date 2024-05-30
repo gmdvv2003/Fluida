@@ -1,6 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 
-import { useDragState, onComponentDragBegin, onComponentDragMove, onComponentDragEnd, DragableModalContext } from "./DragableModalContext";
+import {
+	useDragState,
+	onComponentDragBegin,
+	onComponentDragMove,
+	onComponentDragEnd,
+	DragableModalContext,
+} from "./DragableModalContext";
 
 const DragableModal = React.forwardRef(({ order, elements, callbacks }, ref) => {
 	const { _, useGlobalDragState } = useDragState();
@@ -45,10 +51,18 @@ const DragableModal = React.forwardRef(({ order, elements, callbacks }, ref) => 
 			onComponentDragMove(onDragMove, dragableDivUUID.current),
 
 			// Listeners externos
-			"dragBegin" in callbacks && dragableModalContextRef.current.onDragBegin(wrapExternalDragListener(callbacks.dragBegin)),
-			"dragEnd" in callbacks && dragableModalContextRef.current.onDragEnd(wrapExternalDragListener(callbacks.dragEnd)),
-			"dragMove" in callbacks && dragableModalContextRef.current.onDragMove(wrapExternalDragListener(callbacks.dragMove)),
+			"dragBegin" in callbacks
+				? dragableModalContextRef.current.onDragBegin(wrapExternalDragListener(callbacks.dragBegin))
+				: null,
+			"dragEnd" in callbacks
+				? dragableModalContextRef.current.onDragEnd(wrapExternalDragListener(callbacks.dragEnd))
+				: null,
+			"dragMove" in callbacks
+				? dragableModalContextRef.current.onDragMove(wrapExternalDragListener(callbacks.dragMove))
+				: null,
 		];
+
+		console.log(listeners);
 
 		return () => {
 			listeners.forEach((remove) => remove != null && remove());

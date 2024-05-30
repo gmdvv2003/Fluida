@@ -1,7 +1,8 @@
 import { createContext, useContext, useRef, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
 import { PerformLoginEndpoint, PerformLogoutEndpoint } from "utilities/Endpoints";
+import { decryptData } from "utilities/PBKDF2Decrypt/PBKDF2Decrypt";
+import { setLocalStorage, getFromLocalStorage, removeFromLocalStorage } from "functionalities/LocalStorage";
 
 const AuthenticationContext = createContext();
 
@@ -10,13 +11,14 @@ export function useAuthentication() {
 }
 
 export function AuthenticationProvider({ children }) {
-	const [currentUserSession, setCurrentUserSession] = useState(null);
-	const [loadingUser, setLoadingUser] = useState(false);
+	const [currentUserSession, setCurrentUserSession] = useState(getFromLocalStorage("currentUserSession"));
 
 	const onLoginCallbackReference = useRef(null);
 	const onLogoutCallbackReference = useRef(null);
 
-	const navigate = useNavigate();
+	// Hook de navegação
+	const __onLoginRedirectCallbackReference = useRef(() => {});
+	const __onLogoutRedirectCallbackReference = useRef(() => {});
 
 	/**
 	 * Realiza o login do usuário
@@ -31,22 +33,31 @@ export function AuthenticationProvider({ children }) {
 		}
 
 		const response = await PerformLoginEndpoint("POST", JSON.stringify({ email, password }));
-		if (response.success) {
-			setCurrentUserSession({
-				sessionToken: response.data?.sessionToken,
-				userId: response.data?.userId,
-			});
+		if (response.success && response.data?.success) {
+			decryptData(response?.data?.data, email + password)
+				.then((decryptedData) => {
+					setCurrentUserSession({
+						sessionToken: response?.data?.sessionToken,
+						...decryptedData,
+					});
 
-			if (response.data?.redirect && !ignoreRedirect) {
-				navigate(new URL(response.data.redirect).pathname, { replace: true });
-			}
+					// Salva a sessão do usuário no local storage
+					setLocalStorage("currentUserSession", currentUserSession);
 
-			if (onLoginCallbackReference.current) {
-				onLoginCallbackReference.current();
-			}
+					if (response.data?.redirect && !ignoreRedirect) {
+						__onLoginRedirectCallbackReference.current(response.data.redirect);
+					}
 
-			// Limpa o callback de login
-			onLoginCallbackReference.current = null;
+					if (onLoginCallbackReference.current) {
+						onLoginCallbackReference.current();
+					}
+
+					// Limpa o callback de login
+					onLoginCallbackReference.current = null;
+				})
+				.catch((error) => {
+					console.log(error);
+				});
 		}
 
 		return response;
@@ -65,6 +76,9 @@ export function AuthenticationProvider({ children }) {
 		// Limpa a sessão do usuário
 		setCurrentUserSession(null);
 
+		// Remove a sessão do usuário do local storage
+		removeFromLocalStorage("currentUserSession");
+
 		if (onLogoutCallbackReference.current) {
 			onLogoutCallbackReference.current();
 		}
@@ -73,7 +87,9 @@ export function AuthenticationProvider({ children }) {
 		onLogoutCallbackReference.current = null;
 
 		// Realiza o logout no servidor e redireciona para a página de login
-		await performAuthenticatedRequest(PerformLogoutEndpoint, "POST", null, true).finally(() => navigate("/login"));
+		await performAuthenticatedRequest(PerformLogoutEndpoint, "POST", null, true).finally(() =>
+			__onLogoutRedirectCallbackReference.current()
+		);
 	}
 
 	/**
@@ -85,7 +101,6 @@ export function AuthenticationProvider({ children }) {
 	 * @returns {Object}
 	 */
 	async function performAuthenticatedRequest(endpoint, method, body, ignoreLogout = false) {
-		console.log(currentUserSession);
 		if (!currentUserSession) {
 			return { success: false };
 		}
@@ -102,7 +117,9 @@ export function AuthenticationProvider({ children }) {
 		return response;
 	}
 
-	useEffect(() => {}, []);
+	useEffect(() => {
+		setLocalStorage("currentUserSession", currentUserSession);
+	}, [currentUserSession]);
 
 	return (
 		<AuthenticationContext.Provider
@@ -113,9 +130,11 @@ export function AuthenticationProvider({ children }) {
 				performAuthenticatedRequest,
 				onLoginCallbackReference,
 				onLogoutCallbackReference,
+				__onLoginRedirectCallbackReference,
+				__onLogoutRedirectCallbackReference,
 			}}
 		>
-			{!loadingUser && children}
+			{children}
 		</AuthenticationContext.Provider>
 	);
 }
