@@ -141,15 +141,14 @@ function HomeProjects() {
 						<div className="HP-project">
 							<div className="HP-grid-container">
 								{projects.map((project, index) => (
-									<div key={project.projectId || index} className="HP-grid-item">
-										<div
-											className="HP-project-name"
-											onClick={() => {
-												document.location.href = `/project/${project.projectId}`;
-											}}
-										>
-											{project.projectName}
-										</div>
+									<div
+										key={project.projectId || index}
+										className="HP-grid-item"
+										onClick={() => {
+											document.location.href = `/project/${project.projectId}`;
+										}}
+									>
+										<div className="HP-project-name">{project.projectName}</div>
 									</div>
 								))}
 								<div
