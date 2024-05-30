@@ -8,6 +8,7 @@ const ProjectsChatsService = require("./relationship/projects-chats/ProjectsChat
 const ProjectsPhasesService = require("./relationship/projects-phases/ProjectsPhasesService");
 
 const { UpdateResult } = require("typeorm");
+const PhasesDTO = require("../phases/PhasesDTO");
 
 class ProjectsService extends Service {
 	ProjectsRepository;
@@ -70,7 +71,7 @@ class ProjectsService extends Service {
 	 * @param {string} projectName
 	 * @returns {ProjectsDTO}
 	 */
-	async createProjectAuthenticated(createdBy, projectName) {
+	async createProject(createdBy, projectName) {
 		/**
 		 * Checa a existência de projeto com o mesmo nome
 		 */
@@ -89,9 +90,24 @@ class ProjectsService extends Service {
 		let newProject;
 
 		try {
-			newProject = await this.ProjectsRepository.createProject(
+			// Cria um novo projeto e armazena o objeto retornado em newProject
+			const newProject = await this.ProjectsRepository.createProject(
 				new ProjectsDTO({ createdBy, projectName })
 			);
+
+			const projectId = newProject.identifiers[0].projectId;
+
+			const phaseNames = ["Caixa de entrada", "Em progresso", "Em teste", "Concluído"];
+
+			// Loop para criar cada fase
+			for (const phaseName of phaseNames) {
+				await this.Controller.PhasesService.createPhase(
+					new PhasesDTO({
+						projectId: projectId,
+						phaseName: phaseName,
+					})
+				);
+			}
 		} catch (error) {
 			console.error("Erro ao criar o projeto: ", error);
 			return {
