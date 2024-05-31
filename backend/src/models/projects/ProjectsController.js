@@ -78,7 +78,6 @@ class ProjectsController extends Controller {
 			const result = await this.Service.createProject(userId, projectName);
 			return response.status(result.status).json(result.body);
 		} catch (error) {
-			console.log(error);
 			return response.status(500).json({ message: "Ocorreu um erro ao criar o projeto." });
 		}
 	}

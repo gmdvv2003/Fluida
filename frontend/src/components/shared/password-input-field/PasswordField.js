@@ -7,54 +7,64 @@ import ReactSubscriptionHelper from "utilities/react-subscription-helper/ReactSu
 import { ReactComponent as ShowPasswordIcon } from "assets/action-icons/eye-closed.svg";
 import TextInputField from "components/shared/text-input-field/TextInputField";
 
-const PasswordField = React.forwardRef(({ name, placeholder }, ref) => {
-	const passwordFieldReference = useRef(null);
+const PasswordField = React.forwardRef(
+	({ name, placeholder, leftComponent, middleComponent, rightComponent, textInputFieldStyle = {} }, ref) => {
+		const [passwordVisibility, setPasswordVisibility] = useState(false);
 
-	const [passwordVisibility, setPasswordVisibility] = useState(false);
+		const passwordFieldReference = useRef(null);
+		const currentPasswordFieldReferenceChangeListener = useRef(null);
 
-	const onPasswordChangeSubscriptionHelper = new ReactSubscriptionHelper();
+		const [onPasswordChangeSubscriptionHelper] = useState(new ReactSubscriptionHelper());
 
-	function togglePasswordVisibility() {
-		setPasswordVisibility(!passwordVisibility);
-	}
+		function togglePasswordVisibility() {
+			setPasswordVisibility(!passwordVisibility);
+		}
 
-	function handleOnPasswordChange(event) {
-		onPasswordChangeSubscriptionHelper.notify(event);
-	}
+		function handleOnPasswordChange(event) {
+			onPasswordChangeSubscriptionHelper.notify(event);
+		}
 
-	useImperativeHandle(ref, () => ({
-		onPasswordChange: (subscriber) => {
-			return onPasswordChangeSubscriptionHelper.subscribe(subscriber);
-		},
+		useImperativeHandle(ref, () => ({
+			onPasswordChange: (subscriber) => {
+				return onPasswordChangeSubscriptionHelper.subscribe(subscriber);
+			},
 
-		ref: passwordFieldReference,
-	}));
+			ref: passwordFieldReference,
+		}));
 
-	useEffect(() => {
-		return passwordFieldReference.current.onTextChange(handleOnPasswordChange);
-	});
+		useEffect(() => {
+			return passwordFieldReference.current.onTextChange(handleOnPasswordChange);
+		});
 
-	return (
-		<div className="R-PF-password-input-field-container">
-			<TextInputField
-				ref={passwordFieldReference}
-				name="password"
-				placeholder={placeholder}
-				style={{
-					borderTopRightRadius: "0px",
-					borderBottomRightRadius: "0px",
-					borderRight: "0px",
-				}}
-				type={!passwordVisibility ? "text" : "password"}
-			/>
+		return (
+			<div className="R-PF-password-input-field-container">
+				{leftComponent && leftComponent}
 
-			<div className="R-PF-toggle-password-button-container">
-				<button type="button" className="R-PF-toggle-password-button" onClick={togglePasswordVisibility}>
-					{passwordVisibility ? <ShowPasswordIcon /> : <HidePasswordIcon />}
-				</button>
+				<TextInputField
+					ref={passwordFieldReference}
+					name="password"
+					placeholder={placeholder}
+					style={{
+						...textInputFieldStyle,
+						borderTopRightRadius: "0px",
+						borderBottomRightRadius: "0px",
+						borderRight: "0px",
+					}}
+					type={passwordVisibility ? "text" : "password"}
+				/>
+
+				{middleComponent && middleComponent}
+
+				<div className="R-PF-toggle-password-button-container">
+					<button type="button" className="R-PF-toggle-password-button" onClick={togglePasswordVisibility}>
+						{passwordVisibility ? <HidePasswordIcon /> : <ShowPasswordIcon />}
+					</button>
+				</div>
+
+				{rightComponent && rightComponent}
 			</div>
-		</div>
-	);
-});
+		);
+	}
+);
 
 export default PasswordField;

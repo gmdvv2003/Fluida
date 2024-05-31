@@ -11,7 +11,7 @@ const EMAIL_SENDERS = {
 // Prepara o transporte de emails pelo servidor SMTP
 const TRANSPORTER = nodemailer.createTransport({
 	host: process.env.EMAIL_SERVICE_HOST,
-	port: process.env.EMAIL_SERVICE_PASSWORD,
+	port: process.env.EMAIL_SERVICE_PORT,
 	auth: {
 		user: process.env.EMAIL_SERVICE_ADDRESS,
 		pass: process.env.EMAIL_SERVICE_PASSWORD,
@@ -61,7 +61,7 @@ class EmailTransporter {
 
 					// Prepara as opções de envio do email
 					const mailOptions = {
-						from: process.env.EMAIL_ADDRESS,
+						from: process.env.EMAIL_SERVICE_ADDRESS,
 						to: to,
 						subject: subject,
 						text: text,
@@ -71,7 +71,9 @@ class EmailTransporter {
 					};
 
 					// Envia o email e espera por uma resposta
-					resolve(await TRANSPORTER.sendMail(mailOptions));
+					TRANSPORTER.sendMail(mailOptions)
+						.then(() => resolve)
+						.catch(() => reject);
 				}
 			);
 		});

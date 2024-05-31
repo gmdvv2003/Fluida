@@ -6,10 +6,12 @@ import "./PasswordCreation.css";
 import React, { useEffect, useRef, useState } from "react";
 
 import { ReactComponent as GoBackArrowIcon } from "assets/action-icons/left-circle.svg";
+
 import InputFieldContainer from "../../../shared/text-input-field/InputFieldContainer";
-import InputFieldError from "components/shared/login-registration/error/InputFieldError";
 import PasswordField from "../../../shared/password-input-field/PasswordField";
 import PasswordFieldStrength from "../../../shared/password-input-field/PasswordFieldStrength";
+
+import InputFieldError from "components/shared/login-registration/error/InputFieldError";
 import Background from "components/shared/login-registration/background/Background";
 import ActionButton from "components/shared/action-button/ActionButton";
 

@@ -7,12 +7,13 @@ import { useNavigate } from "react-router-dom";
 
 import { ReactComponent as EmailIcon } from "assets/action-icons/email.svg";
 import { ReactComponent as GoogleIcon } from "assets/action-icons/google-icon.svg";
+import { ReactComponent as PadlockIcon } from "assets/action-icons/padlock.svg";
 
 import Header from "components/shared/login-registration/header/Header";
 import Background from "components/shared/login-registration/background/Background";
 import InputFieldError from "components/shared/login-registration/error/InputFieldError";
 import Loading from "components/shared/loading/Loading";
-import PasswordField from "./input-types/PasswordField";
+import PasswordField from "components/shared/password-input-field/PasswordField";
 import TextInputField from "components/shared/text-input-field/TextInputField";
 import ActionButton from "components/shared/action-button/ActionButton";
 
@@ -83,8 +84,7 @@ function Login() {
 		setIgnoreRedirect(searchParameters.has("ignoreRedirect"));
 
 		const unbindEmailChangeSubscription = emailFieldReference.current.onTextChange(handleOnEmailChange);
-		const unbindPasswordChangeSubscription =
-			passwordFieldReference.current.onPasswordChange(handleOnPasswordChange);
+		const unbindPasswordChangeSubscription = passwordFieldReference.current.onPasswordChange(handleOnPasswordChange);
 
 		return () => {
 			unbindEmailChangeSubscription();
@@ -136,7 +136,22 @@ function Login() {
 
 							{invalidEmail && !wrongCredentials && <InputFieldError error="Preencha este campo." />}
 
-							<PasswordField ref={passwordFieldReference} />
+							<div className="L-left-password-icon-container">
+								<PasswordField
+									placeholder="senha"
+									leftComponent={
+										<div className="L-left-icon-container">
+											<PadlockIcon className="L-left-icon" />
+										</div>
+									}
+									textInputFieldStyle={{
+										borderTopLeftRadius: "0px",
+										borderBottomLeftRadius: "0px",
+										borderLeft: "none",
+									}}
+									ref={passwordFieldReference}
+								/>
+							</div>
 
 							{invalidPassword && !wrongCredentials && <InputFieldError error="Preencha este campo." />}
 							{wrongCredentials && <InputFieldError error="Email e usuário ou senha inválidos." />}

@@ -28,6 +28,15 @@ class PasswordReseterComponent {
 		// Associa o token ao usuário
 		user.passwordResetToken = token;
 
+		try {
+			const { affected } = await this.Controller.Service.updateUser(user);
+			if (affected < 1) {
+				return false;
+			}
+		} catch {
+			return false;
+		}
+
 		// URL que ira redirecionar o usuário para a página de validação de email
 		const resetUrl = global.__URLS__.resetPassword.edit({
 			query: {
