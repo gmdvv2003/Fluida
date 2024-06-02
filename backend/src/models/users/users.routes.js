@@ -3,18 +3,9 @@ const SocketRoute = require("../../context/route/SocketRoute");
 
 module.exports = function (app, io, usersController) {
 	// ==================================== Rotas Publicas ==================================== //
-	app.post(
-		"/users/register",
-		Route.newRoute({ secure: false }, usersController.register, usersController)
-	);
-	app.post(
-		"/users/isEmailInUse",
-		Route.newRoute({ secure: false }, usersController.isEmailInUse, usersController)
-	);
-	app.post(
-		"/users/login",
-		Route.newRoute({ secure: false }, usersController.login, usersController)
-	);
+	app.post("/users/register", Route.newRoute({ secure: false }, usersController.register, usersController));
+	app.post("/users/isEmailInUse", Route.newRoute({ secure: false }, usersController.isEmailInUse, usersController));
+	app.post("/users/login", Route.newRoute({ secure: false }, usersController.login, usersController));
 
 	// ==================================== Rotas Seguras ==================================== //
 	app.post(
@@ -41,9 +32,12 @@ module.exports = function (app, io, usersController) {
 
 	// ==================================== Rotas Intermediárias ==================================== //
 	// Validação do Email
+	app.put("/users/validateEmail", Route.newRoute({ secure: false }, usersController.validateEmail, usersController));
+
+	// Reenvio do Email de Validação
 	app.put(
-		"/users/validateEmail",
-		Route.newRoute({ secure: false }, usersController.validateEmail, usersController)
+		"/users/requestValidationEmail",
+		Route.newRoute({ secure: false }, usersController.requestValidationEmail, usersController)
 	);
 
 	// Reset de Senha
@@ -61,10 +55,7 @@ module.exports = function (app, io, usersController) {
 	 *       200:
 	 *         description: Returns a mysterious string.
 	 */
-	app.put(
-		"/users/resetPassword",
-		Route.newRoute({ secure: false }, usersController.resetPassword, usersController)
-	);
+	app.put("/users/resetPassword", Route.newRoute({ secure: false }, usersController.resetPassword, usersController));
 
 	// ==================================== Rotas do Socket ==================================== //
 	const notificationsIO = io.of("/notifications");

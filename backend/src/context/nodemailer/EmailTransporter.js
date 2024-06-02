@@ -52,30 +52,31 @@ class EmailTransporter {
 		const { to, subject, text, replacer, template } = EMAIL_SENDERS[sender](...data);
 
 		return new Promise((resolve, reject) => {
-			readHTMLTemplateFile(
-				__dirname + `\\..\\..\\..\\html\\${template}`,
-				async function (error, html) {
-					if (error) {
-						return reject(error);
-					}
-
-					// Prepara as opções de envio do email
-					const mailOptions = {
-						from: process.env.EMAIL_SERVICE_ADDRESS,
-						to: to,
-						subject: subject,
-						text: text,
-
-						// Substitui as variáveis do template pelo valor correto
-						html: handlebars.compile(html)(replacer()),
-					};
-
-					// Envia o email e espera por uma resposta
-					TRANSPORTER.sendMail(mailOptions)
-						.then(() => resolve)
-						.catch(() => reject);
+			readHTMLTemplateFile(__dirname + `\\..\\..\\..\\html\\${template}`, async function (error, html) {
+				if (error) {
+					return reject(error);
 				}
-			);
+
+				// Prepara as opções de envio do email
+				const mailOptions = {
+					from: process.env.EMAIL_SERVICE_ADDRESS,
+					to: to,
+					subject: subject,
+					text: text,
+
+					// Substitui as variáveis do template pelo valor correto
+					html: handlebars.compile(html)(replacer()),
+				};
+
+				// Envia o email e espera por uma resposta
+				TRANSPORTER.sendMail(mailOptions)
+					.then(() => {
+						resolve({ success: true });
+					})
+					.catch((error) => {
+						reject({ success: false, message: error });
+					});
+			});
 		});
 	}
 }

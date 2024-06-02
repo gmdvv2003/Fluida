@@ -24,33 +24,6 @@ class UsersController extends Controller {
 
 	// ==================================== Métodos Publicos ==================================== //
 	/**
-	 * Retorna todos os usuários ao requisitante
-	 *
-	 * @param {Request} request
-	 * @param {Response} response
-	 */
-	async getUsers(_, response) {
-		response.status(200).json(await this.Service.getUsers());
-	}
-
-	/**
-	 * Pega um usuário pelo id para o requisitante
-	 *
-	 * @param {Request} request
-	 * @param {Response} response
-	 */
-	async getUserById(request, response) {
-		const { userId } = request.params;
-
-		const user = await this.Service.getUserById(userId);
-		if (!user) {
-			return response.status(404).json({ message: "Usuário não encontrado." });
-		}
-
-		response.json(user);
-	}
-
-	/**
 	 * Realiza o registro de um novo usuário
 	 *
 	 * @param {Request} request
@@ -65,14 +38,9 @@ class UsersController extends Controller {
 		}
 
 		// TODO: Garantir que o email seja enviado em caso de falha
-		this.#EmailValidatorComponent
-			.sendValidationEmail(result.user)
-			.then(() => {
-				console.log(`Email de validação enviado para ${result.user.email}`);
-			})
-			.catch((error) => {
-				console.error(`Falha ao enviar email de validação. Erro: ${error}`);
-			});
+		this.#EmailValidatorComponent.sendValidationEmail(result.user).catch((error) => {
+			console.error(`Falha ao enviar email de validação. Erro: ${error}`);
+		});
 
 		response.status(201).json({ successfullyRegistered: true, message: "Usuário cadastrado com sucesso." });
 	}
@@ -108,7 +76,7 @@ class UsersController extends Controller {
 
 		const result = await this.Service.login(email, password);
 		if (!result.success) {
-			return response.status(400).json({ message: result.message });
+			return response.status(400).json({ ...result });
 		}
 
 		response.status(200).json({ ...result, redirect: global.__URLS__.home.url });
@@ -176,6 +144,35 @@ class UsersController extends Controller {
 	}
 
 	/**
+	 * Realiza o reenvio de um email de validação
+	 *
+	 * @param {Request} request
+	 * @param {Response} response
+	 */
+	async requestValidationEmail(request, response) {
+		const { email } = request.body;
+		if (!email) {
+			return response.status(400).json({ message: "Email não encontrado na requisição." });
+		}
+
+		const user = await this.Service.getUserByEmail(email);
+		if (!user) {
+			return response.status(400).json({ message: "Email não encontrado." });
+		}
+
+		try {
+			const result = await this.#EmailValidatorComponent.sendValidationEmail(user);
+			if (!result?.success) {
+				return response.status(400).json({ message: result?.message });
+			}
+
+			return response.status(201).json({ message: "Email de validação reenviado com sucesso." });
+		} catch (error) {
+			return response.status(400).json({ message: `Falha ao reenviar email de validação. Erro: ${error}` });
+		}
+	}
+
+	/**
 	 * Realiza a solicitação de reset de senha
 	 * Todas as resposta de erro são 201 para evitar que um usuário mal intencionado saiba se um email está cadastrado ou não
 	 *
@@ -185,16 +182,19 @@ class UsersController extends Controller {
 	async requestPasswordReset(request, response) {
 		const { email } = request.body;
 		if (!email) {
-			return response.status(201);
+			return response.status(400).json({ message: "Email não encontrado na requisição." });
 		}
 
 		try {
-			await this.#PasswordReseterComponent.requestPasswordReset(email);
+			const result = await this.#PasswordReseterComponent.requestPasswordReset(email);
+			if (!result?.success) {
+				return response.status(400).json({ message: "Falha ao solicitar reset de senha." });
+			}
+
+			return response.status(201).json({ message: "Solicitação de reset de senha realizada com sucesso." });
 		} catch (error) {
 			console.error(`Falha ao solicitar reset de senha. Erro: ${error}`);
 		}
-
-		return response.status(201);
 	}
 
 	/**
@@ -210,13 +210,13 @@ class UsersController extends Controller {
 		}
 
 		try {
-			const result = this.#PasswordReseterComponent.resetPassword(token, newPassword);
-			if (!result.success) {
-				return response.status(400).json({ message: "Falha ao resetar senha." });
+			const result = await this.#PasswordReseterComponent.resetPassword(token, newPassword);
+			if (result?.samePasswordAsBefore) {
+				return response.status(400).json({ message: "Senha igual a anterior.", samePasswordAsBefore: true });
 			}
 
-			if (result.samePasswordAsBefore) {
-				return response.status(200).json({ message: "Senha igual a anterior.", samePasswordAsBefore: true });
+			if (!result?.success) {
+				return response.status(400).json({ message: "Falha ao resetar senha." });
 			}
 
 			return response.status(200).json({ message: "Senha resetada com sucesso." });

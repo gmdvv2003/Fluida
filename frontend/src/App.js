@@ -22,6 +22,7 @@ const HomeProjects = lazy(() => import("components/pages/home-projects/HomeProje
 const Project = lazy(() => import("components/pages/project/Project"));
 const LandingPage = lazy(() => import("components/pages/landing-page/LandingPage"));
 const AcceptProjectInvitation = lazy(() => import("components/pages/accept-project-invitation/AcceptProjectInvitation"));
+const RequestValidationEmail = lazy(() => import("components/pages/request-validation-email/RequestValidationEmail"));
 
 function App() {
 	return (
@@ -83,6 +84,15 @@ function App() {
 							element={
 								<Suspense fallback={<Loading />}>
 									<ValidateEmail />
+								</Suspense>
+							}
+						/>
+
+						<Route
+							path="/request-validation-email"
+							element={
+								<Suspense fallback={<Loading />}>
+									<RequestValidationEmail />
 								</Suspense>
 							}
 						/>

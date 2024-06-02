@@ -1,20 +1,26 @@
 import "./LandingPage.css";
+
+import { useRef } from "react";
+import { createSearchParams, useNavigate } from "react-router-dom";
+
 import Header from "components/shared/login-registration/header/Header";
 import Footer from "components/shared/login-registration/footer/Footer";
 import ActionButton from "components/shared/action-button/ActionButton";
 import ProjectDisplay from "./components/ProjectDisplay";
+
 import TextInputField from "../../shared/text-input-field/TextInputField";
 
 function LandingPage() {
+	const emailFieldReference = useRef(null);
+
+	const navigate = useNavigate();
+
 	return (
 		<div>
 			<Header />
 			<div className="LP-background-page">
 				<div>
-					<img
-						src="fluida-background-landing-page.png"
-						className="LP-fluida-background-waves"
-					/>
+					<img src="fluida-background-landing-page.png" className="LP-fluida-background-waves" />
 
 					<div className="LP-fluida-description">
 						<h1 className="LP-description-text-h1">
@@ -23,9 +29,7 @@ function LandingPage() {
 							do seu projeto em um único lugar
 						</h1>
 
-						<a className="LP-description-text-a">
-							Faça login ou cadastre-se agora mesmo. É grátis.
-						</a>
+						<a className="LP-description-text-a">Faça login ou cadastre-se agora mesmo. É grátis.</a>
 
 						<div style={{ paddingTop: "10px" }}>
 							<ActionButton
@@ -39,7 +43,7 @@ function LandingPage() {
 								}}
 								is_active={true}
 								on_click={() => {
-									document.location.href = "/login";
+									navigate("/login");
 								}}
 							/>
 						</div>
@@ -54,9 +58,7 @@ function LandingPage() {
 									com Fluida
 								</h1>
 
-								<h2 style={{ color: "orange", textAlign: "right", width: "100%" }}>
-									Método Kanban
-								</h2>
+								<h2 style={{ color: "orange", textAlign: "right", width: "100%" }}>Método Kanban</h2>
 
 								<a className="LP-kanban-description">
 									O kanban é uma ferramenta visual de organização de tarefas.
@@ -73,9 +75,7 @@ function LandingPage() {
 						</div>
 
 						<div className="LP-fluida-project-display-title-container">
-							<h1 style={{ color: "orange", fontSize: "40px" }}>
-								Com uma interface intuitiva e amigável
-							</h1>
+							<h1 style={{ color: "orange", fontSize: "40px" }}>Com uma interface intuitiva e amigável</h1>
 						</div>
 
 						<ProjectDisplay
@@ -103,10 +103,7 @@ function LandingPage() {
 					</div>
 
 					<div className="LP-registration-field-container">
-						<div
-							className="LP-registration-field-title-container"
-							style={{ gap: "10px" }}
-						>
+						<div className="LP-registration-field-title-container" style={{ gap: "10px" }}>
 							<h1
 								style={{
 									fontSize: "20px",
@@ -118,9 +115,7 @@ function LandingPage() {
 								em um ambiente de trabalho flexível e colaborativo.
 							</h1>
 
-							<a style={{ fontWeight: "bold", textAlign: "center" }}>
-								Crie sua conta agora mesmo.
-							</a>
+							<a style={{ fontWeight: "bold", textAlign: "center" }}>Crie sua conta agora mesmo.</a>
 
 							<div
 								className="LP-registration-field-input-container"
@@ -134,6 +129,7 @@ function LandingPage() {
 								<TextInputField
 									placeholder="Insira o seu email."
 									style={{ backgroundColor: "white" }}
+									ref={emailFieldReference}
 								/>
 								<ActionButton
 									title="Registrar-se"
@@ -145,7 +141,17 @@ function LandingPage() {
 									}}
 									is_active={true}
 									on_click={() => {
-										document.location.href = "/registration";
+										const enteredEmailForRegistration = emailFieldReference.current.ref.current.value;
+										if (enteredEmailForRegistration.length > 0) {
+											navigate({
+												pathname: "/registration",
+												search: createSearchParams({
+													email: btoa(enteredEmailForRegistration),
+												}).toString(),
+											});
+										} else {
+											navigate("/registration");
+										}
 									}}
 								/>
 							</div>
@@ -154,14 +160,8 @@ function LandingPage() {
 				</div>
 
 				<div className="LP-fluida-background-container">
-					<img
-						src="fluida-background-landing-page-wave.png"
-						className="LP-fluida-background-bluewave"
-					/>
-					<img
-						src="fluida-fish-landing-page.png"
-						className="LP-fluida-background-fishwave"
-					/>
+					<img src="fluida-background-landing-page-wave.png" className="LP-fluida-background-bluewave" />
+					<img src="fluida-fish-landing-page.png" className="LP-fluida-background-fishwave" />
 				</div>
 
 				<Footer />

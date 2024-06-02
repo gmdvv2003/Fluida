@@ -5,7 +5,7 @@ import React, { useImperativeHandle, useRef, useState } from "react";
 import ReactSubscriptionHelper from "utilities/react-subscription-helper/ReactSubscriptionHelper";
 
 const TextInputField = React.forwardRef(
-	({ name, placeholder, grid_area, container_style = {}, style = {}, type = "text" }, ref) => {
+	({ name, placeholder, grid_area, container_style = {}, style = {}, type = "text", initial_text = null }, ref) => {
 		const realRef = useRef(null);
 
 		let [onTextChangeSubscriptionHelper] = useState(new ReactSubscriptionHelper());
@@ -30,6 +30,7 @@ const TextInputField = React.forwardRef(
 					className="TIF-text-input-field"
 					name={name}
 					type={type}
+					value={initial_text}
 					autoComplete={name}
 					required
 					placeholder={placeholder}

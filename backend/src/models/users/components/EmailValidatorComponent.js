@@ -59,7 +59,7 @@ class EmailValidatorComponent {
 		}
 
 		// Verifica se o usuário existe e se o email foi validado
-		const user = await this.Controller.Service.getUserById(new UsersDTO({ userId }));
+		const user = await this.Controller.Service.getUserById(userId);
 		if (!user || user.emailVerified || user.emailValidationToken != validationToken) {
 			return false;
 		}

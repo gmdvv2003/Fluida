@@ -24,7 +24,7 @@ function SendPasswordReset() {
 
 	const [failedToSendEmail, setFailedToSendEmail] = useState(false);
 
-	function handleSendButton() {
+	async function handleSendButton() {
 		if (waitingForResponse) {
 			return false;
 		}
@@ -40,10 +40,7 @@ function SendPasswordReset() {
 
 		if (isValidEmailFormat && !isInvalidEmail) {
 			// Realiza a requisição para o back
-			const response = RequestPasswordResetEndpoint(
-				"PUT",
-				JSON.stringify({ email: enteredEmail })
-			);
+			const response = await RequestPasswordResetEndpoint("PUT", JSON.stringify({ email: enteredEmail }));
 			if (response.success) {
 				setEmailSent(true);
 			} else {
@@ -70,13 +67,17 @@ function SendPasswordReset() {
 		<div className="SPR-background-container">
 			<Header />
 			<div className="SPR-box-container">
-				<div className="SPR-form-container">
+				<div className="SPR-form-container" style={{ height: emailSent && "100px" }}>
 					<div className="SPR-form">
-						<h2 className="SPR-form-title">Esqueceu sua senha?</h2>
-						<h5 className="SPR-form-description">
-							Insira o email da sua conta, caso ele esteja correto, você receberá um
-							email para redefinição de senha.
-						</h5>
+						{!emailSent && (
+							<div>
+								<h2 className="SPR-form-title">Esqueceu sua senha?</h2>
+								<h5 className="SPR-form-description">
+									Insira o email da sua conta, caso ele esteja correto, você receberá um email para redefinição
+									de senha.
+								</h5>
+							</div>
+						)}
 						{!emailSent && (
 							<div style={{ width: "100%" }}>
 								<TextInputField
@@ -91,9 +92,7 @@ function SendPasswordReset() {
 									}}
 									placeholder="Endereço de email"
 								/>
-								{invalidEmailFormat && !invalidEmail && (
-									<InputFieldError error="O email informado é inválido." />
-								)}
+								{invalidEmailFormat && !invalidEmail && <InputFieldError error="O email informado é inválido." />}
 								{invalidEmail && invalidEmailFormat && (
 									<InputFieldError error="Você deve preencher o campo do email." />
 								)}
@@ -101,7 +100,7 @@ function SendPasswordReset() {
 						)}
 						{(() => {
 							if (waitingForResponse) {
-								return <LoadingDots style={{ paddingTop: "20px" }} />;
+								return <LoadingDots scale={0.75} style={{ paddingTop: "20px" }} />;
 							}
 
 							if (failedToSendEmail) {
@@ -124,11 +123,7 @@ function SendPasswordReset() {
 
 							return (
 								<div className="SPR-button-container">
-									<ActionButton
-										title="Enviar email"
-										is_active={enteredEmail}
-										on_click={handleSendButton}
-									/>
+									<ActionButton title="Enviar email" is_active={enteredEmail} on_click={handleSendButton} />
 								</div>
 							);
 						})()}

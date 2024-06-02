@@ -99,7 +99,7 @@ class UsersRepository extends Repository {
 		}
 
 		// Verifica se a senha está correta
-		if (!bcrypt.compare(usersDTO.password, user.password)) {
+		if (!(await bcrypt.compare(usersDTO.password, user.password))) {
 			throw new WrongPassword();
 		}
 

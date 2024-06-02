@@ -166,3 +166,11 @@
 		height: auto;
 	}
 }
+
+.L-login-form-resend-verification-email {
+	text-decoration: underline;
+}
+
+.L-login-form-resend-verification-email:hover {
+	cursor: pointer;
+}

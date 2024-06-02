@@ -55,6 +55,7 @@ export const PerformLogoutEndpoint = Endpoint.new("/users/logout");
 
 // Validação de Email
 export const ValidateEmailEndpoint = Endpoint.new("/users/validateEmail");
+export const RequestValidationEmailEndpoint = Endpoint.new("/users/requestValidationEmail");
 
 // Reset da Senha
 export const RequestPasswordResetEndpoint = Endpoint.new("/users/requestPasswordReset");

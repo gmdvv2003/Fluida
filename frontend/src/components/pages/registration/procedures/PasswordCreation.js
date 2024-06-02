@@ -15,7 +15,7 @@ import InputFieldError from "components/shared/login-registration/error/InputFie
 import Background from "components/shared/login-registration/background/Background";
 import ActionButton from "components/shared/action-button/ActionButton";
 
-const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure, setState }, ref) => {
+const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure, setState, getState }, ref) => {
 	const passwordFieldReference = useRef(null);
 	const passwordConfirmationFieldReference = useRef(null);
 	const passwordStrengthFieldRefrence = useRef(null);
@@ -27,8 +27,7 @@ const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure, s
 
 	function onPasswordsChange() {
 		const password = passwordFieldReference.current.ref.current.ref.current.value;
-		const passwordConfirmation =
-			passwordConfirmationFieldReference.current.ref.current.ref.current.value;
+		const passwordConfirmation = passwordConfirmationFieldReference.current.ref.current.ref.current.value;
 		setMatchingPassword(password == passwordConfirmation);
 
 		const isPasswordSatisfied = passwordStrengthFieldRefrence.current.isPasswordSatisfied();
@@ -45,8 +44,7 @@ const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure, s
 	}
 
 	useEffect(() => {
-		const unbindPasswordChangeSubscription =
-			passwordFieldReference.current.onPasswordChange(onPasswordsChange);
+		const unbindPasswordChangeSubscription = passwordFieldReference.current.onPasswordChange(onPasswordsChange);
 		const unbindPasswordConfirmationChangeSubscription =
 			passwordConfirmationFieldReference.current.onPasswordChange(onPasswordsChange);
 
@@ -94,18 +92,13 @@ const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure, s
 									}
 
 									if (isPasswordNotSatisfied) {
-										return (
-											<InputFieldError error="A senha não atende aos requisitos." />
-										);
+										return <InputFieldError error="A senha não atende aos requisitos." />;
 									}
 
 									return null;
 								})()}
 
-								<PasswordFieldStrength
-									field={passwordFieldReference}
-									ref={passwordStrengthFieldRefrence}
-								/>
+								<PasswordFieldStrength field={passwordFieldReference} ref={passwordStrengthFieldRefrence} />
 
 								<div className="R-registration-button">
 									<ActionButton
@@ -116,10 +109,7 @@ const PasswordCreation = React.forwardRef(({ nextProcedure, previousProcedure, s
 								</div>
 
 								<div className="R-go-back-button-container">
-									<button
-										onClick={previousProcedure}
-										className="R-go-back-button"
-									>
+									<button onClick={previousProcedure} className="R-go-back-button">
 										<GoBackArrowIcon />
 									</button>
 								</div>

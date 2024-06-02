@@ -3,7 +3,7 @@ import "./../../shared/login-registration/container/Container.css";
 import "./Login.css";
 
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { createSearchParams, useNavigate } from "react-router-dom";
 
 import { ReactComponent as EmailIcon } from "assets/action-icons/email.svg";
 import { ReactComponent as GoogleIcon } from "assets/action-icons/google-icon.svg";
@@ -31,6 +31,7 @@ function Login() {
 
 	const [waitingForValidation, setWaitingForValidation] = useState(false);
 	const [wrongCredentials, setWrongCredentials] = useState(false);
+	const [notYetVerified, setNotYetVerified] = useState(false);
 	const [somethingWentWrong, setSomethingWentWrong] = useState(false);
 
 	const [emailFilled, setEmailFilled] = useState(false);
@@ -39,6 +40,8 @@ function Login() {
 	const [ignoreRedirect, setIgnoreRedirect] = useState(false);
 
 	const { login } = useAuthentication();
+
+	const navigate = useNavigate();
 
 	async function handleOnLoginButton() {
 		if (waitingForValidation) {
@@ -56,11 +59,10 @@ function Login() {
 
 			// Realiza a requisição para o back
 			const response = await login(enteredEmail, enteredPassword, { ignoreRedirect });
-			if (response.success) {
-				setWrongCredentials(response.data?.wrongEmailAndOrPassword);
-			} else {
-				setSomethingWentWrong(true);
-			}
+			setSomethingWentWrong(!response.success);
+
+			setWrongCredentials(response.data?.wrongEmailAndOrPassword);
+			setNotYetVerified(response.data?.userNotVerified);
 
 			// Finaliza o processo de login
 			setWaitingForValidation(false);
@@ -154,7 +156,31 @@ function Login() {
 							</div>
 
 							{invalidPassword && !wrongCredentials && <InputFieldError error="Preencha este campo." />}
+
 							{wrongCredentials && <InputFieldError error="Email e usuário ou senha inválidos." />}
+							{notYetVerified && (
+								<InputFieldError
+									error={
+										<span>
+											Usuário não verificado.
+											<a
+												className="L-login-form-resend-verification-email"
+												onClick={() => {
+													navigate({
+														pathname: "/request-validation-email",
+														search: createSearchParams({
+															address: btoa(enteredEmail),
+														}).toString(),
+													});
+												}}
+											>
+												Clique aqui
+											</a>
+											para reenviar o email de verificação.
+										</span>
+									}
+								/>
+							)}
 
 							<div className="L-login-form-reset-container">
 								<a href="/send-password-reset" className="L-login-form-reset">
@@ -174,7 +200,7 @@ function Login() {
 										on_click={handleOnLoginButton}
 									/>
 
-									{somethingWentWrong ? (
+									{somethingWentWrong && !wrongCredentials && !notYetVerified ? (
 										<InputFieldError error="Algo de errado ocorreu enquanto seu login era processado." />
 									) : null}
 								</div>

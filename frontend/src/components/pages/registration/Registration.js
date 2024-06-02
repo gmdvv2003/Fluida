@@ -23,7 +23,7 @@ function Registration() {
 	const navigate = useNavigate();
 
 	const accountInformationFieldsProvider = {
-		email: useState(false),
+		email: useState(atob(new URLSearchParams(window.location.search).get("email") || "")),
 		firstName: useState(false),
 		lastName: useState(false),
 		phoneNumber: useState(false),
@@ -78,6 +78,10 @@ function Registration() {
 
 	function setState(identifier, value) {
 		accountInformationFieldsProvider[identifier][1](value);
+	}
+
+	function getState(identifier) {
+		return accountInformationFieldsProvider[identifier][0];
 	}
 
 	function successed() {
@@ -141,6 +145,7 @@ function Registration() {
 								nextProcedure={nextProcedure}
 								previousProcedure={previousProcedure}
 								setState={setState}
+								getState={getState}
 							/>
 						);
 
@@ -150,6 +155,7 @@ function Registration() {
 								nextProcedure={nextProcedure}
 								previousProcedure={previousProcedure}
 								setState={setState}
+								getState={getState}
 							/>
 						);
 

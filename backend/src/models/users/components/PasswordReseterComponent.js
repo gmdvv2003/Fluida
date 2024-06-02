@@ -1,3 +1,5 @@
+const bcrypt = require("bcrypt");
+
 const EmailTransporter = require("../../../context/nodemailer/EmailTransporter");
 
 const Session = require("../../../context/session/Session");
@@ -17,13 +19,13 @@ class PasswordReseterComponent {
 	 * @returns {Promise} Promise contendo informação sobre se o email foi enviado com sucesso
 	 */
 	async requestPasswordReset(email) {
-		const user = this.Controller.Service.getUserByEmail(new UsersDTO({ email }));
+		const user = await this.Controller.Service.getUserByEmail(email);
 		if (!user || !user.emailVerified) {
 			return { success: false };
 		}
 
 		// Cria um token de reset de senha para o usuário
-		const token = Session.newSession({ email: user.email });
+		const token = Session.newSession({ email: user.email }, { expiresIn: "24h" });
 
 		// Associa o token ao usuário
 		user.passwordResetToken = token;
@@ -54,28 +56,38 @@ class PasswordReseterComponent {
 	 * @param {string} newPassword
 	 * @returns {Object} Estrutura que diz se a ação foi bem sucedida ou não
 	 */
-	resetPassword(resetPasswordToken, newPassword) {
+	async resetPassword(resetPasswordToken, newPassword) {
 		const [validated, { email }] = Session.validate(resetPasswordToken);
 		if (!validated) {
 			return { success: false };
 		}
 
 		// Verifica se o usuário existe e se o token de reset de senha é válido
-		const user = this.Controller.Service.getUserByEmail(new UsersDTO({ email }));
+		const user = await this.Controller.Service.getUserByEmail(email);
 		if (!user || user.passwordResetToken != resetPasswordToken) {
 			return { success: false };
 		}
 
-		// TODO: Atualmente a senha no banco de dados esta descriptografada, então a comparação é feita diretamente
-		if (user.password === newPassword) {
+		if (await bcrypt.compare(newPassword, user.password)) {
 			return { success: false, samePasswordAsBefore: true };
 		}
 
+		const hashedPassword = await bcrypt.hash(newPassword, Number(process.env.PASSWORD_SALT_ROUNDS));
+
 		// Atualiza a senha do usuário
-		user.password = newPassword;
+		user.password = hashedPassword;
 
 		// Remove o token de reset de senha
 		user.passwordResetToken = undefined;
+
+		try {
+			const { affected } = await this.Controller.Service.updateUser(user);
+			if (affected < 1) {
+				return { success: false };
+			}
+		} catch {
+			return { success: false };
+		}
 
 		return { success: true };
 	}

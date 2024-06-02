@@ -51,7 +51,7 @@ class UsersService extends Service {
 	 * @returns {UsersDTO}
 	 */
 	async getUserByEmail(email) {
-		return await this.#UsersRepository.getUserByEmail(email);
+		return await this.#UsersRepository.getUserByEmail(new UsersDTO({ email }));
 	}
 
 	/**
@@ -61,7 +61,7 @@ class UsersService extends Service {
 	 * @returns {UsersDTO}
 	 */
 	async getUserById(userId) {
-		return await this.#UsersRepository.getUserById(userId);
+		return await this.#UsersRepository.getUserById(new UsersDTO({ userId }));
 	}
 
 	/**
@@ -153,15 +153,15 @@ class UsersService extends Service {
 			};
 		} catch (error) {
 			if (error instanceof UserNotFound || error instanceof WrongPassword) {
-				return { success: false, message: "Usuário ou senha incorretos." };
+				return { success: false, message: "Usuário ou senha incorretos.", wrongEmailAndOrPassword: true };
 			}
 
 			if (error instanceof UserNotVerified) {
-				return { success: false, message: "Usuário não verificado." };
+				return { success: false, message: "Usuário não verificado.", userNotVerified: true };
 			}
 
 			if (error instanceof UserAlreadyLogged) {
-				return { success: false, message: "Usuário já logado." };
+				return { success: false, message: "Usuário já logado.", userAlreadyLogged: true };
 			}
 
 			return { success: false, message: `Erro desconhecido. Erro: ${error}` };

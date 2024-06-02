@@ -9,8 +9,8 @@ import { AcceptProjectInvitationEndpoint } from "utilities/Endpoints";
 import "./AcceptProjectInvitation.css";
 
 function AcceptProjectInvitation() {
-	const { waitingForValidation } = useState(true);
-	const { successfullyInvited } = useState(false);
+	const [waitingForValidation, setWaitingForValidation] = useState(true);
+	const [successfullyInvited, setSuccessfullyInvited] = useState(false);
 
 	function successed() {
 		return (
@@ -47,9 +47,9 @@ function AcceptProjectInvitation() {
 
 		const searchParameters = new URLSearchParams(window.location.search);
 		if (!searchParameters.has("invitation")) {
-			waitingForValidation(false);
+			setWaitingForValidation(false);
 		} else {
-			waitingForValidation(true);
+			setWaitingForValidation(true);
 
 			// Pega o link da url
 			const invitation = searchParameters.get("invitation");
@@ -57,25 +57,19 @@ function AcceptProjectInvitation() {
 			// Realiza a requisição para o back
 			const response = AcceptProjectInvitationEndpoint("PUT", JSON.stringify({ invitation: invitation }));
 			if (response.success) {
-				successfullyInvited(response.data?.inviteValidated);
+				setSuccessfullyInvited(response.data?.inviteValidated);
 			} else {
 				console.error(`Falha ao validar convite. Erro: ${response.error}`);
 			}
 
-			waitingForValidation(false);
+			setWaitingForValidation(false);
 		}
 	}, []);
 
 	return (
 		<div>
 			<Header />
-			{waitingForValidation ? (
-				<Loading text={"Validando convite"} />
-			) : successfullyInvited ? (
-				successed()
-			) : (
-				failed()
-			)}
+			{waitingForValidation ? <Loading text={"Validando convite"} /> : successfullyInvited ? successed() : failed()}
 		</div>
 	);
 }
