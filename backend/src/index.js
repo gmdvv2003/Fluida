@@ -24,8 +24,8 @@ const swaggerUi = require("swagger-ui-express");
 // Configura o Swagger UI para servir a documentação
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(require("./SwaggerModule")));
 
-app.listen(3001, () => {
-	console.log("Swagger está rodando em http://localhost:3001/api-docs");
+app.listen(3000, () => {
+	console.log("Swagger está rodando em http://localhost:3000/api-docs");
 });
 
 // Inicializando o servidor HTTP
