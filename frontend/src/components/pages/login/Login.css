@@ -160,11 +160,6 @@
 		height: 150px;
 		margin: -150px 0 0 -75px;
 	}
-
-	.R-background-container {
-		width: auto;
-		height: auto;
-	}
 }
 
 .L-login-form-resend-verification-email {

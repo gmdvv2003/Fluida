@@ -49,15 +49,9 @@ module.exports = function (app, io, usersController) {
 	 *       500:
 	 *         description: Erro interno do servidor.
 	 */
-	app.post(
-		"/users/register",
-		Route.newRoute({ secure: false }, usersController.register, usersController)
-	);
+	app.post("/users/register", Route.newRoute({ secure: false }, usersController.register, usersController));
 
-	app.post(
-		"/users/isEmailInUse",
-		Route.newRoute({ secure: false }, usersController.isEmailInUse, usersController)
-	);
+	app.post("/users/isEmailInUse", Route.newRoute({ secure: false }, usersController.isEmailInUse, usersController));
 
 	/**
 	 * @swagger
@@ -94,10 +88,9 @@ module.exports = function (app, io, usersController) {
 	 *       500:
 	 *         description: Erro interno do servidor.
 	 */
-	app.post(
-		"/users/login",
-		Route.newRoute({ secure: false }, usersController.login, usersController)
-	);
+	app.post("/users/login", Route.newRoute({ secure: false }, usersController.login, usersController));
+
+	app.post("/users/getProfileIcon/:userId", Route.newRoute({ secure: false }, usersController.getProfileIcon, usersController));
 
 	// ==================================== Rotas Seguras ==================================== //
 

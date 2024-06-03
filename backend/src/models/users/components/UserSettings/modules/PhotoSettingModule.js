@@ -1,6 +1,9 @@
 const UserSettingsModule = require("../UserSettingsModule");
 
-function handleAlter(user, value) {
+const { uploadUserProfileIcon } = require("../../../../../database/content/users-profile-icons/UsersProfileIcons");
+
+function handleAlter(user, file) {
+	console.log(user, file);
 	return { success: true, message: "Foto alterada." };
 }
 

@@ -1,5 +1,7 @@
 const Controller = require("../__types/Controller");
 
+const { retrieveUserProfileIcon } = require("../../database/content/users-profile-icons/UsersProfileIcons");
+
 const PasswordReseterComponent = require("./components/PasswordReseterComponent");
 const EmailValidatorComponent = require("./components/EmailValidatorComponent");
 const UserSettingsComponent = require("./components/UserSettings/UserSettingsComponent");
@@ -80,6 +82,13 @@ class UsersController extends Controller {
 		}
 
 		response.status(200).json({ ...result, redirect: global.__URLS__.home.url });
+	}
+
+	async getProfileIcon(request, response) {
+		const { userId } = request.params;
+		if (!userId) {
+			return response.status(400).json({ message: "ID do usuário não encontrado na requisição." });
+		}
 	}
 
 	// ==================================== Métodos Seguros ==================================== //

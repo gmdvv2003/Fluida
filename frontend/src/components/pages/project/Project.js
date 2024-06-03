@@ -1,3 +1,5 @@
+import "./Project.css";
+
 import { useRef, useState, useEffect } from "react";
 import { Navigate, useParams } from "react-router-dom";
 
@@ -12,11 +14,11 @@ import ProjectUsers from "./project-users/ProjectUsers";
 
 import LazyLoader from "utilities/lazy-loader/LazyLoader";
 import DragableModalDropLocationWithLazyLoader from "utilities/dragable-modal/drop-location/DragableModalDropLocationWithLazyLoader";
+import ReactSubscriptionHelper from "utilities/react-subscription-helper/ReactSubscriptionHelper";
 
 import Phase from "./templates/phase/Phase";
 import ConnectionFailure from "./ConnectionFailure";
 
-import "./Project.css";
 import Backdrop from "components/shared/backdrop/Backdrop";
 
 class CardState {
@@ -42,10 +44,8 @@ class PhaseState {
 
 class ProjectState {
 	#socket;
-	#projectStateUpdated;
 
 	members = [];
-	membersMap = {};
 
 	phases = [];
 	phasesMap = {};
@@ -55,12 +55,76 @@ class ProjectState {
 	// Indica se o número total de fases foi sincronizado com o servidor
 	totalPhasesSynced = false;
 
-	constructor(socket, projectStateUpdated = () => {}) {
+	#projectMembersStateListeners = new ReactSubscriptionHelper();
+	#projectPhasesStateListeners = new ReactSubscriptionHelper();
+	#projectCardsStateListeners = new ReactSubscriptionHelper();
+
+	constructor(socket) {
+		new Promise((resolve, reject) => {
+			async function fetchProjectMembers(page = 1) {
+				socket.emit("fetchProjectMembers", { page }, (response) => {
+					const members = response?.members?.taken;
+					if (!members) {
+						return reject();
+					}
+
+					members.forEach((member) => {
+						this.members.push(member);
+					});
+
+					if (response?.members?.hasNextPage) {
+						fetchProjectMembers(page + 1);
+					} else {
+						resolve();
+					}
+
+					this.#projectPhasesStateListeners.notify({ members });
+				});
+			}
+
+			fetchProjectMembers();
+		})
+			.then(() => {})
+			.catch(() => {});
+
 		// Fetch das fases inicial
 		socket.emit("fetchPhases", { page: 0 });
 
 		this.#socket = socket;
-		this.#projectStateUpdated = projectStateUpdated;
+	}
+
+	/**
+	 * Inscreve um callback para ser chamado quando o estado dos membros do projeto mudar.
+	 *
+	 * @param {Function} callback
+	 * @returns {Function}
+	 */
+	onProjectMembersStateChange(callback) {
+		return this.#projectMembersStateListeners.subscribe(callback);
+	}
+
+	/**
+	 * Inscreve um callback para ser chamado quando o estado das fases do projeto mudar.
+	 *
+	 * @param {Function} callback
+	 * @returns {Function}
+	 */
+	onProjectPhasesStateChange(callback) {
+		return this.#projectPhasesStateListeners.subscribe(callback);
+	}
+
+	/**
+	 * Inscreve um callback para ser chamado quando o estado dos cards do projeto mudar.
+	 *
+	 * @param {Function} callback
+	 * @returns {Function}
+	 */
+	onProjectCardsStateChange(callback) {
+		return this.#projectCardsStateListeners.subscribe(callback);
+	}
+
+	getMembers() {
+		return this.members;
 	}
 
 	/**
@@ -93,8 +157,8 @@ class ProjectState {
 
 	/**
 	 *
-	 * @param {*} phaseId
-	 * @param {*} sync
+	 * @param {number} phaseId
+	 * @param {boolean} sync
 	 * @returns
 	 */
 	async getTotalCards(phaseId, sync = false) {
@@ -161,7 +225,7 @@ class ProjectState {
 		this.totalPhases += fromFetch ? 0 : 1;
 
 		// Atualizar o estado do projeto
-		this.#projectStateUpdated();
+		this.#projectPhasesStateListeners.notify(phaseDTO);
 	}
 
 	/**
@@ -214,7 +278,7 @@ class ProjectState {
 		phaseState.totalCards += fromFetch ? 0 : 1;
 
 		// Atualizar o estado do projeto
-		this.#projectStateUpdated();
+		this.#projectCardsStateListeners.notify(cardDTO);
 	}
 
 	/**
@@ -308,24 +372,28 @@ function Project() {
 
 	const lazyLoaderRef = useRef(null);
 
-	const performLazyLoaderUpdateRef = useRef(null);
-
 	const [waitingForReconnect, setWaitingForReconnect] = useState(false);
 	const [redirectToHome, setRedirectToHome] = useState(false);
 
 	// ============================== Edição de um card ============================== //
+	/**
+	 * Abre o modal de edição de um card.
+	 */
 	function toggleEditCardModal() {
 		setIsEditCardModalVisible(!isEditCardModalVisible);
 	}
 
 	// ============================== Usuários do projeto ============================== //
+	/**
+	 * Abre o modal de usuários do projeto.
+	 */
 	function toggleProjectUsersModal() {
 		setIsProjectUsersModalVisible(!isProjectUsersModalVisible);
 	}
 
 	// ============================== Criação de fases e cards ============================== //
 	/**
-	 *
+	 * Cria uma nova fase.
 	 */
 	function handleCreateNewPhaseButtonClick() {
 		currentProjectSocket?.emit("createPhase", {
@@ -334,8 +402,9 @@ function Project() {
 	}
 
 	/**
+	 * Cria um novo card em uma fase.
 	 *
-	 * @param {*} phaseId
+	 * @param {number} phaseId
 	 */
 	function handleCreateNewPhaseCardButtonClick(phaseId) {
 		currentProjectSocket?.emit("createCard", {
@@ -438,7 +507,7 @@ function Project() {
 
 			{isEditCardModalVisible && <EditCard />}
 
-			{isProjectUsersModalVisible && <ProjectUsers />}
+			{isProjectUsersModalVisible && <ProjectUsers projectState={projectState} />}
 			<Backdrop show={isProjectUsersModalVisible} onClick={toggleProjectUsersModal} />
 
 			{projectState && (
@@ -447,7 +516,6 @@ function Project() {
 						<ol className="P-phases-container" ref={phasesContainerRef}>
 							<div ref={lazyLoaderTopOffsetRef} />
 							<LazyLoader
-								update={performLazyLoaderUpdateRef}
 								// Referências para os offsets
 								topLeftOffset={lazyLoaderBottomOffsetRef}
 								bottomRightOffset={lazyLoaderBottomOffsetRef}
@@ -478,9 +546,7 @@ function Project() {
 								fetchMore={(page) => {
 									return new Promise((resolve, reject) => {
 										return currentProjectSocket?.emit("fetchPhases", { page }, (response) => {
-											resolve(
-												response?.phases?.taken.map((taken) => new PhaseState(taken)) || []
-											);
+											resolve(response?.phases?.taken.map((taken) => new PhaseState(taken)) || []);
 										});
 									});
 								}}
