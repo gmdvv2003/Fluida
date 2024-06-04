@@ -364,7 +364,9 @@ const LazyLoader = React.forwardRef(
 			}
 
 			// Seta a função de atualização do conteúdo a ser exibido na tela
-			update.current = setDisplayableContent;
+			if (update !== undefined) {
+				update.current = setDisplayableContent;
+			}
 
 			// Garante que os elementos de offset fiquem fixos no inicio e no final do container
 			topLeftOffset.current.style.order = "-100000000";

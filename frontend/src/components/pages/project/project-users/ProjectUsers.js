@@ -1,6 +1,6 @@
 import "./ProjectUsers.css";
 
-import { useState } from "react";
+import { memo, useEffect, useState } from "react";
 
 import TextInputField from "components/shared/text-input-field/TextInputField";
 import UserIcon from "components/shared/user-icon/UserIcon";
@@ -10,7 +10,9 @@ import { ReactComponent as CircleCheck } from "assets/action-icons/check-circle.
 import { ReactComponent as ShareChain } from "assets/action-icons/share-chain.svg";
 import { ReactComponent as Lens } from "assets/action-icons/lens.svg";
 
-function ProjectUsers({ projectUsers = [] }) {
+function ProjectUsers({ projectState }) {
+	const [projectUsers, setProjectUsers] = useState(projectState.getMembers());
+
 	const [showInvitationLink, setShowInvitationLink] = useState(false);
 	const [invitationLinkSent, setInvitationLinkSent] = useState(false);
 
@@ -21,6 +23,12 @@ function ProjectUsers({ projectUsers = [] }) {
 
 		setShowInvitationLink(true);
 	}
+
+	useEffect(() => {
+		return projectState.onProjectMembersStateChange((members) => {
+			setProjectUsers(members);
+		});
+	}, []);
 
 	return (
 		<div className="PU-project-users-container">
