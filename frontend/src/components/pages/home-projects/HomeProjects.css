@@ -263,11 +263,11 @@
     background-color: #ffffff;
     padding: 16px;
     width: 20%;
-    min-width: 250px;
-    max-width: 500px;
-    height: 50%;
+    min-width: 300px;
+    max-width: 300px;
+    height: 100%;
     min-height: 350px;
-    max-height: 350px;
+    max-height: 400px;
 
     .HP-container-close-user-photo{
         display: flex;
@@ -300,42 +300,42 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 85%;
-
-            .HP-user-photo{
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                cursor: pointer;
-                border-radius: 50%;
-                background-color: #f4f4f4;
-                width: 180px;
-                height: 180px;
-
-                .photo{
-                    border: 8px solid #e4e4e4;
-                    border-radius: 50%;
-                    background-color: #f4f4f4;
-                    padding: 18px;
-                    width: 60%;
-                    height: 60%;
-                }
-
-                .photoSelected{
-                    display: flex;
-                    border-radius: 50%;
-                    background-color: #f4f4f4;
-                    width: 90%;
-                    height: 90%;
-                }
-
-            }
+            height: 100%;
         }
 
         .HP-label-new-photo{
             display: flex;
             justify-content: center;
+            margin-bottom: 10px;
         }
+    }
+
+    .HP-user-photo{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        border-radius: 50%;
+        background-color: #f4f4f4;
+        height: 180px;
+
+    }
+
+    .photo{
+        border: 8px solid #e4e4e4;
+        border-radius: 50%;
+        background-color: #f4f4f4;
+        padding: 18px;
+        width: 60%;
+        height: 60%;
+    }
+
+    .photoSelected{
+        display: flex;
+        border-radius: 50%;
+        background-color: #f4f4f4;
+        width: 90%;
+        height: 90%;
     }
 
     .HP-container-button-add-photo{
