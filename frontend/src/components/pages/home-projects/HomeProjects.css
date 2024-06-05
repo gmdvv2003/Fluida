@@ -139,6 +139,7 @@
                     min-width: 60px;
                     height: 100%;
                     min-height: 200px;
+                    max-height: 250px;
                     font-weight: bold;
                     font-size: 18px;
                     text-align: center;
@@ -162,6 +163,7 @@
                     min-width: 60px;
                     height: 100%;
                     min-height: 200px;
+                    max-height: 250px;
                     font-size: 18px;
                     text-align: center;
 
