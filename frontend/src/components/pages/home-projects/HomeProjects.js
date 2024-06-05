@@ -7,6 +7,7 @@ import { CreateProjectByUserEndpoint } from "utilities/Endpoints";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { GetProjectsByUserId } from "functionalities/GetProjectsByUserId";
 import HeaderHome from "../../shared/login-registration/header-home/HeaderHome.js";
+import Popup from "../../shared/popup/Popup.js";
 import TextInputField from "../../shared/text-input-field/TextInputField";
 import { useAuthentication } from "context/AuthenticationContext";
 import { useNavigate } from "react-router-dom";
@@ -24,9 +25,11 @@ function HomeProjects() {
 	const [enteredProjectName, setProjectName] = useState("");
 	const [projects, setProjects] = useState([]);
 
-	// const hasFetchedProjects = 		useRef(false);
 	const fileInputRef = useRef(null);
 	const projectNameReference = useRef(null);
+
+	const [isPopupVisible, setIsPopupVisible] = useState(false);
+	const [popupMessage, setPopupMessage] = useState("");
 
 	useEffect(() => {
 		document.title = "Fluida | Home";
@@ -51,6 +54,16 @@ function HomeProjects() {
 	 */
 	function handleAddPhotoClick(boolean) {
 		setAddPhotoDialog(boolean);
+	}
+
+	function clickPopup(message) {
+		setPopupMessage(message);
+		setIsPopupVisible(true);
+	}
+
+	function closePopup() {
+		setIsPopupVisible(false);
+		setPopupMessage("");
 	}
 
 	/**
@@ -93,6 +106,7 @@ function HomeProjects() {
 
 		if (response.status === 201) {
 			fetchProjects();
+			clickPopup("Projeto cadastrado com sucesso !");
 		} else {
 			console.log(response.data.message);
 		}
@@ -259,6 +273,8 @@ function HomeProjects() {
 					</div>
 				</div>
 			)}
+
+			{isPopupVisible && <Popup message={popupMessage} onClose={closePopup} />}
 		</div>
 	);
 }
