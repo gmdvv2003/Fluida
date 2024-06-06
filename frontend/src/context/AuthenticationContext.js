@@ -1,8 +1,12 @@
-import { createContext, useContext, useRef, useState, useEffect } from "react";
-
 import { PerformLoginEndpoint, PerformLogoutEndpoint } from "utilities/Endpoints";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+import {
+	getFromLocalStorage,
+	removeFromLocalStorage,
+	setLocalStorage,
+} from "functionalities/LocalStorage";
+
 import { decryptData } from "utilities/PBKDF2Decrypt/PBKDF2Decrypt";
-import { setLocalStorage, getFromLocalStorage, removeFromLocalStorage } from "functionalities/LocalStorage";
 
 const AuthenticationContext = createContext();
 
@@ -11,7 +15,9 @@ export function useAuthentication() {
 }
 
 export function AuthenticationProvider({ children }) {
-	const [currentUserSession, setCurrentUserSession] = useState(getFromLocalStorage("currentUserSession"));
+	const [currentUserSession, setCurrentUserSession] = useState(
+		getFromLocalStorage("currentUserSession")
+	);
 
 	const onLoginCallbackReference = useRef(null);
 	const onLogoutCallbackReference = useRef(null);
@@ -38,7 +44,7 @@ export function AuthenticationProvider({ children }) {
 				.then((decryptedData) => {
 					setCurrentUserSession({
 						sessionToken: response?.data?.sessionToken,
-						...decryptedData,
+						...JSON.parse(decryptedData),
 					});
 
 					// Salva a sessão do usuário no local storage

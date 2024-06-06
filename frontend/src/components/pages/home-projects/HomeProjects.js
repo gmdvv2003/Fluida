@@ -17,13 +17,12 @@ function HomeProjects() {
 
 	const { currentUserSession, performAuthenticatedRequest } = useAuthentication();
 
-	const username = "variableUserName";
-
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [isDialogAddPhotoOpen, setAddPhotoDialog] = useState(false);
 	const [selectedImage, setSelectedImage] = useState(null);
 	const [enteredProjectName, setProjectName] = useState("");
 	const [projects, setProjects] = useState([]);
+	const [getUserName, setUserName] = useState(null);
 
 	const fileInputRef = useRef(null);
 	const projectNameReference = useRef(null);
@@ -39,7 +38,17 @@ function HomeProjects() {
 
 	useEffect(() => {
 		handleInputChange();
+		handleUserName();
 	});
+
+	async function handleUserName() {
+		if (currentUserSession) {
+			const firstInitial = currentUserSession.firstName.charAt(0);
+			const lastName = currentUserSession.lastName;
+			const username = firstInitial + lastName;
+			setUserName(username);
+		}
+	}
 
 	function handleNewProjectClick() {
 		setIsDialogOpen(true);
@@ -140,8 +149,8 @@ function HomeProjects() {
 					<div className="HP-container-image-label">
 						<i className="HP-user-image" onClick={() => handleAddPhotoClick(true)}></i>
 						<p className="HP-label">
-							<span className="username-style">{`@${username}`}</span>, bem-vindo de
-							volta!
+							<span className="username-style">{`@${getUserName}`}</span>, bem-vindo
+							de volta!
 						</p>
 					</div>
 				</div>
@@ -235,7 +244,7 @@ function HomeProjects() {
 						<div className="HP-container-username-label">
 							<div className="HP-username-label">
 								<span className="HP-hello">Olá,</span>{" "}
-								<span className="username-style">{`@${username}`}</span>
+								<span className="username-style">{`@${getUserName}`}</span>
 							</div>
 							<div className="HP-welcome">Seja bem-vindo ao Fluida.</div>
 						</div>
