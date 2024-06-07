@@ -50,6 +50,17 @@ module.exports = function (app, io, projectsController) {
 		)
 	);
 
+	app.put(
+		"/projects/updateProject/:projectId",
+		Route.newRoute(
+			{ secure: true },
+			projectsController.updateProjectAuthenticated,
+			projectsController,
+			["userId"],
+			projectsController.getService("users").sessionValidator
+		)
+	);
+
 	/**
 	 * @swagger
 	 * /projects/deleteProject/{projectId}:

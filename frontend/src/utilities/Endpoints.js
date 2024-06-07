@@ -66,8 +66,12 @@ export const RegisterUserEndpoint = Endpoint.new("/users/register");
 export const IsEmailInUseEndpoint = Endpoint.new("/users/isEmailInUse");
 
 // Project
-export const CreateProjectByUserEndpoint = Endpoint.new("/projects/createProject")
-export const GetProjectsByUserIdEndpoint = Endpoint.new("/projects/getProjectsOfUser")
+export const CreateProjectByUserEndpoint = Endpoint.new("/projects/createProject");
+export const UpdateProjectAuthenticated = (projectId) =>
+	Endpoint.new(`/projects/updateProject/${projectId}`);
+export const GetProjectsByUserIdEndpoint = Endpoint.new("/projects/getProjectsOfUser");
+export const DeleteProjectByProjectId = (projectId) =>
+	Endpoint.new(`/projects/deleteProject/${projectId}`);
 
 // Participate
 export const ParticipateInProjectEndpoint = Endpoint.new("/projects/participate");

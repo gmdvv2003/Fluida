@@ -132,6 +132,16 @@ class ProjectsService extends Service {
 	 * @param {number} projectId
 	 * @returns {boolean}
 	 */
+	async updateProject(projectId, projectData) {
+		return await this.ProjectsRepository.updateProject(projectId, projectData);
+	}
+
+	/**
+	 * Realiza a exclusão de um projeto.
+	 *
+	 * @param {number} projectId
+	 * @returns {boolean}
+	 */
 	async deleteProject(projectId) {
 		return await this.ProjectsRepository.deleteProject(new ProjectsDTO({ projectId }));
 	}

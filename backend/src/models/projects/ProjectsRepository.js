@@ -14,7 +14,10 @@ class ProjectsRepository extends Repository {
 	 * Trigger que adiciona o criador do projeto como membro do projeto.
 	 */
 	async afterInsert_addProjectManagerAsMember({ entity }) {
-		await this.Service.ProjectsMembersService.addUserAsMemberOfProject(entity.createdBy, entity.projectId);
+		await this.Service.ProjectsMembersService.addUserAsMemberOfProject(
+			entity.createdBy,
+			entity.projectId
+		);
 	}
 
 	constructor(service) {
@@ -41,7 +44,9 @@ class ProjectsRepository extends Repository {
 	 * @returns
 	 */
 	async getProjectsOfUser(userId) {
-		return await this.Repository.createQueryBuilder("Projects").where(`createdBy = ${userId}`).getMany();
+		return await this.Repository.createQueryBuilder("Projects")
+			.where(`createdBy = ${userId}`)
+			.getMany();
 	}
 
 	/**
@@ -80,6 +85,26 @@ class ProjectsRepository extends Repository {
 			.insert()
 			.into("Projects")
 			.values(projectsDTO)
+			.execute();
+	}
+
+	/**
+	 * Faz o update do nome do projeto do banco de dados.
+	 *
+	 * @param {ProjectsDTO} projectsDTO
+	 * @returns {DeleteResult}
+	 */
+	async updateProject(projectId, projectData) {
+		const { projectName } = projectData;
+		const updateFields = {};
+		if (projectName !== undefined) {
+			updateFields.projectName = projectName;
+		}
+
+		return await this.Repository.createQueryBuilder("Projects")
+			.update(ProjectsEntity)
+			.set({ projectName }) // Aqui atualizamos o campo projectName com o valor fornecido
+			.where("projectId = :projectId", { projectId })
 			.execute();
 	}
 

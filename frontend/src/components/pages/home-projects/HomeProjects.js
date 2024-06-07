@@ -1,9 +1,14 @@
 import "./HomeProjects.css";
 
+import {
+	CreateProjectByUserEndpoint,
+	DeleteProjectByProjectId,
+	UpdateProjectAuthenticated,
+} from "utilities/Endpoints";
 import React, { useEffect, useRef, useState } from "react";
 import { faCircleXmark, faUserLarge } from "@fortawesome/free-solid-svg-icons";
 
-import { CreateProjectByUserEndpoint } from "utilities/Endpoints";
+import { ReactComponent as DotsIcon } from "assets/action-icons/dots.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { GetProjectsByUserId } from "functionalities/GetProjectsByUserId";
 import HeaderHome from "../../shared/login-registration/header-home/HeaderHome.js";
@@ -13,22 +18,23 @@ import { useAuthentication } from "context/AuthenticationContext";
 import { useNavigate } from "react-router-dom";
 
 function HomeProjects() {
-	const navigate = useNavigate();
-
 	const { currentUserSession, performAuthenticatedRequest } = useAuthentication();
 
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [isDialogAddPhotoOpen, setAddPhotoDialog] = useState(false);
+	const [isDialogOpenProjectOptions, setDialogOptionsOpen] = useState(false);
 	const [selectedImage, setSelectedImage] = useState(null);
 	const [enteredProjectName, setProjectName] = useState("");
+	const [getEnteredProjectDialog, setProjectDialog] = useState([]);
+	const [projectNameUpdate, setProjectNameUpdate] = useState("");
 	const [projects, setProjects] = useState([]);
 	const [getUserName, setUserName] = useState(null);
+	const [isPopupVisible, setIsPopupVisible] = useState(false);
+	const [popupMessage, setPopupMessage] = useState("");
 
 	const fileInputRef = useRef(null);
 	const projectNameReference = useRef(null);
-
-	const [isPopupVisible, setIsPopupVisible] = useState(false);
-	const [popupMessage, setPopupMessage] = useState("");
+	const projectNameUpdateReference = useRef(null);
 
 	useEffect(() => {
 		document.title = "Fluida | Home";
@@ -38,9 +44,13 @@ function HomeProjects() {
 
 	useEffect(() => {
 		handleInputChange();
+		handleInputChangeUpdateProjectName();
 		handleUserName();
 	});
 
+	/**
+	 * Carrega o username do usuário
+	 */
 	async function handleUserName() {
 		if (currentUserSession) {
 			const firstInitial = currentUserSession.firstName.charAt(0);
@@ -50,19 +60,28 @@ function HomeProjects() {
 		}
 	}
 
-	function handleNewProjectClick() {
-		setIsDialogOpen(true);
-	}
-
-	function handleCloseDialog() {
-		setIsDialogOpen(false);
+	/**
+	 * Lida com o dialog de criar novo projeto
+	 */
+	function handleNewProjectClickDialog(boolean) {
+		setIsDialogOpen(boolean);
+		setProjectName("");
 	}
 
 	/**
-	 * Abre o dialog de adicionar foto ao usuário
+	 * Lida com o dialog de adicionar foto ao usuário
 	 */
-	function handleAddPhotoClick(boolean) {
+	function handleDialogPhotoClick(boolean) {
 		setAddPhotoDialog(boolean);
+	}
+
+	/**
+	 * Lida com o dialog de opções do projeto
+	 */
+	function handleOptionsProjectClick(boolean, project) {
+		setDialogOptionsOpen(boolean);
+		setProjectDialog(project);
+		setProjectNameUpdate("");
 	}
 
 	function clickPopup(message) {
@@ -94,7 +113,20 @@ function HomeProjects() {
 		if (projectNameReference.current) {
 			const unsubscribe = projectNameReference.current.onTextChange((event) => {
 				setProjectName(event.target.value);
-				console.log(enteredProjectName);
+			});
+
+			return () => unsubscribe();
+		}
+	}
+
+	/**
+	 * Atualiza o valor do input de atualização do novo nome do projeto
+	 */
+	async function handleInputChangeUpdateProjectName() {
+		if (projectNameUpdateReference.current) {
+			const unsubscribe = projectNameUpdateReference.current.onTextChange((event) => {
+				setProjectNameUpdate(event.target.value);
+				console.log(projectNameUpdate);
 			});
 
 			return () => unsubscribe();
@@ -116,6 +148,51 @@ function HomeProjects() {
 		if (response.status === 201) {
 			fetchProjects();
 			clickPopup("Projeto cadastrado com sucesso !");
+			setProjectName("");
+			setIsDialogOpen(false);
+		} else {
+			console.log(response.data.message);
+		}
+	}
+
+	/**
+	 * Realiza a exclusão de um projeto
+	 */
+	async function handleOnDeleteProjectButton(projectId) {
+		console.log(projectId);
+		const response = await performAuthenticatedRequest(
+			DeleteProjectByProjectId(projectId),
+			"DELETE"
+		);
+
+		if (response.status === 200) {
+			fetchProjects();
+			clickPopup("Projeto deletado com sucesso !");
+			setProjectNameUpdate("");
+			setDialogOptionsOpen(false);
+		} else {
+			console.log(response.data.message);
+		}
+	}
+
+	/**
+	 * Realiza a atualização do nome do projeto
+	 */
+	async function handleOnUpdateProjectButton(projectId) {
+		console.log(projectId);
+		const response = await performAuthenticatedRequest(
+			UpdateProjectAuthenticated(projectId),
+			"PUT",
+			JSON.stringify({
+				projectName: projectNameUpdate,
+			})
+		);
+
+		if (response.status === 200) {
+			fetchProjects();
+			clickPopup("Projeto atualizado com sucesso !");
+			setProjectNameUpdate("");
+			setDialogOptionsOpen(false);
 		} else {
 			console.log(response.data.message);
 		}
@@ -137,6 +214,10 @@ function HomeProjects() {
 		fileInputRef.current.click();
 	};
 
+	function teste() {
+		console.log("TESTE");
+	}
+
 	return (
 		<div>
 			<HeaderHome hideUsersInProject={true} />
@@ -147,7 +228,10 @@ function HomeProjects() {
 			>
 				<div className="HP-container-user">
 					<div className="HP-container-image-label">
-						<i className="HP-user-image" onClick={() => handleAddPhotoClick(true)}></i>
+						<i
+							className="HP-user-image"
+							onClick={() => handleDialogPhotoClick(true)}
+						></i>
 						<p className="HP-label">
 							<span className="username-style">{`@${getUserName}`}</span>, bem-vindo
 							de volta!
@@ -164,19 +248,26 @@ function HomeProjects() {
 						<div className="HP-project">
 							<div className="HP-grid-container">
 								{projects.map((project, index) => (
-									<div
-										key={project.projectId || index}
-										className="HP-grid-item"
-										onClick={() => {
-											document.location.href = `/project/${project.projectId}`;
-										}}
-									>
-										<div className="HP-project-name">{project.projectName}</div>
+									<div key={project.projectId || index} className="HP-grid-item">
+										<div
+											className="HP-project-name"
+											onClick={() => {
+												document.location.href = `/project/${project.projectId}`;
+											}}
+										>
+											{project.projectName}
+										</div>
+										<div
+											onClick={() => handleOptionsProjectClick(true, project)}
+											className="HP-project-options"
+										>
+											<DotsIcon className="HP-header-icon" />
+										</div>
 									</div>
 								))}
 								<div
 									className="HP-grid-item-new-project"
-									onClick={handleNewProjectClick}
+									onClick={() => handleNewProjectClickDialog(true)}
 								>
 									<div className="HP-container-new-project">
 										<i className="HP-add-new-project"></i>
@@ -196,7 +287,7 @@ function HomeProjects() {
 					<div className="HP-dialog-new-project-container">
 						<div className="HP-container-close-dialog">
 							<FontAwesomeIcon
-								onClick={handleCloseDialog}
+								onClick={() => handleNewProjectClickDialog(false)}
 								icon={faCircleXmark}
 								size="xl"
 								style={{ color: "#8c8c8c", cursor: "pointer", borderRadius: "50%" }}
@@ -229,12 +320,75 @@ function HomeProjects() {
 				</div>
 			)}
 
+			{isDialogOpenProjectOptions && (
+				<div className="HP-dialog-overlay">
+					<div className="HP-dialog-update-name-project-container">
+						<div className="HP-container-label-update-project-name">
+							<div className="HP-container-label-current-name-project">
+								<div>Nome atual do projeto:</div>
+								<div className="HP-label-current-project-name">
+									{getEnteredProjectDialog.projectName}
+								</div>
+							</div>
+							<div className="HP-container-close-dialog-project-update">
+								<FontAwesomeIcon
+									onClick={() => handleOptionsProjectClick(false)}
+									icon={faCircleXmark}
+									size="xl"
+									style={{
+										color: "#8c8c8c",
+										cursor: "pointer",
+										borderRadius: "50%",
+									}}
+								/>
+							</div>
+						</div>
+						<div>
+							<TextInputField
+								style={{
+									marginTop: "10px",
+									marginBottom: "10px",
+									borderRadius: "var(--border-radius)",
+									backgroundColor: "rgb(244, 244, 244)",
+								}}
+								name="projectUpdate"
+								placeholder="Novo nome do projeto"
+								ref={projectNameUpdateReference}
+							/>
+						</div>
+						<div className="HP-container-buttons-update-project">
+							<button
+								className={`HP-button-update-project ${
+									projectNameUpdate.length <= 0
+										? "HP-button-update-project-disabled"
+										: ""
+								}`}
+								onClick={() =>
+									handleOnUpdateProjectButton(getEnteredProjectDialog.projectId)
+								}
+								disabled={projectNameUpdate.length <= 0}
+							>
+								Atualizar projeto
+							</button>
+							<button
+								className="HP-button-delete-project"
+								onClick={() =>
+									handleOnDeleteProjectButton(getEnteredProjectDialog.projectId)
+								}
+							>
+								Excluir projeto
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
+
 			{isDialogAddPhotoOpen && (
 				<div className="HP-dialog-overlay">
 					<div className="HP-container-user-photo">
 						<div className="HP-container-close-user-photo">
 							<FontAwesomeIcon
-								onClick={() => handleAddPhotoClick(false)}
+								onClick={() => handleDialogPhotoClick(false)}
 								icon={faCircleXmark}
 								size="xl"
 								style={{ color: "#8c8c8c", cursor: "pointer", borderRadius: "50%" }}
