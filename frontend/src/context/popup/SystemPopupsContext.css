@@ -6,14 +6,14 @@
 .SPC-popups-container {
     display: flex;
     position: fixed;
-    top: calc(var(--header-height) + 64px);
+    top: calc(var(--header-height));
     right: 0;
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
     z-index: 1000;
     width: var(--system-popup-container-width);
-    height: 800px;
+    height: 200px;
 }
 
 .SPC-popup-holder-background {
