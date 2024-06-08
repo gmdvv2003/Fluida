@@ -7,7 +7,9 @@ const ProjectsService = require("./ProjectsService");
 const PhasesService = require("../phases/PhasesService");
 const CardsService = require("../cards/CardsService");
 
-const { ProjectsFunctionalityInterface } = require("./functionalities/projects/ProjectsFunctionalityInterface");
+const {
+	ProjectsFunctionalityInterface,
+} = require("./functionalities/projects/ProjectsFunctionalityInterface");
 
 class ProjectsController extends Controller {
 	#ProjectInvitationComponent;
@@ -52,7 +54,9 @@ class ProjectsController extends Controller {
 			const projects = await this.Service.getProjectsOfUser(userId);
 
 			if (!projects || projects.length === 0) {
-				return response.status(404).json({ message: "Nenhum projeto encontrado para este usuário" });
+				return response
+					.status(404)
+					.json({ message: "Nenhum projeto encontrado para este usuário" });
 			}
 
 			return response.status(200).json(projects);
@@ -71,7 +75,9 @@ class ProjectsController extends Controller {
 	async createProjectAuthenticated(request, response) {
 		const { userId, projectName } = request.body;
 		if (!userId || !projectName) {
-			return response.status(400).json({ message: "Usuário ou nome do projeto não informado." });
+			return response
+				.status(400)
+				.json({ message: "Usuário ou nome do projeto não informado." });
 		}
 
 		try {
@@ -80,6 +86,30 @@ class ProjectsController extends Controller {
 		} catch (error) {
 			return response.status(500).json({ message: "Ocorreu um erro ao criar o projeto." });
 		}
+	}
+
+	/**
+	 * Faz a atualização do nome do projeto pelo ID
+	 *
+	 * @param {Request} request
+	 * @param {Reponse} response
+	 */
+	async updateProjectAuthenticated(request, response) {
+		const { projectId } = request.params;
+		const projectData = request.body;
+
+		if (!projectId) {
+			return response.status(400).json({ message: "ID de projeto não informado." });
+		}
+
+		const projectExist = await this.Service.getProjectById(projectId);
+		if (!projectExist) {
+			return response.status(400).json({ message: "Não existe projeto para esse ID." });
+		}
+
+		(await this.Service.updateProject(projectId, projectData))
+			? response.status(200).json({ message: "Projeto atualizado com sucesso" })
+			: response.status(400).json({ error, message: "Erro ao atualizar o projeto" });
 	}
 
 	/**
@@ -122,13 +152,19 @@ class ProjectsController extends Controller {
 		}
 
 		// Verifica se o usuário está no projeto
-		const isInProject = await this.Service.ProjectsMembersService.isUserMemberOfProject(userId, projectId);
+		const isInProject = await this.Service.ProjectsMembersService.isUserMemberOfProject(
+			userId,
+			projectId
+		);
 		if (!isInProject) {
 			return response.status(400).json({ message: "Usuário não está no projeto." });
 		}
 
 		// Tenta adicionar o usuário ao projeto e obtem o token de participação
-		const [wasAdded, participationToken] = this.ProjectsFunctionalityInterface.addParticipant(userId, projectId);
+		const [wasAdded, participationToken] = this.ProjectsFunctionalityInterface.addParticipant(
+			userId,
+			projectId
+		);
 		if (!wasAdded) {
 			return response.status(400).json({ message: "Erro ao adicionar usuário ao projeto." });
 		}
@@ -153,13 +189,18 @@ class ProjectsController extends Controller {
 			return response.status(400).json({ message: "Usuário ou projeto não informado." });
 		}
 
-		const result = this.#ProjectInvitationComponent.sendProjectEmailInvitation(userIdToInvite, projectId);
+		const result = this.#ProjectInvitationComponent.sendProjectEmailInvitation(
+			userIdToInvite,
+			projectId
+		);
 
 		if (!result.success) {
 			return response.status(400).json({ message: result.message });
 		}
 
-		response.status(201).json({ message: "Convite enviado com sucesso.", successfullyInvited: true });
+		response
+			.status(201)
+			.json({ message: "Convite enviado com sucesso.", successfullyInvited: true });
 	}
 
 	/**
@@ -174,7 +215,8 @@ class ProjectsController extends Controller {
 			return response.status(400).json({ message: "Projeto não informado." });
 		}
 
-		const invitationLink = this.#ProjectInvitationComponent.createProjectInvitationLink(projectId);
+		const invitationLink =
+			this.#ProjectInvitationComponent.createProjectInvitationLink(projectId);
 		if (!invitationLink) {
 			return response.status(400).json({ message: "Erro ao criar link de convite." });
 		}
@@ -195,14 +237,21 @@ class ProjectsController extends Controller {
 		}
 
 		try {
-			const success = this.#ProjectInvitationComponent.validateEmailInvitation(userId, invitation);
+			const success = this.#ProjectInvitationComponent.validateEmailInvitation(
+				userId,
+				invitation
+			);
 			if (!success) {
 				return response.status(400).json({ message: "Convite inválido." });
 			}
 
-			response.status(200).json({ message: "Convite validado com sucesso.", inviteValidated: true });
+			response
+				.status(200)
+				.json({ message: "Convite validado com sucesso.", inviteValidated: true });
 		} catch (error) {
-			return response.status(400).json({ message: `Falha ao validar convite. Erro: ${error}` });
+			return response
+				.status(400)
+				.json({ message: `Falha ao validar convite. Erro: ${error}` });
 		}
 	}
 }
