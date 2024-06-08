@@ -12,13 +12,13 @@ import { ReactComponent as DotsIcon } from "assets/action-icons/dots.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { GetProjectsByUserId } from "functionalities/GetProjectsByUserId";
 import HeaderHome from "../../shared/login-registration/header-home/HeaderHome.js";
-import Popup from "../../shared/popup/Popup.js";
 import TextInputField from "../../shared/text-input-field/TextInputField";
 import { useAuthentication } from "context/AuthenticationContext";
-import { useNavigate } from "react-router-dom";
+import { useSystemPopups } from "context/popup/SystemPopupsContext";
 
 function HomeProjects() {
 	const { currentUserSession, performAuthenticatedRequest } = useAuthentication();
+	const { newPopup } = useSystemPopups();
 
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [isDialogAddPhotoOpen, setAddPhotoDialog] = useState(false);
@@ -29,8 +29,6 @@ function HomeProjects() {
 	const [projectNameUpdate, setProjectNameUpdate] = useState("");
 	const [projects, setProjects] = useState([]);
 	const [getUserName, setUserName] = useState(null);
-	const [isPopupVisible, setIsPopupVisible] = useState(false);
-	const [popupMessage, setPopupMessage] = useState("");
 
 	const fileInputRef = useRef(null);
 	const projectNameReference = useRef(null);
@@ -82,16 +80,6 @@ function HomeProjects() {
 		setDialogOptionsOpen(boolean);
 		setProjectDialog(project);
 		setProjectNameUpdate("");
-	}
-
-	function clickPopup(message) {
-		setPopupMessage(message);
-		setIsPopupVisible(true);
-	}
-
-	function closePopup() {
-		setIsPopupVisible(false);
-		setPopupMessage("");
 	}
 
 	/**
@@ -147,7 +135,7 @@ function HomeProjects() {
 
 		if (response.status === 201) {
 			fetchProjects();
-			clickPopup("Projeto cadastrado com sucesso !");
+			newPopup("Common", { severity: "success", message: "Projeto criado com sucesso !" });
 			setProjectName("");
 			setIsDialogOpen(false);
 		} else {
@@ -167,7 +155,7 @@ function HomeProjects() {
 
 		if (response.status === 200) {
 			fetchProjects();
-			clickPopup("Projeto deletado com sucesso !");
+			newPopup("Common", { severity: "error", message: "Projeto deletado com sucesso !" });
 			setProjectNameUpdate("");
 			setDialogOptionsOpen(false);
 		} else {
@@ -190,7 +178,10 @@ function HomeProjects() {
 
 		if (response.status === 200) {
 			fetchProjects();
-			clickPopup("Projeto atualizado com sucesso !");
+			newPopup("Common", {
+				severity: "success",
+				message: "Projeto atualizado com sucesso !",
+			});
 			setProjectNameUpdate("");
 			setDialogOptionsOpen(false);
 		} else {
@@ -436,8 +427,6 @@ function HomeProjects() {
 					</div>
 				</div>
 			)}
-
-			{isPopupVisible && <Popup message={popupMessage} onClose={closePopup} />}
 		</div>
 	);
 }
