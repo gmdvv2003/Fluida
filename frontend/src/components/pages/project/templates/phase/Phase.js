@@ -29,17 +29,23 @@ const Phase = React.forwardRef(
 
 		const performLazyLoaderUpdateRef = useRef(null);
 
+		const [isDialogOpen, setIsDialogOpen] = useState(false);
 		const [isDialogOpenProjectOptions, setDialogOptionsOpen] = useState(false);
 		const [getEnteredProjectDialog, setProjectDialog] = useState([]);
 		const [projectNameUpdate, setProjectNameUpdate] = useState("");
 		const projectNameUpdateReference = useRef(null);
 		const { performAuthenticatedRequest } = useAuthentication();
+		const projectNameReference = useRef(null);
 
 		/**
 		 *
 		 */
 		function handleCreateNewPhaseButtonClick() {
 			onCreateCardRequest(phase?.phaseDTO?.phaseId);
+		}
+
+		function handleNewProjectClickDialog(boolean) {
+			setIsDialogOpen(boolean);
 		}
 
 		function handleOptionsProjectClick(boolean, project) {
@@ -63,6 +69,10 @@ const Phase = React.forwardRef(
 				phase?.phaseDTO?.order
 			);
 		});
+
+		async function handleOnCreateProjectButton() {
+			const response = await performAuthenticatedRequest();
+		}
 
 		async function handleOnDeleteProjectButton(projectId) {
 			console.log(projectId);
@@ -118,7 +128,7 @@ const Phase = React.forwardRef(
 										/>
 										<PlusIcon
 											className="PP-header-icon-plus"
-											onClick={handleCreateNewPhaseButtonClick}
+											onClick={handleNewProjectClickDialog}
 										/>
 										<DotsIcon
 											className="PP-header-icon"
@@ -178,10 +188,10 @@ const Phase = React.forwardRef(
 										<div ref={lazyLoaderBottomOffsetRef} />
 									</div>
 									{isDialogOpenProjectOptions && (
-										<div className="HP-dialog-overlay">
-											<div className="HP-dialog-update-name-project-container">
-												<div className="HP-container-label-update-project-name">
-													<div className="HP-container-close-dialog-project-update">
+										<div className="PP-dialog-overlay">
+											<div className="PP-dialog-update-name-project-container">
+												<div className="PP-container-label-update-project-name">
+													<div className="PP-container-close-dialog-project-update">
 														<FontAwesomeIcon
 															onClick={() =>
 																handleOptionsProjectClick(false)
@@ -205,15 +215,15 @@ const Phase = React.forwardRef(
 															backgroundColor: "rgb(244, 244, 244)",
 														}}
 														name="projectUpdate"
-														placeholder="Novo nome do projeto"
+														placeholder="Novo nome da fase"
 														ref={projectNameUpdateReference}
 													/>
 												</div>
-												<div className="HP-container-buttons-update-project">
+												<div className="PP-container-buttons-update-project">
 													<button
-														className={`HP-button-update-project ${
+														className={`PP-button-update-project ${
 															projectNameUpdate.length <= 0
-																? "HP-button-update-project-disabled"
+																? "PP-button-update-project-disabled"
 																: ""
 														}`}
 														onClick={() =>
@@ -223,17 +233,63 @@ const Phase = React.forwardRef(
 														}
 														disabled={projectNameUpdate.length <= 0}
 													>
-														Atualizar projeto
+														Atualizar fase
 													</button>
 													<button
-														className="HP-button-delete-project"
+														className="PP-button-delete-project"
 														onClick={() =>
 															handleOnDeleteProjectButton(
 																getEnteredProjectDialog.projectId
 															)
 														}
 													>
-														Excluir projeto
+														Excluir fase
+													</button>
+												</div>
+											</div>
+										</div>
+									)}
+
+									{isDialogOpen && (
+										<div className="PP-dialog-overlay">
+											<div className="PP-dialog-new-project-container">
+												<div className="PP-container-close-dialog">
+													<FontAwesomeIcon
+														onClick={() =>
+															handleNewProjectClickDialog(false)
+														}
+														icon={faCircleXmark}
+														size="xl"
+														style={{
+															color: "#8c8c8c",
+															cursor: "pointer",
+															borderRadius: "50%",
+														}}
+													/>
+												</div>
+
+												<div>
+													<TextInputField
+														style={{
+															marginTop: "10px",
+															marginBottom: "10px",
+															borderRadius: "var(--border-radius)",
+															backgroundColor: "rgb(244, 244, 244)",
+														}}
+														name="project"
+														placeholder="Nome da fase"
+														ref={projectNameReference}
+													/>
+												</div>
+
+												<div className="PP-container-button-new-project">
+													<button
+														className="PP-button-new-project"
+														onClick={() =>
+															handleOnCreateProjectButton()
+														}
+													>
+														Criar nova fase
 													</button>
 												</div>
 											</div>
