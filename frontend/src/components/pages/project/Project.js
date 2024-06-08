@@ -207,8 +207,9 @@ class ProjectState {
 	 * Resposta do servidor para a criação de uma fase.
 	 *
 	 * @param {Object} phaseDTO
+	 * @returns {PhaseState}
 	 */
-	phaseCreated(phaseDTO, fromFetch = false) {
+	phaseCreated(phaseDTO, fromFetch = false, fromLazyLoader = false) {
 		phaseDTO = phaseDTO?.[0];
 		if (!phaseDTO) {
 			return null;
@@ -221,13 +222,19 @@ class ProjectState {
 		// Criar o estado da fase
 		const phaseState = new PhaseState(phaseDTO);
 
-		this.phases.push(phaseState);
+		// Adiciona a fase ao estado da fase
+		if (!fromLazyLoader) {
+			this.phases.push(phaseState);
+		}
+
 		this.phasesMap[phaseDTO.phaseId] = phaseState;
 
 		this.totalPhases += fromFetch ? 0 : 1;
 
 		// Atualizar o estado do projeto
 		this.#projectPhasesStateListeners.notify(phaseDTO);
+
+		return phaseState;
 	}
 
 	/**
@@ -257,8 +264,9 @@ class ProjectState {
 	 * Resposta do servidor para a criação de um card.
 	 *
 	 * @param {Object} cardDTO
+	 * @returns {CardState}
 	 */
-	cardCreated(cardDTO, fromFetch = false) {
+	cardCreated(cardDTO, fromFetch = false, fromLazyLoader = false) {
 		cardDTO = cardDTO?.[0];
 		if (!cardDTO) {
 			return null;
@@ -276,8 +284,11 @@ class ProjectState {
 		// Criar o estado do card
 		const cardState = new CardState(cardDTO);
 
-		// Adicionar o card ao estado da fase
-		phaseState.cards?.push(cardState);
+		// Adiciona o card ao estado da fase
+		if (!fromLazyLoader) {
+			phaseState.cards?.push(cardState);
+		}
+
 		phaseState.cardsMap[cardDTO.cardId] = cardState;
 
 		// Incrimenta o número total de cards
@@ -285,6 +296,8 @@ class ProjectState {
 
 		// Atualizar o estado do projeto
 		this.#projectCardsStateListeners.notify(cardDTO);
+
+		return cardState;
 	}
 
 	/**
@@ -440,10 +453,7 @@ function Project() {
 		});
 
 		// Atualiza a ordem da fase
-		phaseState.phaseDTO.order = newPosition + 1;
-
-		console.log("====================================");
-		console.log(projectState.getPhases(), projectState.getPhases().length);
+		phaseState.phaseDTO.order = newPosition;
 
 		// Atualiza a ordem das fases
 		performLazyLoaderUpdateRef.current();
@@ -655,14 +665,15 @@ function Project() {
 									fetchMore={(page) => {
 										return new Promise((resolve, reject) => {
 											return currentProjectSocket?.emit("fetchPhases", { page }, (response) => {
-												resolve(
-													response?.phases?.taken.map((taken) => new PhaseState(taken)) || []
-												);
+												resolve(response?.phases?.taken || []);
 											});
 										});
 									}}
 									getAvailableContentCountForFetch={async (sync = false) => {
 										return await projectState?.getTotalPhases(sync);
+									}}
+									insertFetchedElement={(element) => {
+										return projectState?.phaseCreated([element], true, true);
 									}}
 									// Tamanho da página
 									pageSize={10}

@@ -19,8 +19,9 @@ const LazyLoader = React.forwardRef(
 			direction,
 			fetchMore,
 			getAvailableContentCountForFetch,
-			getContent,
+			insertFetchedElement,
 			pageSize,
+			getContent,
 		},
 		ref
 	) => {
@@ -188,6 +189,10 @@ const LazyLoader = React.forwardRef(
 			 * @returns {Array}
 			 */
 			async function retrieveVisibleContent(start, end, lateFetch) {
+				if (getContent == undefined) {
+					return [];
+				}
+
 				end = Math.min(end, await getAvailableContentCountForFetch());
 
 				// Caso não tenha conteúdo, preenche a lista com conteúdo vazio
@@ -216,7 +221,10 @@ const LazyLoader = React.forwardRef(
 							);
 							fetchedContent.forEach((element, index) => {
 								const contentIndex = start + undefinedContentIndex + index;
-								getContent[contentIndex] = getContent[contentIndex] || element;
+								if (getContent[contentIndex] == undefined) {
+									getContent[contentIndex] =
+										insertFetchedElement != undefined ? insertFetchedElement(element) : element;
+								}
 							});
 
 							// Atualiza o conteúdo a ser exibido na tela

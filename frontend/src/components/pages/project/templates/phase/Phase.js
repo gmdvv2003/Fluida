@@ -73,7 +73,7 @@ const Phase = React.forwardRef(
 											}}
 										/>
 										<PlusIcon
-											className="PP-header-icon"
+											className="PP-header-icon-plus"
 											onClick={handleCreateNewPhaseButtonClick}
 										/>
 										<DotsIcon className="PP-header-icon" />
