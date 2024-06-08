@@ -5,53 +5,55 @@
 }
 
 .P-background {
-	overflow-x: auto;
-	overflow-y: hidden;
 	position: relative;
-	width: calc(100vw - var(--cards-column-gap));
-	height: calc(100vh - var(--header-height));
 	background-color: var(--background-color);
 	padding-left: var(--cards-column-gap);
+	width: calc(100vw - var(--cards-column-gap));
+	height: calc(100vh - var(--header-height));
+	overflow-x: auto;
+	overflow-y: hidden;
 }
 
 .P-phases-container-holder {
 	display: flex;
+	column-gap: var(--cards-column-gap);
 	justify-content: start;
 	align-items: center;
-	column-gap: var(--cards-column-gap);
+	padding-right: 50px;
 	width: fit-content;
 	height: 100%;
 }
 
 .P-phases-container {
-	margin: 0;
-	padding: 0;
 	display: flex;
 	column-gap: var(--cards-column-gap);
+	margin: 0;
+	padding: 0;
 	width: 100%;
 	height: calc(100% - var(--cards-padding));
 }
 
 .P-add-new-phase-button-container {
+	padding-bottom: var(--cards-padding);
 	width: var(--add-new-phase-button-scale);
 	height: var(--add-new-phase-button-scale);
-	padding-bottom: var(--cards-padding);
 }
 
 .P-add-new-phase-button {
-	width: var(--add-new-phase-button-scale);
-	height: var(--add-new-phase-button-scale);
-	padding: 0;
+	cursor: pointer;
 	margin: 0;
 	border: 0;
 	border: 2px solid rgb(215, 215, 215);
 	border-radius: 50%;
+	padding: 0;
+	width: var(--add-new-phase-button-scale);
+	height: var(--add-new-phase-button-scale);
 }
 
 .P-add-new-phase-button-icon {
+	transform: translate(-2px, -2px);
 	width: var(--add-new-phase-button-scale);
 	height: var(--add-new-phase-button-scale);
-	transform: translate(-2px, -2px);
 }
 
 @media screen and (max-width: 600px) {

@@ -1,9 +1,10 @@
-import { useState, createContext, useContext } from "react";
+import "./SystemPopupsContext.css";
+
+import { createContext, useContext, useState } from "react";
 
 import { CommonPopup } from "./popup-modals/common/CommonPopup";
 
 // Estilos padrões para o componente de popups
-import "./SystemPopupsContext.css";
 
 const POPUPS_MODAL_TYPES = {
 	Common: CommonPopup,
@@ -73,16 +74,23 @@ export function SystemPopupsProvider({ children }) {
 		<SystemPopupsContext.Provider value={systemPopupsProviderFunctions}>
 			<div className="SPC-popups-container">
 				{popups.map(({ PopupConstructor, popupData, isGettingDeleted }) => (
-					<div className={`SPC-popup-holder-background ${isGettingDeleted && "SPC-popup-background-out"}`}>
+					<div
+						key={popupData.uuid}
+						className={`SPC-popup-holder-background ${
+							isGettingDeleted ? "SPC-popup-background-out" : ""
+						}`}
+					>
 						<div
-							key={popupData.uuid}
-							className={`SPC-popup-holder ${isGettingDeleted ? "SPC-popup-out" : "SPC-popup-in"}`}
+							className={`SPC-popup-holder ${
+								isGettingDeleted ? "SPC-popup-out" : "SPC-popup-start"
+							}`}
 						>
 							{PopupConstructor(systemPopupsProviderFunctions, popupData)}
 						</div>
 					</div>
 				))}
 			</div>
+
 			{children}
 		</SystemPopupsContext.Provider>
 	);

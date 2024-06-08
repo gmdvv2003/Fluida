@@ -1,40 +1,75 @@
 :root {
-	--system-popup-container-width: 400px;
-	--system-popup-container-height: 50px;
+    --system-popup-container-width: 400px;
+    --system-popup-container-height: 50px;
 }
 
 .SPC-popups-container {
-	z-index: 1000;
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-start;
-	align-items: center;
-	top: calc(var(--header-height) + 64px);
-	left: calc(100% - var(--system-popup-container-width));
-	width: var(--system-popup-container-width);
-	height: 800px;
-	position: fixed;
+    display: flex;
+    position: fixed;
+    top: calc(var(--header-height));
+    right: 0;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    z-index: 1000;
+    width: var(--system-popup-container-width);
+    height: 200px;
 }
 
 .SPC-popup-holder-background {
-	width: 100%;
-	height: var(--system-popup-container-height);
-	padding-bottom: 10px;
+	padding-right: 10px;
+    padding-bottom: 10px;
+    width: 100%;
+    height: var(--system-popup-container-height);
 }
 
 .SPC-popup-holder {
-	width: 100%;
-	height: var(--system-popup-container-height);
+    animation: slideIn 1s forwards;
+    border-radius: 8px;
+    padding-right: 20px;
+    padding-bottom: 10px;
+    padding-left: 20px;
+    width: 100%;
+    height: var(--system-popup-container-height);
+}
+
+/* Keyframes para a animação de entrada */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Keyframes para a animação de saída */
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Estado inicial fora da tela à direita */
+.SPC-popup-start {
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+/* Animação de saída (da esquerda para a direita) */
+.SPC-popup-out {
+    animation: slideOut 1s forwards;
 }
 
 .SPC-popup-background-out {
-	transition: height 1s linear 1s, padding-bottom 1s linear 1s;
-	height: 0px;
-	padding-bottom: 0px;
-}
-
-.SPC-popup-out {
-	transition: transform 1s, opacity 1.5s;
-	transform: translateX(100%);
-	opacity: 0;
+    transition: height 1s linear 1s, padding-bottom 1s linear 1s;
+    padding-bottom: 0px;
+    height: 0px;
 }
