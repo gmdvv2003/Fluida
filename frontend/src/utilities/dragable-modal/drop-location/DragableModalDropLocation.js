@@ -1,80 +1,101 @@
+import { useEffect } from "react";
+
 function DragableModalDropLocation({
 	createPlaceholder,
-	getDropoffIndex,
 	getComponentFromRef,
+	getComponentOrderFromData,
 	getComponentDataFromRef,
 	getAssociatedPlaceholder,
+	getDropoffIndex,
 	addPlaceholder,
 	removePlaceholder,
 	associatePlaceholder,
 	onDragBeginRef,
 	onDragEndRef,
 	onDragMoveRef,
-	onDragConcludeCallback,
+	onDragConcludedCallback,
+	children,
 }) {
-	/**
-	 *
-	 * @param {*} ref
-	 * @param {*} _
-	 * @param {*} event
-	 */
-	function onDragBegin(ref, _, event) {
-		const { current, data, index } = getComponentDataFromRef(ref);
-		lazyLoaderRef.current?.associatePlaceholder(
-			current,
-			lazyLoaderRef.current?.addPlaceholder(index, constructPhasePlaceholder, data?.phaseDTO)
-		);
-	}
+	useEffect(() => {
+		/**
+		 *
+		 * @param {*} ref
+		 * @param {*} _
+		 * @param {*} event
+		 */
+		function onDragBegin(ref, _, event) {
+			const { current, data, index } = getComponentDataFromRef(ref);
+			associatePlaceholder(current, addPlaceholder(index, createPlaceholder, data));
+		}
 
-	/**
-	 *
-	 * @param {*} ref
-	 * @param {*} _
-	 * @param {*} event
-	 */
-	function onDragEnd(ref, _, event) {
-		// Pega o componente associado ao ref
-		const { current, data } = getComponentDataFromRef(ref);
+		/**
+		 *
+		 * @param {*} ref
+		 * @param {*} _
+		 * @param {*} event
+		 */
+		function onDragEnd(ref, _, event) {
+			// Pega o componente associado ao ref
+			const { current, data } = getComponentDataFromRef(ref);
 
-		// Pega o UUID do placeholder associado ao elemento
-		const { uuid } = getAssociatedPlaceholder(current);
+			// Pega o UUID do placeholder associado ao elemento
+			const { uuid } = getAssociatedPlaceholder(current);
 
-		// Remove o placeholder associado ao elemento
-		lazyLoaderRef.current?.removePlaceholder(uuid);
+			// Remove o placeholder associado ao elemento
+			removePlaceholder(uuid);
 
-		// Novo índice de ordem da fase
-		let newOrderIndex = getNewPhaseOrderIndex(event.clientX);
-		newOrderIndex += newOrderIndex >= data?.phaseDTO?.order ? 1 : 0;
+			// Novo índice de ordem da fase
+			let newOrderIndex = getDropoffIndex(event.clientX);
+			newOrderIndex += newOrderIndex >= getComponentOrderFromData(data) || 0;
 
-		// Manda um evento para o servidor para mover a fase
-		currentProjectSocket?.emit("movePhase", {
-			phaseId: data?.phaseDTO?.phaseId,
-			targetPositionIndex: newOrderIndex,
-		});
-	}
+			if (onDragConcludedCallback && typeof onDragConcludedCallback === "function") {
+				onDragConcludedCallback(data, newOrderIndex);
+			}
+		}
 
-	/**
-	 *
-	 * @param {*} ref
-	 * @param {*} _
-	 * @param {*} event
-	 */
-	function onDragMove(ref, _, event) {
-		// Pega o componente associado ao ref
-		const { current, data } = getComponentDataFromRef(ref);
+		/**
+		 *
+		 * @param {*} ref
+		 * @param {*} _
+		 * @param {*} event
+		 */
+		function onDragMove(ref, _, event) {
+			// Pega o componente associado ao ref
+			const { current, data } = getComponentDataFromRef(ref);
 
-		// Pega o placeholder associado ao elemento
-		const { getReference } = getAssociatedPlaceholder(current);
+			// Pega o placeholder associado ao elemento
+			const { getReference } = getAssociatedPlaceholder(current);
 
-		const { clientX } = event;
+			const { clientX } = event;
 
-		// Novo índice de ordem da fase
-		let newOrderIndex = getNewPhaseOrderIndex(clientX);
-		newOrderIndex += newOrderIndex >= data?.phaseDTO?.order ? 1 : 0;
+			// Novo índice de ordem da fase
+			let newOrderIndex = getDropoffIndex(clientX);
+			newOrderIndex += newOrderIndex >= getComponentOrderFromData(data) || 0;
 
-		// Atualiza a ordem da fase
-		getReference().style.order = newOrderIndex;
-	}
+			// Atualiza a ordem da fase
+			getReference().style.order = newOrderIndex;
+		}
+
+		onDragBeginRef.current = onDragBegin;
+		onDragEndRef.current = onDragEnd;
+		onDragMoveRef.current = onDragMove;
+
+		return () => {
+			onDragBeginRef.current = null;
+			onDragEndRef.current = null;
+			onDragMoveRef.current = null;
+		};
+	}, [
+		addPlaceholder,
+		removePlaceholder,
+		associatePlaceholder,
+		onDragBeginRef,
+		onDragEndRef,
+		onDragMoveRef,
+		onDragConcludedCallback,
+	]);
+
+	return children;
 }
 
 export default DragableModalDropLocation;

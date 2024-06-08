@@ -70,7 +70,7 @@ class EmailTransporter {
 
 				// Envia o email e espera por uma resposta
 				TRANSPORTER.sendMail(mailOptions)
-					.then(() => {
+					.then((x) => {
 						resolve({ success: true });
 					})
 					.catch((error) => {

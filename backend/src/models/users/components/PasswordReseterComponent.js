@@ -31,7 +31,7 @@ class PasswordReseterComponent {
 		user.passwordResetToken = token;
 
 		try {
-			const { affected } = await this.Controller.Service.updateUser(user);
+			const { affected } = await this.Controller.Service.updateUser(user, ["passwordResetToken"]);
 			if (affected < 1) {
 				return false;
 			}
@@ -81,7 +81,7 @@ class PasswordReseterComponent {
 		user.passwordResetToken = undefined;
 
 		try {
-			const { affected } = await this.Controller.Service.updateUser(user);
+			const { affected } = await this.Controller.Service.updateUser(user, ["password", "passwordResetToken"]);
 			if (affected < 1) {
 				return { success: false };
 			}

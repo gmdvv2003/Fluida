@@ -5,6 +5,7 @@ import React, { useEffect, useState, useImperativeHandle, useRef } from "react";
 const LazyLoader = React.forwardRef(
 	(
 		{
+			canFillWithContent,
 			update,
 			topLeftOffset,
 			bottomRightOffset,
@@ -140,7 +141,9 @@ const LazyLoader = React.forwardRef(
 				 * @param {*} uuid
 				 */
 				removePlaceholder: (uuid) => {
-					placeholdersContent.current = placeholdersContent.current.filter((placeholder) => placeholder.uuid != uuid);
+					placeholdersContent.current = placeholdersContent.current.filter(
+						(placeholder) => placeholder.uuid != uuid
+					);
 
 					// Remove a associação do placeholder ao elemento
 					ref.current.removePlaceholderAssociation(uuid);
@@ -149,6 +152,14 @@ const LazyLoader = React.forwardRef(
 					setVisibleContent((visibleContent) => {
 						return visibleContent.filter((element) => element.uuid != uuid);
 					});
+				},
+
+				settings: {
+					width,
+					height,
+					margin,
+					padding,
+					direction,
 				},
 			}),
 			[]
@@ -187,7 +198,9 @@ const LazyLoader = React.forwardRef(
 				}
 
 				// Pega a "fatia" do conteúdo que está sendo exibido no momento e verifica se há algum elemento indefinido
-				const undefinedContentIndex = getContent.slice(start, end).findIndex((element) => element === undefined);
+				const undefinedContentIndex = getContent
+					.slice(start, end)
+					.findIndex((element) => element === undefined);
 
 				if (undefinedContentIndex > -1) {
 					if (end !== lastSectionEnd || start !== lastSectionStart) {
@@ -198,7 +211,9 @@ const LazyLoader = React.forwardRef(
 
 						// Inicia um novo timeout
 						sectionFetchTimeoutId = setTimeout(async () => {
-							const fetchedContent = await fetchMore(Math.floor((start + undefinedContentIndex) / pageSize));
+							const fetchedContent = await fetchMore(
+								Math.floor((start + undefinedContentIndex) / pageSize)
+							);
 							fetchedContent.forEach((element, index) => {
 								const contentIndex = start + undefinedContentIndex + index;
 								getContent[contentIndex] = getContent[contentIndex] || element;

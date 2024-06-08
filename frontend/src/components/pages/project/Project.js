@@ -6,6 +6,7 @@ import { Navigate, useParams } from "react-router-dom";
 import { ReactComponent as AddButtonIcon } from "assets/action-icons/add-circle-unlined.svg";
 
 import { useProjectAuthentication } from "context/ProjectAuthenticationContext";
+import { useSystemPopups } from "context/popup/SystemPopupsContext";
 
 import HomeHeader from "components/shared/login-registration/header-home/HeaderHome";
 
@@ -86,9 +87,6 @@ class ProjectState {
 		})
 			.then(() => {})
 			.catch(() => {});
-
-		// Fetch das fases inicial
-		socket.emit("fetchPhases", { page: 0 });
 
 		this.#socket = socket;
 	}
@@ -216,6 +214,10 @@ class ProjectState {
 			return null;
 		}
 
+		if (this.getPhaseState(phaseDTO.phaseId)) {
+			return null;
+		}
+
 		// Criar o estado da fase
 		const phaseState = new PhaseState(phaseDTO);
 
@@ -262,15 +264,19 @@ class ProjectState {
 			return null;
 		}
 
-		// Adicionar o card ao estado da fase
 		const phaseState = this.getPhaseState(cardDTO.phaseId);
 		if (!phaseState) {
+			return null;
+		}
+
+		if (this.getCardState(cardDTO.phaseId, cardDTO.cardId)) {
 			return null;
 		}
 
 		// Criar o estado do card
 		const cardState = new CardState(cardDTO);
 
+		// Adicionar o card ao estado da fase
 		phaseState.cards?.push(cardState);
 		phaseState.cardsMap[cardDTO.cardId] = cardState;
 
@@ -312,12 +318,12 @@ class ProjectState {
 	 */
 	phasesFetched(phases) {
 		phases = phases?.[0]?.taken?.filter(({ phaseId }) => this.phasesMap[phaseId] == undefined);
-		phases.forEach(({ phaseId, phase }) => {
+		phases.forEach((phase) => {
 			// Cria o estado da fase
 			this.phaseCreated([phase], true);
 
 			// Realiza o fetch dos cards da fase inicial
-			this.#socket.emit("fetchCards", { page: 0, phaseId: phaseId });
+			this.#socket.emit("fetchCards", { page: 0, phaseId: phase?.phaseId });
 		});
 	}
 
@@ -328,9 +334,9 @@ class ProjectState {
 	 * @param {Array} cards
 	 */
 	cardsFetched(phaseId, cards) {
-		cards?.taken?.forEach((cardDTO) => {
+		cards?.taken?.forEach((card) => {
 			// Cria o estado do card
-			this.cardCreated([cardDTO], true);
+			this.cardCreated([card], true);
 		});
 	}
 
@@ -361,6 +367,7 @@ function Project() {
 
 	const { projectId, cardId } = useParams();
 	const { getProjectSession } = useProjectAuthentication();
+	const { newPopup } = useSystemPopups();
 
 	const [projectState, setProjectState] = useState(null);
 
@@ -371,6 +378,13 @@ function Project() {
 	const lazyLoaderBottomOffsetRef = useRef(null);
 
 	const lazyLoaderRef = useRef(null);
+	const dragableModalDropLocationRef = useRef(null);
+
+	const dragableModalOnDragBeginRef = useRef(null);
+	const dragableModalOnDragEndRef = useRef(null);
+	const dragableModalOnDragMoveRef = useRef(null);
+
+	const performLazyLoaderUpdateRef = useRef(null);
 
 	const [waitingForReconnect, setWaitingForReconnect] = useState(false);
 	const [redirectToHome, setRedirectToHome] = useState(false);
@@ -391,14 +405,66 @@ function Project() {
 		setIsProjectUsersModalVisible(!isProjectUsersModalVisible);
 	}
 
+	// ============================== Drag n Drop ============================== //
+	/**
+	 * Função chamada quando o drag de um elemento é concluído.
+	 *
+	 * @param {phaseDTO} phase
+	 * @param {number} newPosition
+	 */
+	function onDragConcluded({ phaseDTO }, newPosition) {
+		currentProjectSocket?.emit(
+			"movePhase",
+			{ phaseId: phaseDTO?.phaseId, targetPositionIndex: newPosition },
+			(success, data) => {
+				!success && newPopup("Common", { severity: "error", message: "Erro ao mover a fase" });
+			}
+		);
+
+		const phaseState = projectState.getPhaseState(phaseDTO?.phaseId);
+
+		// "Salva" a ordem atual da fase
+		const currentPhaseOrder = phaseState.phaseDTO.order;
+
+		// Ajusta a ordem das outras fases
+		projectState.getPhases().forEach((phaseState) => {
+			if (phaseState.phaseDTO.phaseId == phaseDTO.phaseId) {
+				return null;
+			}
+
+			if (phaseState.phaseDTO.order < currentPhaseOrder && phaseState.phaseDTO.order >= newPosition) {
+				phaseState.phaseDTO.order += 1;
+			} else if (phaseState.phaseDTO.order > currentPhaseOrder && phaseState.phaseDTO.order <= newPosition) {
+				phaseState.phaseDTO.order -= 1;
+			}
+		});
+
+		// Atualiza a ordem da fase
+		phaseState.phaseDTO.order = newPosition + 1;
+
+		console.log("====================================");
+		console.log(projectState.getPhases(), projectState.getPhases().length);
+
+		// Atualiza a ordem das fases
+		performLazyLoaderUpdateRef.current();
+	}
+
 	// ============================== Criação de fases e cards ============================== //
 	/**
 	 * Cria uma nova fase.
 	 */
 	function handleCreateNewPhaseButtonClick() {
-		currentProjectSocket?.emit("createPhase", {
-			phaseName: "Nova Fase",
-		});
+		currentProjectSocket?.emit(
+			"createPhase",
+			{
+				phaseName: "Nova Fase",
+			},
+			(success, data) => {
+				success
+					? newPopup("Common", { severity: "success", message: "Fase criada com sucesso" })
+					: newPopup("Common", { severity: "error", message: "Erro ao criar a fase" });
+			}
+		);
 	}
 
 	/**
@@ -406,11 +472,19 @@ function Project() {
 	 *
 	 * @param {number} phaseId
 	 */
-	function handleCreateNewPhaseCardButtonClick(phaseId) {
-		currentProjectSocket?.emit("createCard", {
-			phaseId,
-			cardName: "Novo Card",
-		});
+	function handleCreateNewCardButtonClick(phaseId) {
+		currentProjectSocket?.emit(
+			"createCard",
+			{
+				phaseId,
+				cardName: "Novo Card",
+			},
+			(success, data) => {
+				success
+					? newPopup("Common", { severity: "success", message: "Card criado com sucesso" })
+					: newPopup("Common", { severity: "error", message: "Erro ao criar o card" });
+			}
+		);
 	}
 
 	// ============================== Socket ============================== //
@@ -475,6 +549,11 @@ function Project() {
 		socket.on("phasesFetched", phasesFetched);
 		socket.on("cardsFetched", cardsFetched);
 
+		// Listeners do estado do projeto
+		const unbindOnProjectPhaseStateChange = newProjectState.onProjectPhasesStateChange((phases) => {
+			performLazyLoaderUpdateRef.current();
+		});
+
 		return () => {
 			// Remove o socket do projeto
 			setCurrentProjectSocket(null);
@@ -495,6 +574,8 @@ function Project() {
 
 			socket.off("phasesFetched", phasesFetched);
 			socket.off("cardsFetched", cardsFetched);
+
+			unbindOnProjectPhaseStateChange();
 		};
 	}, [projectId]);
 
@@ -515,51 +596,82 @@ function Project() {
 					<div className="P-phases-container-holder">
 						<ol className="P-phases-container" ref={phasesContainerRef}>
 							<div ref={lazyLoaderTopOffsetRef} />
-							<LazyLoader
-								// Referências para os offsets
-								topLeftOffset={lazyLoaderBottomOffsetRef}
-								bottomRightOffset={lazyLoaderBottomOffsetRef}
-								// Container e barra de rolagem
-								container={phasesContainerRef}
-								scrollBar={phasesContainerScrollBarRef}
-								// Função para construir os elementos
-								constructElement={(phase, _, isLoading, setReference) => (
-									<Phase
-										onCreateCardRequest={handleCreateNewPhaseCardButtonClick}
-										isLoading={isLoading}
-										phase={phase}
-										projectState={projectState}
-										currentProjectSocket={currentProjectSocket}
-										// dragBegin={handlePhaseDragBegin}
-										// dragEnd={handlePhaseDragEnd}
-										// dragMove={handlePhaseDragMove}
-										ref={(element) => setReference(element)}
-									/>
-								)}
-								// Dimensões dos elementos
-								width={320}
-								margin={20}
-								padding={20}
-								// Direção de rolagem
-								direction={"horizontal"}
-								// Funções de controle do conteúdo
-								fetchMore={(page) => {
-									return new Promise((resolve, reject) => {
-										return currentProjectSocket?.emit("fetchPhases", { page }, (response) => {
-											resolve(response?.phases?.taken.map((taken) => new PhaseState(taken)) || []);
+							<DragableModalDropLocationWithLazyLoader
+								lazyLoaderRef={lazyLoaderRef}
+								// Função para criar um placeholder
+								createPlaceholder={(setPlaceholder, { order }) => {
+									return (
+										<div
+											className="PP-background PP-background-placeholder"
+											style={{ order: order + 1 }}
+											ref={(element) => setPlaceholder(element)}
+										/>
+									);
+								}}
+								// Referência para o dragable modal
+								getComponentFromRef={(ref) => {
+									return ref.current?.children?.[0];
+								}}
+								// Função para obter a ordem de um elemento
+								getComponentOrderFromData={({ phaseDTO }) => {
+									return phaseDTO?.order;
+								}}
+								// Referências das funções de drag
+								dragBeginRef={dragableModalOnDragBeginRef}
+								dragEndRef={dragableModalOnDragEndRef}
+								dragMoveRef={dragableModalOnDragMoveRef}
+								dragConcludedCallback={onDragConcluded}
+							>
+								<LazyLoader
+									// Função para atualizar o lazy loader
+									update={performLazyLoaderUpdateRef}
+									// Referências para os offsets
+									topLeftOffset={lazyLoaderBottomOffsetRef}
+									bottomRightOffset={lazyLoaderBottomOffsetRef}
+									// Container e barra de rolagem
+									container={phasesContainerRef}
+									scrollBar={phasesContainerScrollBarRef}
+									// Função para construir os elementos
+									constructElement={(phase, _, isLoading, setReference) => (
+										<Phase
+											onCreateCardRequest={handleCreateNewCardButtonClick}
+											isLoading={isLoading}
+											phase={phase}
+											projectState={projectState}
+											currentProjectSocket={currentProjectSocket}
+											dragBegin={dragableModalOnDragBeginRef.current}
+											dragEnd={dragableModalOnDragEndRef.current}
+											dragMove={dragableModalOnDragMoveRef.current}
+											ref={(element) => setReference(element)}
+										/>
+									)}
+									// Dimensões dos elementos
+									width={320}
+									margin={20}
+									padding={20}
+									// Direção de rolagem
+									direction={"horizontal"}
+									// Funções de controle do conteúdo
+									fetchMore={(page) => {
+										return new Promise((resolve, reject) => {
+											return currentProjectSocket?.emit("fetchPhases", { page }, (response) => {
+												resolve(
+													response?.phases?.taken.map((taken) => new PhaseState(taken)) || []
+												);
+											});
 										});
-									});
-								}}
-								getAvailableContentCountForFetch={async (sync = false) => {
-									return await projectState?.getTotalPhases(sync);
-								}}
-								// Tamanho da página
-								pageSize={10}
-								// Função para obter o conteúdo
-								getContent={projectState?.getPhases()}
-								// Referência para o lazy loader
-								ref={lazyLoaderRef}
-							/>
+									}}
+									getAvailableContentCountForFetch={async (sync = false) => {
+										return await projectState?.getTotalPhases(sync);
+									}}
+									// Tamanho da página
+									pageSize={10}
+									// Função para obter o conteúdo
+									getContent={projectState?.getPhases()}
+									// Referência para o lazy loader
+									ref={lazyLoaderRef}
+								/>
+							</DragableModalDropLocationWithLazyLoader>
 							<div ref={lazyLoaderBottomOffsetRef} />
 						</ol>
 

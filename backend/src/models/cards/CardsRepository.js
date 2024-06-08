@@ -12,11 +12,13 @@ class CardsRepository extends Repository {
 	 * Trigger que adiciona o cartão à fase.
 	 */
 	async afterInsert_addCardToPhasesCards({ entity }) {
-		await this.Service.Service.PhasesService.PhasesCardsService.addPhaseToProjectPhases(
+		await this.Service.Service.Controller.PhasesService.PhasesCardsService.addPhaseToProjectPhases(
 			entity.phaseId,
 			entity.projectId
 		);
 	}
+
+	async afterDelete_removeCardFromPhasesCards({ entity }) {}
 
 	constructor(service) {
 		super(service, CardsDTO);
@@ -30,9 +32,7 @@ class CardsRepository extends Repository {
 	 * @returns {CardsDTO}
 	 */
 	async getCardById(cardId) {
-		return await this.Repository.createQueryBuilder("Cards")
-			.where(`cardId = :cardId`, { cardId })
-			.getOne();
+		return await this.Repository.createQueryBuilder("Cards").where(`cardId = :cardId`, { cardId }).getOne();
 	}
 
 	/**
@@ -42,11 +42,7 @@ class CardsRepository extends Repository {
 	 * @returns {InsertResult}
 	 */
 	async createCard(cardsDTO) {
-		return await this.Repository.createQueryBuilder("Cards")
-			.insert()
-			.into("Cards")
-			.values(cardsDTO)
-			.execute();
+		return await this.Repository.createQueryBuilder("Cards").insert().into("Cards").values(cardsDTO).execute();
 	}
 
 	/**

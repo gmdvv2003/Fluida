@@ -34,7 +34,7 @@ function Paginate({ GROUP_BY }) {
 			PAGE = PAGE || 1;
 			PAGE_SIZE = PAGE_SIZE || 10;
 
-			const { repository, query } = await handler.apply(this, [data]);
+			const { repository, query, pick } = await handler.apply(this, [data]);
 			if (!query) {
 				throw new Error("Métodos paginados devem retornar um objeto com a propriedade 'query'");
 			}
@@ -45,7 +45,11 @@ function Paginate({ GROUP_BY }) {
 			query.order = { [GROUP_BY]: "ASC" };
 
 			// Realiza a busca no banco de dados.
-			const [taken, total] = await repository.findAndCount(query);
+			let [taken, total] = await repository.findAndCount(query);
+
+			if (pick != undefined) {
+				taken = taken.map((item) => item[pick]);
+			}
 
 			// Verifica se existe uma próxima página.
 			const hasNextPage = (PAGE - 1) * PAGE_SIZE < total;

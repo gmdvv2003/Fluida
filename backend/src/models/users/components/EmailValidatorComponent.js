@@ -28,7 +28,7 @@ class EmailValidatorComponent {
 		user.emailValidationToken = token;
 
 		try {
-			const { affected } = await this.Controller.Service.updateUser(user);
+			const { affected } = await this.Controller.Service.updateUser(user, ["emailValidationToken"]);
 			if (affected < 1) {
 				return false;
 			}
@@ -68,7 +68,7 @@ class EmailValidatorComponent {
 		user.emailVerified = true;
 
 		try {
-			const { affected } = await this.Controller.Service.updateUser(user);
+			const { affected } = await this.Controller.Service.updateUser(user, ["emailVerified"]);
 			if (affected < 1) {
 				return false;
 			}

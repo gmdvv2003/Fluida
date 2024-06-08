@@ -34,7 +34,7 @@ class ProjectsPhasesRepository extends Repository {
 			// select: { phase: true, log: true },
 		};
 
-		return { repository: this.Repository, query: query };
+		return { repository: this.Repository, query: query, pick: "phase" };
 	}
 
 	/**

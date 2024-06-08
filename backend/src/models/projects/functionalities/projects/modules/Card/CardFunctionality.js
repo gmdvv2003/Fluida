@@ -1,4 +1,5 @@
 const { Socket, Namespace } = require("socket.io");
+const CardsDTO = require("../../../../../cards/CardsDTO");
 
 class CardFunctionality {
 	constructor(_, inject) {
@@ -18,7 +19,16 @@ class CardFunctionality {
 	 */
 	#IOCreateCard(projectsIO, socket, project, data) {}
 
-	#IODeleteCard(projectsIO, socket, project, data) {}
+	#IODeleteCard(projectsIO, socket, project, { cardId }) {
+		const cardDTO = new CardsDTO({ cardId });
+
+		// Deleta o card do banco de dados
+		this.ProjectsController.CardsService.deleteCard(cardDTO)
+			.then(({ generatedMaps }) => {
+				console.log(generatedMaps);
+			})
+			.catch((error) => socket.emit("error", { message: "Erro ao deletar o card", error: error }));
+	}
 
 	#IOUpdateCard(projectsIO, socket, project, data) {}
 

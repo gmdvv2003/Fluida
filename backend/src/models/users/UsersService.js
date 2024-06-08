@@ -70,8 +70,8 @@ class UsersService extends Service {
 	 * @param {UsersDTO} userDTO
 	 * @returns {UsersDTO}
 	 */
-	async updateUser(userDTO) {
-		return await this.#UsersRepository.updateUser(userDTO);
+	async updateUser(userDTO, fieldsToUpdate = []) {
+		return await this.#UsersRepository.updateUser(userDTO, fieldsToUpdate);
 	}
 
 	// ==================================== Métodos Abertos ==================================== //
@@ -90,12 +90,12 @@ class UsersService extends Service {
 		const userDTO = new UsersDTO({ firstName, lastName, email, phoneNumber, password });
 
 		try {
-			const { raw } = await this.#UsersRepository.register(userDTO);
+			const { raw, identifiers } = await this.#UsersRepository.register(userDTO);
 			if (raw?.affectedRows != 1) {
 				return { success: false, message: "Erro ao registrar usuário." };
 			}
 
-			return { success: true, user: userDTO };
+			return { success: true, user: { ...userDTO, ...identifiers[0] } };
 		} catch (error) {
 			if (error instanceof InvalidInputParameter) {
 				return { success: false, message: "Parâmetros inválidos." };

@@ -23,7 +23,7 @@ class PhaseFunctionality {
 	 * @param {Object} data
 	 */
 	@Validate({ NAME: "phaseName", TYPE: "string", LENGTH: 100, INDEX: 3 })
-	#IOCreatePhase(projectsIO, socket, project, data) {
+	#IOCreatePhase(projectsIO, socket, project, data, acknowledgement) {
 		// Cria um DTO para a fase
 		let phaseDTO = new PhasesDTO({
 			projectId: project.projectId,
@@ -43,8 +43,16 @@ class PhaseFunctionality {
 
 				// Emite o evento de criação da fase
 				projectsIO.to(project.projectId).emit("phaseCreated", phaseDTO);
+
+				// Emite a resposta pessoal do evento
+				acknowledgement && acknowledgement(true, { phase: phaseDTO });
 			})
-			.catch((error) => socket.emit("error", { message: "Erro ao criar a fase", error: error }));
+			.catch((error) => {
+				socket.emit("error", { message: "Erro ao criar a fase", error: error });
+
+				// Emite a resposta pessoal do evento
+				acknowledgement && acknowledgement(false, { error: error });
+			});
 	}
 
 	#IODeletePhase(projectsIO, socket, project, data) {}

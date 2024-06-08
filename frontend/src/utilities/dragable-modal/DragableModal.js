@@ -62,8 +62,6 @@ const DragableModal = React.forwardRef(({ order, elements, callbacks }, ref) => 
 				: null,
 		];
 
-		console.log(listeners);
-
 		return () => {
 			listeners.forEach((remove) => remove != null && remove());
 		};

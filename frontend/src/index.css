@@ -23,7 +23,7 @@
 
 	--background-color: rgb(255, 255, 255);
 
-	--background-elements-color: #f4f4f4
+	--background-elements-color: #f4f4f4;
 }
 
 body {
@@ -53,4 +53,10 @@ code {
 input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
 	display: none;
+}
+
+@media screen and (max-width: 1100px) {
+	:root {
+		--header-height: 170px;
+	}
 }

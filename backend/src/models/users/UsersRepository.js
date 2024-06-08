@@ -46,12 +46,19 @@ class UsersRepository extends Repository {
 	 * Atualiza um usuário no banco de dados.
 	 *
 	 * @param {UsersDTO} usersDTO
+	 * @param {string[]} fieldsToUpdate
 	 * @returns {UpdateResult}
 	 */
-	async updateUser(usersDTO) {
+	async updateUser(usersDTO, fieldsToUpdate) {
+		if (fieldsToUpdate == undefined || fieldsToUpdate == undefined) {
+			throw new Error("Parâmetros inválidos.");
+		}
+
 		return await this.Repository.createQueryBuilder("Users")
 			.update()
-			.set(usersDTO)
+			.set({
+				...fieldsToUpdate.reduce((accumulator, field) => ({ ...accumulator, [field]: usersDTO[field] }), {}),
+			})
 			.where(`userId = :userId`, usersDTO)
 			.execute();
 	}
@@ -106,11 +113,6 @@ class UsersRepository extends Repository {
 		// Verifica se o email do usuário foi verificado
 		if (!user.emailVerified) {
 			throw new UserNotVerified();
-		}
-
-		// Verifica se o usuário já está logado
-		if (user.sessionToken != null && user.sessionToken != "") {
-			throw new UserAlreadyLogged();
 		}
 
 		const session = Session.newSession({ userId: user.userId, email: user.email });

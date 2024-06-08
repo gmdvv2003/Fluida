@@ -99,7 +99,12 @@ class Project {
 	 */
 	async getCards(page, phaseId) {
 		const phasesCardsService = this.ProjectsController.PhasesService.PhasesCardsService;
-		return await this.#fetchMore(this.#cards, phasesCardsService.getCardsOfPhase.bind(phasesCardsService), page, phaseId);
+		return await this.#fetchMore(
+			this.#cards,
+			phasesCardsService.getCardsOfPhase.bind(phasesCardsService),
+			page,
+			phaseId
+		);
 	}
 
 	/**
@@ -137,7 +142,8 @@ class Project {
 	async getTotalPhasesInProject() {
 		// Retorno o valor já calculado caso ele exista, caso contrário, é feita a busca no banco de dados
 		this.#totalPhasesInProject =
-			this.#totalPhasesInProject || (await this.ProjectsController.Service.getTotalPhasesInProject(this.projectId)?.totalPhases);
+			this.#totalPhasesInProject ||
+			(await this.ProjectsController.Service.getTotalPhasesInProject(this.projectId))?.totalPhases;
 		return this.#totalPhasesInProject;
 	}
 

@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Router } from "react-router-dom";
 
 import { AuthenticationProvider } from "context/AuthenticationContext";
 import { ProjectAuthenticationProvider } from "context/ProjectAuthenticationContext";
+import { SystemPopupsProvider } from "context/popup/SystemPopupsContext";
 
 import PrivateRoute from "functionalities/PrivateRoute";
 import ParticipateInProject from "functionalities/ParticipateInProject";
@@ -21,134 +22,138 @@ const ValidateEmail = lazy(() => import("components/pages/validate-email/Validat
 const HomeProjects = lazy(() => import("components/pages/home-projects/HomeProjects"));
 const Project = lazy(() => import("components/pages/project/Project"));
 const LandingPage = lazy(() => import("components/pages/landing-page/LandingPage"));
-const AcceptProjectInvitation = lazy(() => import("components/pages/accept-project-invitation/AcceptProjectInvitation"));
+const AcceptProjectInvitation = lazy(() =>
+	import("components/pages/accept-project-invitation/AcceptProjectInvitation")
+);
 const RequestValidationEmail = lazy(() => import("components/pages/request-validation-email/RequestValidationEmail"));
 
 function App() {
 	return (
-		<AuthenticationProvider>
-			<ProjectAuthenticationProvider>
-				<BrowserRouter>
-					<LoginRedirect />
-					<Routes>
-						{/* Rotas Públicas */}
-						<Route
-							path="*"
-							element={
-								<Suspense fallback={<Loading />}>
-									<LandingPage />
-								</Suspense>
-							}
-						/>
-
-						<Route
-							path="/registration"
-							element={
-								<Suspense fallback={<Loading />}>
-									<Registration />
-								</Suspense>
-							}
-						/>
-
-						<Route
-							path="/login"
-							element={
-								<LoginRoutePrivacy>
+		<SystemPopupsProvider>
+			<AuthenticationProvider>
+				<ProjectAuthenticationProvider>
+					<BrowserRouter>
+						<LoginRedirect />
+						<Routes>
+							{/* Rotas Públicas */}
+							<Route
+								path="*"
+								element={
 									<Suspense fallback={<Loading />}>
-										<Login />
+										<LandingPage />
 									</Suspense>
-								</LoginRoutePrivacy>
-							}
-						/>
+								}
+							/>
 
-						<Route
-							path="/send-password-reset"
-							element={
-								<Suspense fallback={<Loading />}>
-									<SendPasswordReset />
-								</Suspense>
-							}
-						/>
-
-						<Route
-							path="/reset-password"
-							element={
-								<Suspense fallback={<Loading />}>
-									<LoginPasswordReset />
-								</Suspense>
-							}
-						/>
-
-						<Route
-							path="/validate-email"
-							element={
-								<Suspense fallback={<Loading />}>
-									<ValidateEmail />
-								</Suspense>
-							}
-						/>
-
-						<Route
-							path="/request-validation-email"
-							element={
-								<Suspense fallback={<Loading />}>
-									<RequestValidationEmail />
-								</Suspense>
-							}
-						/>
-
-						{/* Rotas Seguras */}
-						<Route
-							path="/home"
-							element={
-								<PrivateRoute>
+							<Route
+								path="/registration"
+								element={
 									<Suspense fallback={<Loading />}>
-										<HomeProjects />
+										<Registration />
 									</Suspense>
-								</PrivateRoute>
-							}
-						/>
+								}
+							/>
 
-						<Route
-							path="/configurations"
-							element={
-								<PrivateRoute redirectAutomatically={true}>
-									<Suspense fallback={<Loading />}>
-										<Configurations />
-									</Suspense>
-								</PrivateRoute>
-							}
-						/>
-
-						<Route
-							path="/project/:projectId/:cardId?"
-							element={
-								<PrivateRoute redirectAutomatically={true}>
-									<ParticipateInProject>
+							<Route
+								path="/login"
+								element={
+									<LoginRoutePrivacy>
 										<Suspense fallback={<Loading />}>
-											<Project />
+											<Login />
 										</Suspense>
-									</ParticipateInProject>
-								</PrivateRoute>
-							}
-						/>
+									</LoginRoutePrivacy>
+								}
+							/>
 
-						<Route
-							path="/validate-project-invite"
-							element={
-								<PrivateRoute redirectAutomatically={true}>
-									<AcceptProjectInvitation>
+							<Route
+								path="/send-password-reset"
+								element={
+									<Suspense fallback={<Loading />}>
+										<SendPasswordReset />
+									</Suspense>
+								}
+							/>
+
+							<Route
+								path="/reset-password"
+								element={
+									<Suspense fallback={<Loading />}>
+										<LoginPasswordReset />
+									</Suspense>
+								}
+							/>
+
+							<Route
+								path="/validate-email"
+								element={
+									<Suspense fallback={<Loading />}>
+										<ValidateEmail />
+									</Suspense>
+								}
+							/>
+
+							<Route
+								path="/request-validation-email"
+								element={
+									<Suspense fallback={<Loading />}>
+										<RequestValidationEmail />
+									</Suspense>
+								}
+							/>
+
+							{/* Rotas Seguras */}
+							<Route
+								path="/home"
+								element={
+									<PrivateRoute>
 										<Suspense fallback={<Loading />}>
-											<Project />
+											<HomeProjects />
 										</Suspense>
-									</AcceptProjectInvitation>
-								</PrivateRoute>
-							}
-						/>
-					</Routes>
-				</BrowserRouter>
-			</ProjectAuthenticationProvider>
-		</AuthenticationProvider>
+									</PrivateRoute>
+								}
+							/>
+
+							<Route
+								path="/configurations"
+								element={
+									<PrivateRoute redirectAutomatically={true}>
+										<Suspense fallback={<Loading />}>
+											<Configurations />
+										</Suspense>
+									</PrivateRoute>
+								}
+							/>
+
+							<Route
+								path="/project/:projectId/:cardId?"
+								element={
+									<PrivateRoute redirectAutomatically={true}>
+										<ParticipateInProject>
+											<Suspense fallback={<Loading />}>
+												<Project />
+											</Suspense>
+										</ParticipateInProject>
+									</PrivateRoute>
+								}
+							/>
+
+							<Route
+								path="/validate-project-invite"
+								element={
+									<PrivateRoute redirectAutomatically={true}>
+										<AcceptProjectInvitation>
+											<Suspense fallback={<Loading />}>
+												<Project />
+											</Suspense>
+										</AcceptProjectInvitation>
+									</PrivateRoute>
+								}
+							/>
+						</Routes>
+					</BrowserRouter>
+				</ProjectAuthenticationProvider>
+			</AuthenticationProvider>
+		</SystemPopupsProvider>
 	);
 }
 

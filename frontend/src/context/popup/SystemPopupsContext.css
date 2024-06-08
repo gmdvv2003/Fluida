@@ -1,0 +1,40 @@
+:root {
+	--system-popup-container-width: 400px;
+	--system-popup-container-height: 50px;
+}
+
+.SPC-popups-container {
+	z-index: 1000;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+	top: calc(var(--header-height) + 64px);
+	left: calc(100% - var(--system-popup-container-width));
+	width: var(--system-popup-container-width);
+	height: 800px;
+	position: fixed;
+}
+
+.SPC-popup-holder-background {
+	width: 100%;
+	height: var(--system-popup-container-height);
+	padding-bottom: 10px;
+}
+
+.SPC-popup-holder {
+	width: 100%;
+	height: var(--system-popup-container-height);
+}
+
+.SPC-popup-background-out {
+	transition: height 1s linear 1s, padding-bottom 1s linear 1s;
+	height: 0px;
+	padding-bottom: 0px;
+}
+
+.SPC-popup-out {
+	transition: transform 1s, opacity 1.5s;
+	transform: translateX(100%);
+	opacity: 0;
+}

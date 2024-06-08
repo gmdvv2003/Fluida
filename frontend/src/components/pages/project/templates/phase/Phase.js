@@ -40,15 +40,13 @@ const Phase = React.forwardRef(
 			[]
 		);
 
+		useEffect(() => {
+			console.log("Phase mounted", phase?.phaseDTO?.phaseId, phase?.phaseDTO.phaseName, phase?.phaseDTO?.order);
+		});
+
 		return (
 			<DragableModal
 				order={phase?.phaseDTO?.order}
-				// Esqueleto de drag
-				draggingSkeleton={() => (
-					<div className="PP-background PP-background-dragging" ref={cardsContainerScrollBarRef}>
-						<h1>Salve</h1>
-					</div>
-				)}
 				// Elementos do modal
 				elements={(isDragging) => (
 					<div
@@ -106,14 +104,13 @@ const Phase = React.forwardRef(
 														"fetchCards",
 														{ page },
 														(response) => {
-															resolve([]);
+															resolve(response?.taken || []);
 														}
 													);
 												});
 											}}
 											getAvailableContentCountForFetch={async (sync = false) => {
-												// return await projectState?.getTotalCards(sync);
-												return 100;
+												return await projectState?.getTotalCards(sync);
 											}}
 											// Tamanho da página
 											pageSize={10}
