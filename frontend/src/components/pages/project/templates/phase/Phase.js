@@ -44,11 +44,11 @@ const Phase = React.forwardRef(
 			onCreateCardRequest(phase?.phaseDTO?.phaseId);
 		}
 
-		function handleNewProjectClickDialog(boolean) {
+		function handleNewPhaseClickDialog(boolean) {
 			setIsDialogOpen(boolean);
 		}
 
-		function handleOptionsProjectClick(boolean, project) {
+		function handleOptionsPhaseClick(boolean, project) {
 			setDialogOptionsOpen(boolean);
 			setProjectDialog(project);
 		}
@@ -74,7 +74,7 @@ const Phase = React.forwardRef(
 			const response = await performAuthenticatedRequest();
 		}
 
-		async function handleOnDeleteProjectButton(projectId) {
+		async function handleOnDeletePhaseButton(projectId) {
 			console.log(projectId);
 			const response = await performAuthenticatedRequest(
 				DeleteProjectByProjectId(projectId),
@@ -82,7 +82,7 @@ const Phase = React.forwardRef(
 			);
 		}
 
-		async function handleOnUpdateProjectButton(projectId) {
+		async function handleOnUpdatePhaseButton(projectId) {
 			console.log(projectId);
 			const response = await performAuthenticatedRequest(
 				UpdateProjectAuthenticated(projectId),
@@ -91,11 +91,6 @@ const Phase = React.forwardRef(
 					projectName: projectNameUpdate,
 				})
 			);
-		}
-
-		function handleOptionsProjectClick(boolean, project) {
-			setDialogOptionsOpen(boolean);
-			setProjectDialog(project);
 		}
 
 		return (
@@ -128,11 +123,11 @@ const Phase = React.forwardRef(
 										/>
 										<PlusIcon
 											className="PP-header-icon-plus"
-											onClick={handleNewProjectClickDialog}
+											onClick={handleNewPhaseClickDialog}
 										/>
 										<DotsIcon
 											className="PP-header-icon"
-											onClick={handleOptionsProjectClick}
+											onClick={handleOptionsPhaseClick}
 										/>
 									</div>
 
@@ -194,7 +189,7 @@ const Phase = React.forwardRef(
 													<div className="PP-container-close-dialog-project-update">
 														<FontAwesomeIcon
 															onClick={() =>
-																handleOptionsProjectClick(false)
+																handleOptionsPhaseClick(false)
 															}
 															icon={faCircleXmark}
 															size="xl"
@@ -227,7 +222,7 @@ const Phase = React.forwardRef(
 																: ""
 														}`}
 														onClick={() =>
-															handleOnUpdateProjectButton(
+															handleOnUpdatePhaseButton(
 																getEnteredProjectDialog.projectId
 															)
 														}
@@ -238,7 +233,7 @@ const Phase = React.forwardRef(
 													<button
 														className="PP-button-delete-project"
 														onClick={() =>
-															handleOnDeleteProjectButton(
+															handleOnDeletePhaseButton(
 																getEnteredProjectDialog.projectId
 															)
 														}
@@ -256,7 +251,7 @@ const Phase = React.forwardRef(
 												<div className="PP-container-close-dialog">
 													<FontAwesomeIcon
 														onClick={() =>
-															handleNewProjectClickDialog(false)
+															handleNewPhaseClickDialog(false)
 														}
 														icon={faCircleXmark}
 														size="xl"
