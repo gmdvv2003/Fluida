@@ -25,22 +25,35 @@ const DragableModal = React.forwardRef(({ order, elements, callbacks }, ref) => 
 	}
 
 	useEffect(() => {
+		const { x, y, width, height } = dragableDivRef.current.getBoundingClientRect();
+
+		let pinOffsetX = 0;
+		let pinOffsetY = 0;
+
 		function wrapExternalDragListener(listener) {
 			return (event) => {
 				listener(dragableDivRef, dragableDivUUID, event);
 			};
 		}
 
+		function getPositionWithOffset(clientX, clientY) {
+			return [clientX + width / 2 - pinOffsetX, clientY + height / 2 - pinOffsetY];
+		}
+
 		function onDragBegin(event) {
 			const { clientX, clientY } = event;
-			setPosition([clientX, clientY]);
+
+			pinOffsetX = clientX - x;
+			pinOffsetY = clientY - y;
+
+			setPosition(getPositionWithOffset(clientX, clientY));
 		}
 
 		function onDragEnd(event) {}
 
 		function onDragMove(event) {
 			const { clientX, clientY } = event;
-			setPosition([clientX, clientY]);
+			setPosition(getPositionWithOffset(clientX, clientY));
 		}
 
 		// Adiciona todos os listeners incluindo os externos

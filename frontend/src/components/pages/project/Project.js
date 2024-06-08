@@ -426,6 +426,18 @@ function Project() {
 	 * @param {number} newPosition
 	 */
 	function onDragConcluded({ phaseDTO }, newPosition) {
+		const phaseState = projectState.getPhaseState(phaseDTO?.phaseId);
+
+		// "Salva" a ordem atual da fase
+		const currentPhaseOrder = phaseState.phaseDTO.order;
+
+		// Para caso a nova posição seja posterior a posição atual
+		newPosition += newPosition <= currentPhaseOrder ? 1 : 0;
+
+		if (currentPhaseOrder == newPosition) {
+			return null;
+		}
+
 		currentProjectSocket?.emit(
 			"movePhase",
 			{ phaseId: phaseDTO?.phaseId, targetPositionIndex: newPosition },
@@ -433,11 +445,6 @@ function Project() {
 				!success && newPopup("Common", { severity: "error", message: "Erro ao mover a fase" });
 			}
 		);
-
-		const phaseState = projectState.getPhaseState(phaseDTO?.phaseId);
-
-		// "Salva" a ordem atual da fase
-		const currentPhaseOrder = phaseState.phaseDTO.order;
 
 		// Ajusta a ordem das outras fases
 		projectState.getPhases().forEach((phaseState) => {

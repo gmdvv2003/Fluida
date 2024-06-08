@@ -27,7 +27,9 @@ function bindToListenerWrapper(key) {
 	return function (listener, target) {
 		setGlobalDragState(key, (previousListeners) => [...(previousListeners || []), { listener, target }]);
 		return () => {
-			setGlobalDragState(key, (previousListeners) => previousListeners?.filter((listener) => listener.listener == listener));
+			setGlobalDragState(key, (previousListeners) =>
+				previousListeners?.filter((listener) => listener.listener == listener)
+			);
 		};
 	};
 }
@@ -128,6 +130,10 @@ const DragableModalContext = React.forwardRef(({ children, uuid, modal }, ref) =
 
 			currentMouseMoveEventHandler = onMouseMove;
 			currentMouseUpEventHandler = onMouseUp;
+
+			requestAnimationFrame(() => {
+				invokeListeners(onDragMove, uuid, event);
+			});
 		}
 
 		// Pega o elemento atual

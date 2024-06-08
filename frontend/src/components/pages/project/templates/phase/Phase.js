@@ -40,10 +40,6 @@ const Phase = React.forwardRef(
 			[]
 		);
 
-		useEffect(() => {
-			console.log("Phase mounted", phase?.phaseDTO?.phaseId, phase?.phaseDTO.phaseName, phase?.phaseDTO?.order);
-		});
-
 		return (
 			<DragableModal
 				order={phase?.phaseDTO?.order}
