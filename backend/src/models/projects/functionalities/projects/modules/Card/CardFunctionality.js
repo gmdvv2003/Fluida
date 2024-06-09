@@ -1,4 +1,7 @@
 const { Socket, Namespace } = require("socket.io");
+
+const { Validate } = require("../../../../../../context/decorators/input-validator/InputValidator");
+
 const CardsDTO = require("../../../../../cards/CardsDTO");
 
 class CardFunctionality {
@@ -17,28 +20,29 @@ class CardFunctionality {
 	 * @param {Projec} project
 	 * @param {Object} data
 	 */
+	@Validate({ NAME: "title", TYPE: "string", LENGTH: 100, INDEX: 3 })
 	#IOCreateCard(projectsIO, socket, project, data) {
-		// console.log(data.phaseId);
-		// console.log(data.cardTitle);
-		// // Cria o DTO para o card
-		// let cardDTO = new CardsDTO({
-		// 	phaseId: data.phaseId,
-		// 	title: data.cardTitle,
-		// });
-		// // Cria o card no banco de dados
-		// this.ProjectsController.CardsService.createCard(cardDTO)
-		// 	.then(({ generatedMaps }) => {
-		// 		let generatedMap = generatedMaps[0];
-		// 		// Atualiza o DTO com os valores gerados
-		// 		cardDTO = { ...cardDTO, ...generatedMap };
-		// 		// Adiciona o card a phase localmente
-		// 		project.addCard(cardDTO);
-		// 		// Emite o evento de criaçao de card
-		// 		projectsIO.to(project.projectId).emit("createCard", cardDTO);
-		// 	})
-		// 	.catch((error) =>
-		// 		socket.emit("error", { message: "Erro ao criar o card da fase", error: error })
-		// 	);
+		// Cria o DTO para o card
+		let cardDTO = new CardsDTO({
+			phaseId: data.phaseId,
+			title: data.title,
+		});
+
+		// Cria o card no banco de dados
+		this.ProjectsController.CardsService.createCard(cardDTO)
+			.then(({ generatedMaps }) => {
+				let generatedMap = generatedMaps[0];
+
+				// Atualiza o DTO com os valores gerados
+				cardDTO = { ...cardDTO, ...generatedMap };
+
+				// Adiciona o card a phase localmente
+				project.addCard(cardDTO);
+
+				// Emite o evento de criaçao de card
+				projectsIO.to(project.projectId).emit("createCard", cardDTO);
+			})
+			.catch((error) => socket.emit("error", { message: "Erro ao criar o card da fase", error: error }));
 	}
 
 	#IODeleteCard(projectsIO, socket, project, { cardId }) {

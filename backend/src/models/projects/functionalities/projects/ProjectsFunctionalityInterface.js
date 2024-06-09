@@ -226,11 +226,7 @@ class ProjectsFunctionalityInterface {
 				return member.socketToken === socket.handshake.auth.socketToken && member.subscribed;
 			});
 			if (!isValidProjectMember) {
-				// return this.#acknowledgeError(
-				// 	socket,
-				// 	acknowledgement,
-				// 	"Você não é membro deste projeto."
-				// );
+				return this.#acknowledgeError(socket, acknowledgement, "Você não é membro deste projeto.");
 			}
 
 			try {
@@ -246,6 +242,7 @@ class ProjectsFunctionalityInterface {
 	 *
 	 * @param {string} name
 	 * @param {Function} next
+	 * @param {boolean} authenticateless
 	 */
 	injectProjectFunctionality(name, next, authenticateless = false) {
 		this[name] = authenticateless ? next.bind(this) : this.socketToProjectRedirector(next.bind(this));
