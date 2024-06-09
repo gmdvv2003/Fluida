@@ -128,11 +128,9 @@ function App() {
 								path="/project/:projectId/:cardId?"
 								element={
 									<PrivateRoute redirectAutomatically={true}>
-										<ParticipateInProject>
-											<Suspense fallback={<Loading />}>
-												<Project />
-											</Suspense>
-										</ParticipateInProject>
+										<Suspense fallback={<Loading />}>
+											<Project />
+										</Suspense>
 									</PrivateRoute>
 								}
 							/>

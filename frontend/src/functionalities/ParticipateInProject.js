@@ -18,23 +18,16 @@ function ParticipateInProject({ children }) {
 			return setNavigateToHome(true);
 		}
 
-		let isCancelled = false;
-
 		participate(parseInt(projectId)).then(({ success }) => {
-			if (isCancelled) {
-				return null;
-			}
-
 			setNavigateToHome(!success);
 			setWaitingForParticipation(false);
 		});
 
 		return () => {
-			isCancelled = true;
 			setWaitingForParticipation(true);
 			setNavigateToHome(false);
 		};
-	}, [projectId]);
+	}, []);
 
 	if (waitingForParticipation) {
 		return <Loading />;

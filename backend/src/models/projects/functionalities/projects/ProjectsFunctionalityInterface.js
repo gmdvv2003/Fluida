@@ -297,9 +297,11 @@ class ProjectsFunctionalityInterface {
 	 * @param {Project} project
 	 * @param {*} data
 	 */
-	IOSubscribeToProject(projectsIO, socket, data) {
+	IOSubscribeToProject(projectsIO, socket, data = {}) {
+		const { projectId } = data;
+
 		// Verifica se o projeto existe
-		const project = this.#projects[data.projectId];
+		const project = this.#projects[projectId];
 		if (!project) {
 			return socket.emit("error", { message: "Projeto não encontrado." });
 		}
@@ -324,6 +326,10 @@ class ProjectsFunctionalityInterface {
 		// Atualiza o status de inscrição do usuário
 		user.subscribed = true;
 
+		socket.on("disconnect", () => {
+			this.IOUnsubscribeFromProject(projectsIO, socket, { projectId: project.projectId });
+		});
+
 		// Envia a confirmação de inscrição
 		socket.emit("subscribedToProject");
 	}
@@ -336,7 +342,19 @@ class ProjectsFunctionalityInterface {
 	 * @param {Project} project
 	 * @param {Object} data
 	 */
-	IOUnsubscribeFromProject(projectsIO, socket, data) {}
+	IOUnsubscribeFromProject(projectsIO, socket, data = {}) {
+		const { projectId } = data;
+
+		// Verifica se o projeto existe
+		const project = this.#projects[projectId];
+		if (!project) {
+			return socket.emit("error", { message: "Projeto não encontrado." });
+		}
+
+		try {
+			socket.disconnect();
+		} catch {}
+	}
 }
 
 module.exports = { Participant, Project, ProjectsFunctionalityInterface };

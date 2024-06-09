@@ -373,16 +373,15 @@ class ProjectState {
 }
 
 function Project() {
-	const [currentProjectSocket, setCurrentProjectSocket] = useState(null);
-
 	const [isEditCardModalVisible, setIsEditCardModalVisible] = useState(false);
 	const [isProjectUsersModalVisible, setIsProjectUsersModalVisible] = useState(false);
 
 	const { projectId, cardId } = useParams();
-	const { getProjectSession } = useProjectAuthentication();
 	const { newPopup } = useSystemPopups();
+	const { participate, leave } = useProjectAuthentication();
 
-	const [projectState, setProjectState] = useState(null);
+	const projectSocketRef = useRef(null);
+	const projectStateRef = useRef(null);
 
 	const phasesContainerRef = useRef(null);
 	const phasesContainerScrollBarRef = useRef(null);
@@ -398,6 +397,8 @@ function Project() {
 	const dragableModalOnDragMoveRef = useRef(null);
 
 	const performLazyLoaderUpdateRef = useRef(null);
+
+	const onProjectUnmountCallbackRef = useRef(null);
 
 	const [waitingForReconnect, setWaitingForReconnect] = useState(false);
 	const [redirectToHome, setRedirectToHome] = useState(false);
@@ -426,7 +427,10 @@ function Project() {
 	 * @param {number} newPosition
 	 */
 	function onDragConcluded({ phaseDTO }, newPosition) {
-		const phaseState = projectState.getPhaseState(phaseDTO?.phaseId);
+		const phaseState = projectStateRef.current?.getPhaseState(phaseDTO?.phaseId);
+		if (!phaseState) {
+			return null;
+		}
 
 		// "Salva" a ordem atual da fase
 		const currentPhaseOrder = phaseState.phaseDTO.order;
@@ -438,7 +442,7 @@ function Project() {
 			return null;
 		}
 
-		currentProjectSocket?.emit(
+		projectSocketRef.current?.emit(
 			"movePhase",
 			{ phaseId: phaseDTO?.phaseId, targetPositionIndex: newPosition },
 			(success, data) => {
@@ -447,7 +451,7 @@ function Project() {
 		);
 
 		// Ajusta a ordem das outras fases
-		projectState.getPhases().forEach((phaseState) => {
+		projectStateRef.current?.getPhases().forEach((phaseState) => {
 			if (phaseState.phaseDTO.phaseId == phaseDTO.phaseId) {
 				return null;
 			}
@@ -471,7 +475,7 @@ function Project() {
 	 * Cria uma nova fase.
 	 */
 	function handleCreateNewPhaseButtonClick() {
-		currentProjectSocket?.emit(
+		projectSocketRef.current?.emit(
 			"createPhase",
 			{
 				phaseName: "Nova Fase",
@@ -490,7 +494,7 @@ function Project() {
 	 * @param {number} phaseId
 	 */
 	function handleCreateNewCardButtonClick(phaseId) {
-		currentProjectSocket?.emit(
+		projectSocketRef.current?.emit(
 			"createCard",
 			{
 				phaseId,
@@ -506,95 +510,114 @@ function Project() {
 
 	// ============================== Socket ============================== //
 	useEffect(() => {
-		// Pega o socket do projeto, caso exista
-		const project = getProjectSession(projectId);
-		if (!project) {
-			return undefined;
+		async function connect() {
+			// Pega o socket do projeto, caso exista
+			const project = (await participate(parseInt(projectId)))?.localProjectInstance;
+			if (!project) {
+				return undefined;
+			}
+
+			const { socket, projectName } = project;
+			if (!socket || !socket.connected) {
+				return undefined;
+			}
+
+			const newProjectState = new ProjectState(socket);
+
+			// Atualiza as referências do projeto
+			projectStateRef.current = newProjectState;
+			projectSocketRef.current = socket;
+
+			document.title = `Fluida | ${projectName}`;
+
+			// Funções de resposta do servidor
+			const disconnect = (reason) => {
+				if (!reason.active) {
+					// Remove a sessão do projeto
+					projectSocketRef.current = null;
+					projectStateRef.current = null;
+					setRedirectToHome(true);
+				} else {
+					setWaitingForReconnect(true);
+				}
+			};
+
+			const connect = () => {
+				setWaitingForReconnect(false);
+			};
+
+			const phaseCreated = (...data) => newProjectState.phaseCreated(data);
+			const phaseUpdated = (...data) => newProjectState.phaseUpdated(data);
+			const phaseDeleted = (...data) => newProjectState.phaseDeleted(data);
+			const phaseMoved = (...data) => newProjectState.phaseMoved(data);
+
+			const cardCreated = (...data) => newProjectState.cardCreated(data);
+			const cardUpdated = (...data) => newProjectState.cardUpdated(data);
+			const cardDeleted = (...data) => newProjectState.cardDeleted(data);
+			const cardMoved = (...data) => newProjectState.cardMoved(data);
+
+			const phasesFetched = (...data) => newProjectState.phasesFetched(data);
+			const cardsFetched = (...data) => newProjectState.cardsFetched(data);
+
+			// Adiciona os listeners
+			socket.on("disconnect", disconnect);
+			socket.on("connect", connect);
+
+			socket.on("phaseCreated", phaseCreated);
+			socket.on("phaseUpdated", phaseUpdated);
+			socket.on("phaseDeleted", phaseDeleted);
+			socket.on("phaseMoved", phaseMoved);
+
+			socket.on("cardCreated", cardCreated);
+			socket.on("cardUpdated", cardUpdated);
+			socket.on("cardDeleted", cardDeleted);
+			socket.on("cardMoved", cardMoved);
+
+			socket.on("phasesFetched", phasesFetched);
+			socket.on("cardsFetched", cardsFetched);
+
+			// Listeners do estado do projeto
+			const unbindOnProjectPhaseStateChange = newProjectState.onProjectPhasesStateChange((phases) => {
+				performLazyLoaderUpdateRef.current();
+			});
+
+			onProjectUnmountCallbackRef.current = () => {
+				leave(projectId).catch((error) =>
+					console.error(`Ocorreu um erro ao sair do projeto: ${error.message}`)
+				);
+
+				// Remove os listeners
+				socket.off("disconnect", disconnect);
+				socket.off("connect", connect);
+
+				socket.off("phaseCreated", phaseCreated);
+				socket.off("phaseUpdated", phaseUpdated);
+				socket.off("phaseDeleted", phaseDeleted);
+				socket.off("phaseMoved", phaseMoved);
+
+				socket.off("cardCreated", cardCreated);
+				socket.off("cardUpdated", cardUpdated);
+				socket.off("cardDeleted", cardDeleted);
+				socket.off("cardMoved", cardMoved);
+
+				socket.off("phasesFetched", phasesFetched);
+				socket.off("cardsFetched", cardsFetched);
+
+				unbindOnProjectPhaseStateChange();
+			};
 		}
 
-		const { socket, projectName } = project;
-		setCurrentProjectSocket(socket);
-
-		const newProjectState = new ProjectState(socket);
-		setProjectState(newProjectState);
-
-		document.title = `Fluida | ${projectName}`;
-
-		// Funções de resposta do servidor
-		const disconnect = (reason) => {
-			if (!reason.active) {
-				// Remove a sessão do projeto
-				setProjectState(null);
-				setCurrentProjectSocket(null);
-				setRedirectToHome(true);
-			} else {
-				setWaitingForReconnect(true);
-			}
-		};
-
-		const connect = () => {
-			setWaitingForReconnect(false);
-		};
-
-		const phaseCreated = (...data) => newProjectState.phaseCreated(data);
-		const phaseUpdated = (...data) => newProjectState.phaseUpdated(data);
-		const phaseDeleted = (...data) => newProjectState.phaseDeleted(data);
-		const phaseMoved = (...data) => newProjectState.phaseMoved(data);
-
-		const cardCreated = (...data) => newProjectState.cardCreated(data);
-		const cardUpdated = (...data) => newProjectState.cardUpdated(data);
-		const cardDeleted = (...data) => newProjectState.cardDeleted(data);
-		const cardMoved = (...data) => newProjectState.cardMoved(data);
-
-		const phasesFetched = (...data) => newProjectState.phasesFetched(data);
-		const cardsFetched = (...data) => newProjectState.cardsFetched(data);
-
-		// Adiciona os listeners
-		socket.on("disconnect", disconnect);
-		socket.on("connect", connect);
-
-		socket.on("phaseCreated", phaseCreated);
-		socket.on("phaseUpdated", phaseUpdated);
-		socket.on("phaseDeleted", phaseDeleted);
-		socket.on("phaseMoved", phaseMoved);
-
-		socket.on("cardCreated", cardCreated);
-		socket.on("cardUpdated", cardUpdated);
-		socket.on("cardDeleted", cardDeleted);
-		socket.on("cardMoved", cardMoved);
-
-		socket.on("phasesFetched", phasesFetched);
-		socket.on("cardsFetched", cardsFetched);
-
-		// Listeners do estado do projeto
-		const unbindOnProjectPhaseStateChange = newProjectState.onProjectPhasesStateChange((phases) => {
-			performLazyLoaderUpdateRef.current();
-		});
+		// Conecta ao projeto
+		connect();
 
 		return () => {
-			// Remove o socket do projeto
-			setCurrentProjectSocket(null);
+			if (!onProjectUnmountCallbackRef.current) {
+				return undefined;
+			}
 
-			// Remove os listeners
-			socket.off("disconnect", disconnect);
-			socket.off("connect", connect);
-
-			socket.off("phaseCreated", phaseCreated);
-			socket.off("phaseUpdated", phaseUpdated);
-			socket.off("phaseDeleted", phaseDeleted);
-			socket.off("phaseMoved", phaseMoved);
-
-			socket.off("cardCreated", cardCreated);
-			socket.off("cardUpdated", cardUpdated);
-			socket.off("cardDeleted", cardDeleted);
-			socket.off("cardMoved", cardMoved);
-
-			socket.off("phasesFetched", phasesFetched);
-			socket.off("cardsFetched", cardsFetched);
-
-			unbindOnProjectPhaseStateChange();
+			onProjectUnmountCallbackRef.current();
 		};
-	}, [projectId]);
+	}, []);
 
 	return redirectToHome ? (
 		<Navigate to="/" />
@@ -605,10 +628,10 @@ function Project() {
 
 			{isEditCardModalVisible && <EditCard />}
 
-			{isProjectUsersModalVisible && <ProjectUsers projectState={projectState} />}
+			{isProjectUsersModalVisible && <ProjectUsers projectState={projectStateRef.current} />}
 			<Backdrop show={isProjectUsersModalVisible} onClick={toggleProjectUsersModal} />
 
-			{projectState && (
+			{projectStateRef.current && (
 				<div className="P-background" ref={phasesContainerScrollBarRef}>
 					<div className="P-phases-container-holder">
 						<ol className="P-phases-container" ref={phasesContainerRef}>
@@ -654,8 +677,8 @@ function Project() {
 											onCreateCardRequest={handleCreateNewCardButtonClick}
 											isLoading={isLoading}
 											phase={phase}
-											projectState={projectState}
-											currentProjectSocket={currentProjectSocket}
+											projectState={projectStateRef}
+											currentProjectSocket={projectSocketRef}
 											dragBegin={dragableModalOnDragBeginRef.current}
 											dragEnd={dragableModalOnDragEndRef.current}
 											dragMove={dragableModalOnDragMoveRef.current}
@@ -671,21 +694,25 @@ function Project() {
 									// Funções de controle do conteúdo
 									fetchMore={(page) => {
 										return new Promise((resolve, reject) => {
-											return currentProjectSocket?.emit("fetchPhases", { page }, (response) => {
-												resolve(response?.phases?.taken || []);
-											});
+											return projectSocketRef.current?.emit(
+												"fetchPhases",
+												{ page },
+												(response) => {
+													resolve(response?.phases?.taken || []);
+												}
+											);
 										});
 									}}
 									getAvailableContentCountForFetch={async (sync = false) => {
-										return await projectState?.getTotalPhases(sync);
+										return await projectStateRef.current?.getTotalPhases(sync);
 									}}
-									insertFetchedElement={(element) => {
-										return projectState?.phaseCreated([element], true, true);
+									insertFetchedElement={(element, l) => {
+										return projectStateRef.current?.phaseCreated([element], true, true);
 									}}
 									// Tamanho da página
 									pageSize={10}
 									// Função para obter o conteúdo
-									getContent={projectState?.getPhases()}
+									getContent={() => projectStateRef.current?.getPhases()}
 									// Referência para o lazy loader
 									ref={lazyLoaderRef}
 								/>

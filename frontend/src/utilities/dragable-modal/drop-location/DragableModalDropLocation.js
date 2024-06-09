@@ -44,7 +44,7 @@ function DragableModalDropLocation({
 			// Remove o placeholder associado ao elemento
 			removePlaceholder(uuid);
 
-			// Novo índice de ordem da fase
+			// Novo índice de ordem do componente
 			let newOrderIndex = getDropoffIndex(event.clientX);
 			newOrderIndex += newOrderIndex >= getComponentOrderFromData(data) || 0;
 
@@ -68,11 +68,11 @@ function DragableModalDropLocation({
 
 			const { clientX } = event;
 
-			// Novo índice de ordem da fase
+			// Novo índice de ordem do componente
 			let newOrderIndex = getDropoffIndex(clientX);
 			newOrderIndex += newOrderIndex >= getComponentOrderFromData(data) || 0;
 
-			// Atualiza a ordem da fase
+			// Atualiza a ordem do componente
 			getReference().style.order = newOrderIndex;
 		}
 

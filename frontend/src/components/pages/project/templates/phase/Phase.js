@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useImperativeHandle, useRef } from "react";
+import React, { Suspense, useEffect, useImperativeHandle, useRef, useState } from "react";
 
 import { ReactComponent as PlusIcon } from "assets/action-icons/add-circle-unlined.svg";
 import { ReactComponent as DotsIcon } from "assets/action-icons/dots.svg";
@@ -96,7 +96,7 @@ const Phase = React.forwardRef(
 											// Funções de controle do conteúdo
 											fetchMore={(page) => {
 												return new Promise((resolve, reject) => {
-													return currentProjectSocket?.emit(
+													return currentProjectSocket.current?.emit(
 														"fetchCards",
 														{ page },
 														(response) => {
@@ -106,12 +106,12 @@ const Phase = React.forwardRef(
 												});
 											}}
 											getAvailableContentCountForFetch={async (sync = false) => {
-												return await projectState?.getTotalCards(sync);
+												return await projectState.current?.getTotalCards(sync);
 											}}
 											// Tamanho da página
 											pageSize={10}
 											// Função para obter o conteúdo
-											getContent={projectState?.getCards(phase?.phaseDTO?.phaseId)}
+											getContent={() => projectState.current?.getCards(phase?.phaseDTO?.phaseId)}
 											// Referência para o lazy loader
 											ref={lazyLoaderRef}
 										/>

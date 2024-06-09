@@ -189,21 +189,21 @@ const LazyLoader = React.forwardRef(
 			 * @returns {Array}
 			 */
 			async function retrieveVisibleContent(start, end, lateFetch) {
-				if (getContent == undefined) {
+				if (getContent() == undefined) {
 					return [];
 				}
 
 				end = Math.min(end, await getAvailableContentCountForFetch());
 
 				// Caso não tenha conteúdo, preenche a lista com conteúdo vazio
-				if (getContent.length < end) {
-					for (let index = getContent.length; index < end; index += 1) {
-						getContent.push(undefined);
+				if (getContent().length < end) {
+					for (let index = getContent().length; index < end; index += 1) {
+						getContent().push(undefined);
 					}
 				}
 
 				// Pega a "fatia" do conteúdo que está sendo exibido no momento e verifica se há algum elemento indefinido
-				const undefinedContentIndex = getContent
+				const undefinedContentIndex = getContent()
 					.slice(start, end)
 					.findIndex((element) => element === undefined);
 
@@ -221,20 +221,20 @@ const LazyLoader = React.forwardRef(
 							);
 							fetchedContent.forEach((element, index) => {
 								const contentIndex = start + undefinedContentIndex + index;
-								if (getContent[contentIndex] == undefined) {
-									getContent[contentIndex] =
+								if (getContent()[contentIndex] == undefined) {
+									getContent()[contentIndex] =
 										insertFetchedElement != undefined ? insertFetchedElement(element) : element;
 								}
 							});
 
 							// Atualiza o conteúdo a ser exibido na tela
-							lateFetch(getContent.slice(start, end));
+							lateFetch(getContent().slice(start, end));
 						}, 1000);
 					}
 				}
 
 				// Retorna novamente a "fatia" do conteúdo que está sendo exibido no momento
-				return getContent.slice(start, end);
+				return getContent().slice(start, end);
 			}
 
 			/**

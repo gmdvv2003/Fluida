@@ -49,7 +49,11 @@ export function ProjectAuthenticationProvider({ children }) {
 	async function participate(projectId) {
 		// Verifica se a participação no projeto já está sendo validada
 		if (projectsBeingValidated.current[projectId]) {
-			return projectsBeingValidated.current[projectId];
+			return new Promise((resolve, reject) => {
+				projectsBeingValidated.current[projectId].finally(async () => {
+					resolve(await participate(projectId));
+				});
+			});
 		}
 
 		const promise = new Promise(async (resolve, reject) => {
@@ -60,7 +64,7 @@ export function ProjectAuthenticationProvider({ children }) {
 
 			// Verifica se o usuário já está participando do projeto
 			if (isParticipating(projectId) !== undefined) {
-				return resolve({ success: false });
+				return resolve({ success: true });
 			}
 
 			// Realiza a requisição para participar do projeto
@@ -69,6 +73,7 @@ export function ProjectAuthenticationProvider({ children }) {
 				"POST",
 				JSON.stringify({ projectId })
 			);
+
 			if (response.success) {
 				// Cria uma nova instância do socket com o token de participação
 				const socket = io(ProjectsSocketEndpoint, {
@@ -109,6 +114,7 @@ export function ProjectAuthenticationProvider({ children }) {
 				 * @param {*} reason
 				 */
 				function onDisconnect(reason) {
+					console.log("Disconnect");
 					if (!reason.active) {
 						// Remove a sessão do projeto
 						setAuthenticatedProjectsSessions(
@@ -128,16 +134,16 @@ export function ProjectAuthenticationProvider({ children }) {
 				 *
 				 */
 				function onSubscribedToProject() {
-					setAuthenticatedProjectsSessions([
-						...authenticatedProjectsSessions,
-						{
-							projectName: response.data?.projectName,
-							projectId: projectId,
-							socket: socket,
-						},
-					]);
+					const localProjectInstance = {
+						projectName: response.data?.projectName,
+						projectId: projectId,
+						socket: socket,
+					};
 
-					resolve({ success: true });
+					// Adiciona a sessão do projeto
+					setAuthenticatedProjectsSessions([...authenticatedProjectsSessions, localProjectInstance]);
+
+					resolve({ success: true, localProjectInstance });
 				}
 
 				// Eventos do socket
@@ -156,9 +162,11 @@ export function ProjectAuthenticationProvider({ children }) {
 
 		return new Promise((resolve, reject) => {
 			promise
+				.finally(() => {
+					projectsBeingValidated.current[projectId] = false;
+				})
 				.then((response) => resolve(response))
-				.catch((error) => reject(error))
-				.finally(() => (projectsBeingValidated.current[projectId] = false));
+				.catch((error) => reject(error));
 		});
 	}
 
@@ -174,13 +182,13 @@ export function ProjectAuthenticationProvider({ children }) {
 		}
 
 		// Verifica se o usuário está participando do projeto
-		const projectSessionIndex = isParticipating(projectId);
-		if (projectSessionIndex === -1) {
+		const projectSession = isParticipating(projectId);
+		if (projectSession == undefined) {
 			return { success: false };
 		}
 
 		// Desconecta o socket do projeto
-		const { socket } = authenticatedProjectsSessions[projectSessionIndex];
+		const { socket } = projectSession;
 		socket.emit("unsubscribeFromProject");
 
 		try {
@@ -188,6 +196,8 @@ export function ProjectAuthenticationProvider({ children }) {
 		} catch (error) {
 			console.error(`Erro ao desconectar o socket: ${error.message}`);
 		}
+
+		return { success: true };
 	}
 
 	useEffect(() => {});

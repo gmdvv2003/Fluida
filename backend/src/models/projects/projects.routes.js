@@ -276,12 +276,7 @@ module.exports = function (app, io, projectsController) {
 		// Função utilitária para linkar os métodos do controller com os eventos do socket
 		function linkToMethod(method) {
 			return (data, acknowledgement) => {
-				projectsController.ProjectsFunctionalityInterface[method](
-					projectsIO,
-					socket,
-					data,
-					acknowledgement
-				);
+				projectsController.ProjectsFunctionalityInterface[method](projectsIO, socket, data, acknowledgement);
 			};
 		}
 
