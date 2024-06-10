@@ -142,9 +142,7 @@ const LazyLoader = React.forwardRef(
 				 * @param {*} uuid
 				 */
 				removePlaceholder: (uuid) => {
-					placeholdersContent.current = placeholdersContent.current.filter(
-						(placeholder) => placeholder.uuid != uuid
-					);
+					placeholdersContent.current = placeholdersContent.current.filter((placeholder) => placeholder.uuid != uuid);
 
 					// Remove a associação do placeholder ao elemento
 					ref.current.removePlaceholderAssociation(uuid);
@@ -216,9 +214,7 @@ const LazyLoader = React.forwardRef(
 
 						// Inicia um novo timeout
 						sectionFetchTimeoutId = setTimeout(async () => {
-							const fetchedContent = await fetchMore(
-								Math.floor((start + undefinedContentIndex) / pageSize)
-							);
+							const fetchedContent = await fetchMore(Math.floor((start + undefinedContentIndex) / pageSize));
 							fetchedContent.forEach((element, index) => {
 								const contentIndex = start + undefinedContentIndex + index;
 								if (getContent()[contentIndex] == undefined) {

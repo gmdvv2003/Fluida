@@ -591,7 +591,8 @@ function Project() {
 										"movePhase",
 										{ phaseId: phaseDTO?.phaseId, targetPositionIndex: newPosition },
 										(success, data) => {
-											!success && newPopup("Common", { severity: "error", message: "Erro ao mover a fase" });
+											!success &&
+												newPopup("Common", { severity: "error", message: "Erro ao mover a fase" });
 										}
 									);
 
@@ -601,7 +602,10 @@ function Project() {
 											return null;
 										}
 
-										if (phaseState.phaseDTO.order < currentPhaseOrder && phaseState.phaseDTO.order >= newPosition) {
+										if (
+											phaseState.phaseDTO.order < currentPhaseOrder &&
+											phaseState.phaseDTO.order >= newPosition
+										) {
 											phaseState.phaseDTO.order += 1;
 										} else if (
 											phaseState.phaseDTO.order > currentPhaseOrder &&
@@ -657,7 +661,7 @@ function Project() {
 									getAvailableContentCountForFetch={async (sync = false) => {
 										return await projectStateRef.current?.getTotalPhases(sync);
 									}}
-									insertFetchedElement={(element, l) => {
+									insertFetchedElement={(element) => {
 										return projectStateRef.current?.phaseCreated([element], true, true);
 									}}
 									// Tamanho da página

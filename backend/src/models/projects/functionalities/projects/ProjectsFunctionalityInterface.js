@@ -99,12 +99,7 @@ class Project {
 	 */
 	async getCards(page, phaseId) {
 		const phasesCardsService = this.ProjectsController.PhasesService.PhasesCardsService;
-		return await this.#fetchMore(
-			this.#cards,
-			phasesCardsService.getCardsOfPhase.bind(phasesCardsService),
-			page,
-			phaseId
-		);
+		return await this.#fetchMore(this.#cards, phasesCardsService.getCardsOfPhase.bind(phasesCardsService), page, phaseId);
 	}
 
 	/**
@@ -223,7 +218,7 @@ class ProjectsFunctionalityInterface {
 			// Verifica se o usuário é membro do projeto
 			const isValidProjectMember = project.members.some((member) => {
 				// Procura por um usuário que tenha o mesmo token de socket e que esteja inscrito no projeto
-				return member.socketToken === socket.handshake.auth.socketToken && member.subscribed;
+				return member.socketToken == socket.handshake.auth.socketToken && member.subscribed;
 			});
 			if (!isValidProjectMember) {
 				return this.#acknowledgeError(socket, acknowledgement, "Você não é membro deste projeto.");
@@ -264,8 +259,10 @@ class ProjectsFunctionalityInterface {
 		const project = this.#projects[projectId];
 
 		// Verifica se o usuário já é membro do projeto
-		if (project.members.includes(user)) {
-			return [false, null];
+		const userAsParticipant = project.members.find((member) => member.user.userId === user.userId);
+		if (userAsParticipant !== undefined) {
+			// Caso o mesmo já seja membro, retorna o token de socket já existente
+			return [true, userAsParticipant.socketToken];
 		}
 
 		// Cria um token de participação do usuário no projeto
@@ -283,8 +280,6 @@ class ProjectsFunctionalityInterface {
 
 		return [true, participationToken];
 	}
-
-	removeParticipant(user, projectId) {}
 
 	/**
 	 * Realiza a inscrição de um usuário em um projeto.
@@ -348,9 +343,21 @@ class ProjectsFunctionalityInterface {
 			return socket.emit("error", { message: "Projeto não encontrado." });
 		}
 
+		const { socketToken } = socket.handshake.auth;
+
+		// Realiza a validação para obter o userId
+		const [_, { userId }] = Session.validate(socketToken);
+
+		// Remove o usuário da lista de membros do projeto
+		project.members = project.members.filter((member) => {
+			return member.user.userId !== userId;
+		});
+
 		try {
 			socket.disconnect();
-		} catch {}
+		} catch (error) {
+			socket.emit("error", { message: error.message });
+		}
 	}
 }
 
