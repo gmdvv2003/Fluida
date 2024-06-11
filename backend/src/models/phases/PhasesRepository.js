@@ -65,7 +65,68 @@ class PhasesRepository extends Repository {
 	 * @returns {DeleteResult}
 	 */
 	async deletePhase(phasesDTO) {
-		return await this.Repository.createQueryBuilder("Phases").delete().from("Phases").where(`phaseId = :phaseId`, phasesDTO).execute();
+		return await this.Repository.createQueryBuilder("Phases")
+			.delete()
+			.from("Phases")
+			.where(`phaseId = :phaseId`, phasesDTO)
+			.execute();
+	}
+
+	/**
+	 * Move as ordens das fases para a posição alvo.
+	 *
+	 * @param {PhasesDTO} phaseDTO
+	 * @param {number} targetPositionIndex
+	 * @returns
+	 */
+	async movePhase(phaseDTO, targetPositionIndex) {
+		// Pega a posição atual da fase
+		const { order } =
+			(await this.Repository.createQueryBuilder("Phases")
+				.select("Phases.order", "order")
+				.where(`phaseId = :phaseId`, phaseDTO)
+				.getRawOne()) || {};
+
+		if (!order) {
+			throw new Error("Fase não encontrada.");
+		}
+
+		let rangeStart, rangeEnd;
+		if (order < targetPositionIndex) {
+			rangeStart = order;
+			rangeEnd = targetPositionIndex;
+		} else {
+			rangeStart = targetPositionIndex;
+			rangeEnd = order;
+		}
+
+		return await this.Repository.manager.transaction(async (transactionalEntityManager) => {
+			// Pega todas as fases que precisam ser atualizadas
+			const phasesToUpdate = await transactionalEntityManager
+				.createQueryBuilder("Phases", "Phase")
+				.where("Phase.projectId = :projectId AND Phase.order >= :rangeStart AND Phase.order <= :rangeEnd", {
+					projectId: phaseDTO.projectId,
+					rangeStart,
+					rangeEnd,
+				})
+				.orderBy("Phase.order")
+				.limit(rangeEnd - rangeStart + 1)
+				.getMany();
+
+			// Atualiza a posição das fases
+			phasesToUpdate.forEach((phase) => {
+				if (phase.phaseId === phaseDTO.phaseId) {
+					phase.order = targetPositionIndex;
+				} else if (phase.order < order && phase.order >= targetPositionIndex) {
+					phase.order += 1;
+				} else if (phase.order > order && phase.order <= targetPositionIndex) {
+					phase.order -= 1;
+				}
+			});
+
+			// Salva as fases atualizadas no banco de dados
+			await transactionalEntityManager.save(phasesToUpdate);
+		});
 	}
 }
 

@@ -88,7 +88,7 @@ export function ProjectAuthenticationProvider({ children }) {
 				 * @param {*} error
 				 */
 				function onError(error) {
-					console.error(`Erro no socket: ${error.message}`);
+					console.error(`Erro no socket: ${error?.message} || ${error?.error}`);
 				}
 
 				/**
@@ -114,7 +114,6 @@ export function ProjectAuthenticationProvider({ children }) {
 				 * @param {*} reason
 				 */
 				function onDisconnect(reason) {
-					console.log("Disconnect");
 					if (!reason.active) {
 						// Remove a sessão do projeto
 						setAuthenticatedProjectsSessions(

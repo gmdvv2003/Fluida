@@ -143,6 +143,15 @@ class Project {
 	}
 
 	/**
+	 *
+	 * @param {*} cardId
+	 * @returns
+	 */
+	getCard(cardId) {
+		return this.#cards.find((card) => card.cardId === cardId);
+	}
+
+	/**
 	 * @param {CardsDTO} cardDTO
 	 */
 	addCard(cardDTO) {
@@ -154,6 +163,15 @@ class Project {
 	 */
 	removeCard(caseId) {
 		this.#cards = this.#cards.filter((card) => card.cardId !== cardId);
+	}
+
+	/**
+	 *
+	 * @param {*} phaseId
+	 * @returns
+	 */
+	getPhase(phaseId) {
+		return this.#phases.find((phase) => phase.phaseId === phaseId);
 	}
 
 	/**

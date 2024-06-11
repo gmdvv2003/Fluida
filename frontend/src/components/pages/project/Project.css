@@ -14,6 +14,14 @@
 	overflow-y: hidden;
 }
 
+.P-background::-webkit-scrollbar {
+	height: 10px;
+}
+
+.P-background::-webkit-scrollbar-thumb {
+	background-color: rgb(200, 200, 200);
+}
+
 .P-phases-container-holder {
 	display: flex;
 	column-gap: var(--cards-column-gap);

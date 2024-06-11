@@ -4,7 +4,7 @@
 	box-shadow: rgb(211, 211, 211) 0px 0px 6px;
 	background-color: #ffffff;
 	width: 100%;
-	height: var(--header-height);
+	height: var(--header-home-height);
 	overflow-x: hidden;
 	overflow-y: hidden;
 }

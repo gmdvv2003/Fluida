@@ -13,122 +13,108 @@ import Card from "../card/Card";
 
 import "./Phase.css";
 
-const Phase = React.forwardRef(
-	({ onCreateCardRequest, isLoading, phase, projectState, currentProjectSocket, ...callbacks }, ref) => {
-		const cardsContainerRef = useRef(null);
-		const cardsContainerScrollBarRef = useRef(null);
+const Phase = React.forwardRef(({ isLoading, phase, projectState, currentProjectSocket, ...callbacks }, ref) => {
+	const cardsContainerRef = useRef(null);
+	const cardsContainerScrollBarRef = useRef(null);
 
-		const lazyLoaderTopOffsetRef = useRef(null);
-		const lazyLoaderBottomOffsetRef = useRef(null);
+	const lazyLoaderTopOffsetRef = useRef(null);
+	const lazyLoaderBottomOffsetRef = useRef(null);
 
-		const lazyLoaderRef = useRef(null);
+	const lazyLoaderRef = useRef(null);
 
-		const performLazyLoaderUpdateRef = useRef(null);
+	const performLazyLoaderUpdateRef = useRef(null);
 
-		/**
-		 *
-		 */
-		function handleCreateNewPhaseButtonClick() {
-			onCreateCardRequest(phase?.phaseDTO?.phaseId);
-		}
+	useImperativeHandle(
+		ref,
+		() => ({
+			ref: cardsContainerScrollBarRef,
+		}),
+		[]
+	);
 
-		useImperativeHandle(
-			ref,
-			() => ({
-				ref: cardsContainerScrollBarRef,
-			}),
-			[]
-		);
+	useEffect(() => {}, []);
 
-		return (
-			<DragableModal
-				order={phase?.phaseDTO?.order}
-				// Elementos do modal
-				elements={(isDragging) => (
-					<div
-						className={`PP-background ${isDragging && "PP-background-dragging"}`}
-						ref={cardsContainerScrollBarRef}
-					>
-						<Suspense fallback={<LoadingDots />}>
-							{isLoading ? (
-								<div className="PP-center-lock">
-									<LoadingDots style={{ width: "32px", height: "32px" }} />
+	return (
+		<DragableModal
+			order={phase?.phaseDTO?.order}
+			// Elementos do modal
+			elements={(isDragging) => (
+				<div className={`PP-background ${isDragging && "PP-background-dragging"}`} ref={cardsContainerScrollBarRef}>
+					<Suspense fallback={<LoadingDots />}>
+						{isLoading ? (
+							<div className="PP-center-lock">
+								<LoadingDots style={{ width: "32px", height: "32px" }} />
+							</div>
+						) : (
+							<div>
+								<div className="PP-header">
+									<TextInputField
+										name="title"
+										placeholder={`${phase?.phaseDTO?.phaseName || "Título"} (#${phase?.phaseDTO?.phaseId})`}
+										style={{
+											backgroundColor: "white",
+											width: "100%",
+											height: "100%",
+										}}
+									/>
+									<PlusIcon
+										className="PP-header-icon-plus"
+										onClick={() => {
+											projectState.requestCreateNewPhase().catch((error) => {
+												console.error(`Erro ao criar nova fase:`, error);
+											});
+										}}
+									/>
+									<DotsIcon className="PP-header-icon" />
 								</div>
-							) : (
-								<div>
-									<div className="PP-header">
-										<TextInputField
-											name="title"
-											placeholder={`${phase?.phaseDTO?.phaseName || "Título"} (#${
-												phase?.phaseDTO?.phaseId
-											})`}
-											style={{
-												backgroundColor: "white",
-												width: "100%",
-												height: "100%",
-											}}
-										/>
-										<PlusIcon
-											className="PP-header-icon-plus"
-											onClick={handleCreateNewPhaseButtonClick}
-										/>
-										<DotsIcon className="PP-header-icon" />
-									</div>
 
-									<div className="PP-cards-container" ref={cardsContainerRef}>
-										<div ref={lazyLoaderTopOffsetRef} />
-										<LazyLoader
-											update={performLazyLoaderUpdateRef}
-											// Referências para os offsets
-											topLeftOffset={lazyLoaderBottomOffsetRef}
-											bottomRightOffset={lazyLoaderBottomOffsetRef}
-											// Container e barra de rolagem
-											container={cardsContainerRef}
-											scrollBar={cardsContainerScrollBarRef}
-											// Função para construir os elementos
-											constructElement={(phase, _, isLoading, setReference) => <Card />}
-											// Dimensões dos elementos
-											height={138}
-											margin={8}
-											padding={8}
-											// Direção de rolagem
-											direction={"vertical"}
-											// Funções de controle do conteúdo
-											fetchMore={(page) => {
-												return new Promise((resolve, reject) => {
-													return currentProjectSocket.current?.emit(
-														"fetchCards",
-														{ page },
-														(response) => {
-															resolve(response?.taken || []);
-														}
-													);
-												});
-											}}
-											getAvailableContentCountForFetch={async (sync = false) => {
-												return await projectState.current?.getTotalCards(sync);
-											}}
-											// Tamanho da página
-											pageSize={10}
-											// Função para obter o conteúdo
-											getContent={() => projectState.current?.getCards(phase?.phaseDTO?.phaseId)}
-											// Referência para o lazy loader
-											ref={lazyLoaderRef}
-										/>
-										<div ref={lazyLoaderBottomOffsetRef} />
-									</div>
+								<div className="PP-cards-container" ref={cardsContainerRef}>
+									<div ref={lazyLoaderTopOffsetRef} />
+									<LazyLoader
+										update={performLazyLoaderUpdateRef}
+										// Referências para os offsets
+										topLeftOffset={lazyLoaderBottomOffsetRef}
+										bottomRightOffset={lazyLoaderBottomOffsetRef}
+										// Container e barra de rolagem
+										container={cardsContainerRef}
+										scrollBar={cardsContainerScrollBarRef}
+										// Função para construir os elementos
+										constructElement={(phase, _, isLoading, setReference) => <Card />}
+										// Dimensões dos elementos
+										height={138}
+										margin={8}
+										padding={8}
+										// Direção de rolagem
+										direction={"vertical"}
+										// Funções de controle do conteúdo
+										fetchMore={(page) => {
+											return new Promise((resolve, reject) => {
+												resolve([]);
+											});
+										}}
+										getAvailableContentCountForFetch={async (sync = false) => {
+											return await projectState.current?.getTotalCards(phase?.phaseDTO?.phaseId, sync);
+										}}
+										// Tamanho da página
+										pageSize={10}
+										// Função para obter o conteúdo
+										getContent={() => projectState.current?.getCards(phase?.phaseDTO?.phaseId)}
+										// Referência para o lazy loader
+										ref={lazyLoaderRef}
+									/>
+									<div ref={lazyLoaderBottomOffsetRef} />
 								</div>
-							)}
-						</Suspense>
-					</div>
-				)}
-				// Callbacks
-				callbacks={callbacks}
-				// Referência para o modal
-				ref={ref}
-			></DragableModal>
-		);
-	}
-);
+							</div>
+						)}
+					</Suspense>
+				</div>
+			)}
+			// Callbacks
+			callbacks={callbacks}
+			// Referência para o modal
+			ref={ref}
+		></DragableModal>
+	);
+});
 
 export default Phase;

@@ -59,7 +59,36 @@ class PhaseFunctionality {
 
 	#IOUpdatePhase(projectsIO, socket, project, data) {}
 
-	#IOMovePhase(projectsIO, socket, project, data) {}
+	/**
+	 * Realiza a movimentação de uma fase.
+	 *
+	 * @param {Namespace} projectsIO
+	 * @param {Socket} socket
+	 * @param {Projec} project
+	 * @param {Object} data
+	 * @param {Function} acknowledgement
+	 */
+	#IOMovePhase(projectsIO, socket, project, data, acknowledgement) {
+		const { phaseId, targetPositionIndex } = data;
+
+		if (project.getPhase(phaseId) == undefined) {
+			return socket.emit("error", { message: "Fase não encontrada." });
+		}
+
+		this.ProjectsController.PhasesService.movePhase(
+			new PhasesDTO({ projectId: project.projectId, phaseId }),
+			targetPositionIndex
+		)
+			.then((result) => {
+				console.log(result);
+			})
+			.catch((error) => {
+				socket.emit("error", { message: "Erro ao mover a fase", error: error });
+
+				// Emite a resposta pessoal do evento
+				acknowledgement && acknowledgement(false, { error: error });
+			});
+	}
 
 	/**
 	 * Busca as fases do projeto.

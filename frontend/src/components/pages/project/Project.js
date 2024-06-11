@@ -22,364 +22,383 @@ import ConnectionFailure from "./ConnectionFailure";
 
 import Backdrop from "components/shared/backdrop/Backdrop";
 
-class CardState {
-	cardDTO;
-
-	constructor(cardDTO) {
-		this.cardDTO = cardDTO;
-	}
-}
-
-class PhaseState {
-	phaseDTO;
-
-	cards = [];
-	cardsMap = {};
-
-	totalCards = 0;
-
-	constructor(phaseDTO) {
-		this.phaseDTO = phaseDTO;
-	}
-}
-
-class ProjectState {
-	#socket;
-
-	members = [];
-
-	phases = [];
-	phasesMap = {};
-
-	totalPhases = 0;
-
-	// Indica se o número total de fases foi sincronizado com o servidor
-	totalPhasesSynced = false;
-
-	#projectMembersStateListeners = new ReactSubscriptionHelper();
-	#projectPhasesStateListeners = new ReactSubscriptionHelper();
-
-	// Cada fase tem um listener
-	#projectCardsStateListeners = [];
-
-	constructor(socket) {
-		new Promise((resolve, reject) => {
-			async function fetchProjectMembers(page = 1) {
-				socket.emit("fetchProjectMembers", { page }, (response) => {
-					const members = response?.members?.taken;
-					if (!members) {
-						return reject();
-					}
-
-					members.forEach((member) => {
-						this.members.push(member);
-					});
-
-					if (response?.members?.hasNextPage) {
-						fetchProjectMembers(page + 1);
-					} else {
-						resolve();
-					}
-
-					this.#projectPhasesStateListeners.notify({ members });
-				});
-			}
-
-			fetchProjectMembers();
-		})
-			.then(() => {})
-			.catch(() => {});
-
-		this.#socket = socket;
-	}
-
-	/**
-	 * Inscreve um callback para ser chamado quando o estado dos membros do projeto mudar.
-	 *
-	 * @param {Function} callback
-	 * @returns {Function}
-	 */
-	onProjectMembersStateChange(callback) {
-		return this.#projectMembersStateListeners.subscribe(callback);
-	}
-
-	/**
-	 * Inscreve um callback para ser chamado quando o estado das fases do projeto mudar.
-	 *
-	 * @param {Function} callback
-	 * @returns {Function}
-	 */
-	onProjectPhasesStateChange(callback) {
-		return this.#projectPhasesStateListeners.subscribe(callback);
-	}
-
-	/**
-	 * Inscreve um callback para ser chamado quando o estado dos cards do projeto mudar.
-	 *
-	 * @param {Function} callback
-	 * @returns {Function}
-	 */
-	onProjectCardsStateChange(callback, phaseId) {
-		return this.#projectCardsStateListeners.subscribe(callback);
-	}
-
-	getMembers() {
-		return this.members;
-	}
-
-	/**
-	 * Retorna o número total de fases.
-	 *
-	 * @param {boolean} sync
-	 * @returns {Promise}
-	 */
-	async getTotalPhases(sync = false) {
-		return new Promise((resolve) => {
-			// Caso sync = true ou o número total de fases ainda não tenha sido sincronizado, então é feito um fetch do número total de fases
-			// Caso contrário, é retornado o número total de fases local
-			if (!this.totalPhasesSynced && !sync) {
-				return this.#socket.emit("getTotalPhases", null, (response) => {
-					let retrievedCount = response?.amount;
-
-					// Se o número total de fases foi retornado, então o número total de fases foi sincronizado
-					if (retrievedCount != undefined) {
-						this.totalPhases = retrievedCount;
-						this.totalPhasesSynced = true;
-					}
-
-					resolve(this.totalPhases);
-				});
-			}
-
-			return resolve(this.totalPhases);
-		});
-	}
-
-	/**
-	 *
-	 * @param {number} phaseId
-	 * @param {boolean} sync
-	 * @returns
-	 */
-	async getTotalCards(phaseId, sync = false) {
-		return 0;
-	}
-
-	/**
-	 * Pega o estado de uma fase.
-	 *
-	 * @param {number} phaseId
-	 * @returns {PhaseState}
-	 */
-	getPhaseState(phaseId) {
-		return this.phasesMap[phaseId];
-	}
-
-	/**
-	 * Pega o estado de um card.
-	 *
-	 * @param {number} phaseId
-	 * @param {number} cardId
-	 * @returns {CardState}
-	 */
-	getCardState(phaseId, cardId) {
-		return this.getPhaseState(phaseId)?.cardsMap[cardId];
-	}
-
-	/**
-	 * Retorna as fases do projeto.
-	 *
-	 * @returns {Array}
-	 */
-	getPhases() {
-		return this.phases;
-	}
-
-	/**
-	 * Retorna os cards de uma fase.
-	 *
-	 * @param {number} phaseId
-	 * @returns {Array}
-	 */
-	getCards(phaseId) {
-		return this.getPhaseState(phaseId)?.cards;
-	}
-
-	/**
-	 * Resposta do servidor para a criação de uma fase.
-	 *
-	 * @param {Object} phaseDTO
-	 * @returns {PhaseState}
-	 */
-	phaseCreated(phaseDTO, fromFetch = false, fromLazyLoader = false) {
-		phaseDTO = phaseDTO?.[0];
-		if (!phaseDTO) {
-			return null;
-		}
-
-		if (this.getPhaseState(phaseDTO.phaseId)) {
-			return null;
-		}
-
-		// Criar o estado da fase
-		const phaseState = new PhaseState(phaseDTO);
-
-		// Adiciona a fase ao estado da fase
-		if (!fromLazyLoader) {
-			this.phases.push(phaseState);
-		}
-
-		this.phasesMap[phaseDTO.phaseId] = phaseState;
-
-		this.totalPhases += fromFetch ? 0 : 1;
-
-		// Atualizar o estado do projeto
-		this.#projectPhasesStateListeners.notify(phaseDTO);
-
-		return phaseState;
-	}
-
-	/**
-	 * Resposta do servidor para a atualização de uma fase.
-	 *
-	 * @param {number} phaseId
-	 * @param {Object} updatedPhaseDTOFields
-	 */
-	phaseUpdated(phaseId, updatedPhaseDTOFields) {}
-
-	/**
-	 * Resposta do servidor para a remoção de uma fase.
-	 *
-	 * @param {number} phaseId
-	 */
-	phaseDeleted(phaseId) {}
-
-	/**
-	 * Resposta do servidor para a movimentação de uma fase.
-	 *
-	 * @param {number} phaseId
-	 * @param {number} targetPositionIndex
-	 */
-	phaseMoved(phaseId, targetPositionIndex) {}
-
-	/**
-	 * Resposta do servidor para a criação de um card.
-	 *
-	 * @param {Object} cardDTO
-	 * @returns {CardState}
-	 */
-	cardCreated(cardDTO, fromFetch = false, fromLazyLoader = false) {
-		cardDTO = cardDTO?.[0];
-		if (!cardDTO) {
-			return null;
-		}
-
-		const phaseState = this.getPhaseState(cardDTO.phaseId);
-		if (!phaseState) {
-			return null;
-		}
-
-		if (this.getCardState(cardDTO.phaseId, cardDTO.cardId)) {
-			return null;
-		}
-
-		// Criar o estado do card
-		const cardState = new CardState(cardDTO);
-
-		// Adiciona o card ao estado da fase
-		if (!fromLazyLoader) {
-			phaseState.cards?.push(cardState);
-		}
-
-		phaseState.cardsMap[cardDTO.cardId] = cardState;
-
-		// Incrimenta o número total de cards
-		phaseState.totalCards += fromFetch ? 0 : 1;
-
-		// Atualizar o estado do projeto
-		this.#projectCardsStateListeners.notify(cardDTO);
-
-		return cardState;
-	}
-
-	/**
-	 * Resposta do servidor para a atualização de um card.
-	 *
-	 * @param {number} cardId
-	 * @param {Object} updatedCardDTOFields
-	 */
-	cardUpdated(cardId, updatedCardDTOFields) {}
-
-	/**
-	 * Resposta do servidor para a remoção de um card.
-	 *
-	 * @param {number} cardId
-	 */
-	cardDeleted(cardId) {}
-
-	/**
-	 * Resposta do servidor para a movimentação de um card.
-	 *
-	 * @param {number} cardId
-	 * @param {number} targetPhaseIndex
-	 * @param {number} targetPositionIndex
-	 */
-	cardMoved(cardId, targetPhaseIndex, targetPositionIndex) {}
-
-	/**
-	 * Resposta do servidor para o fetch das fases.
-	 *
-	 * @param {Array} phases
-	 */
-	phasesFetched(phases) {
-		phases = phases?.[0]?.taken?.filter(({ phaseId }) => this.phasesMap[phaseId] == undefined);
-		phases.forEach((phase) => {
-			// Cria o estado da fase
-			this.phaseCreated([phase], true);
-
-			// Realiza o fetch dos cards da fase inicial
-			this.#socket.emit("fetchCards", { page: 0, phaseId: phase?.phaseId });
-		});
-	}
-
-	/**
-	 * Resposta do servidor para o fetch dos cards.
-	 *
-	 * @param {number} phaseId
-	 * @param {Array} cards
-	 */
-	cardsFetched(phaseId, cards) {
-		cards?.taken?.forEach((card) => {
-			// Cria o estado do card
-			this.cardCreated([card], true);
-		});
-	}
-
-	/**
-	 *
-	 * @param {*} phaseDTO
-	 * @returns
-	 */
-	newPhaseState(phaseDTO) {
-		return new PhaseState(phaseDTO);
-	}
-
-	/**
-	 *
-	 * @param {*} cardDTO
-	 * @returns
-	 */
-	newCardState(cardDTO) {
-		return new CardState(cardDTO);
-	}
-}
-
 function Project() {
+	const { newPopup } = useSystemPopups();
+
+	class CardState {
+		cardDTO;
+
+		constructor(cardDTO) {
+			this.cardDTO = cardDTO;
+		}
+	}
+
+	class PhaseState {
+		phaseDTO;
+
+		cards = [];
+		cardsMap = {};
+
+		totalCards = 0;
+
+		constructor(phaseDTO) {
+			this.phaseDTO = phaseDTO;
+		}
+	}
+
+	class ProjectState {
+		#socket;
+
+		members = [];
+
+		phases = [];
+		phasesMap = {};
+
+		totalPhases = 0;
+
+		// Indica se o número total de fases foi sincronizado com o servidor
+		totalPhasesSynced = false;
+
+		#projectMembersStateListeners = new ReactSubscriptionHelper();
+		#projectPhasesStateListeners = new ReactSubscriptionHelper();
+
+		// Cada fase tem um listener
+		#projectCardsStateListeners = [];
+
+		constructor(socket) {
+			new Promise((resolve, reject) => {
+				async function fetchProjectMembers(page = 1) {
+					socket.emit("fetchProjectMembers", { page }, (response) => {
+						const members = response?.members?.taken;
+						if (!members) {
+							return reject();
+						}
+
+						members.forEach((member) => {
+							this.members.push(member);
+						});
+
+						if (response?.members?.hasNextPage) {
+							fetchProjectMembers(page + 1);
+						} else {
+							resolve();
+						}
+
+						this.#projectPhasesStateListeners.notify({ members });
+					});
+				}
+
+				fetchProjectMembers();
+			})
+				.then(() => {})
+				.catch(() => {});
+
+			this.#socket = socket;
+		}
+
+		/**
+		 * Inscreve um callback para ser chamado quando o estado dos membros do projeto mudar.
+		 *
+		 * @param {Function} callback
+		 * @returns {Function}
+		 */
+		onProjectMembersStateChange(callback) {
+			return this.#projectMembersStateListeners.subscribe(callback);
+		}
+
+		/**
+		 * Inscreve um callback para ser chamado quando o estado das fases do projeto mudar.
+		 *
+		 * @param {Function} callback
+		 * @returns {Function}
+		 */
+		onProjectPhasesStateChange(callback) {
+			return this.#projectPhasesStateListeners.subscribe(callback);
+		}
+
+		/**
+		 * Inscreve um callback para ser chamado quando o estado dos cards do projeto mudar.
+		 *
+		 * @param {Function} callback
+		 * @returns {Function}
+		 */
+		onProjectCardsStateChange(callback, phaseId) {
+			return this.#projectCardsStateListeners.subscribe(callback);
+		}
+
+		getMembers() {
+			return this.members;
+		}
+
+		/**
+		 * Retorna o número total de fases.
+		 *
+		 * @param {boolean} sync
+		 * @returns {Promise}
+		 */
+		async getTotalPhases(sync = false) {
+			return new Promise((resolve) => {
+				// Caso sync = true ou o número total de fases ainda não tenha sido sincronizado, então é feito um fetch do número total de fases
+				// Caso contrário, é retornado o número total de fases local
+				if (!this.totalPhasesSynced && !sync) {
+					return this.#socket.emit("getTotalPhases", null, (response) => {
+						let retrievedCount = response?.amount;
+
+						// Se o número total de fases foi retornado, então o número total de fases foi sincronizado
+						if (retrievedCount != undefined) {
+							this.totalPhases = retrievedCount;
+							this.totalPhasesSynced = true;
+						}
+
+						resolve(this.totalPhases);
+					});
+				}
+
+				return resolve(this.totalPhases);
+			});
+		}
+
+		/**
+		 *
+		 * @param {number} phaseId
+		 * @param {boolean} sync
+		 * @returns
+		 */
+		async getTotalCards(phaseId, sync = false) {
+			return 0;
+		}
+
+		/**
+		 * Pega o estado de uma fase.
+		 *
+		 * @param {number} phaseId
+		 * @returns {PhaseState}
+		 */
+		getPhaseState(phaseId) {
+			return this.phasesMap[phaseId];
+		}
+
+		/**
+		 * Pega o estado de um card.
+		 *
+		 * @param {number} phaseId
+		 * @param {number} cardId
+		 * @returns {CardState}
+		 */
+		getCardState(phaseId, cardId) {
+			return this.getPhaseState(phaseId)?.cardsMap[cardId];
+		}
+
+		/**
+		 * Retorna as fases do projeto.
+		 *
+		 * @returns {Array}
+		 */
+		getPhases() {
+			return this.phases;
+		}
+
+		/**
+		 * Retorna os cards de uma fase.
+		 *
+		 * @param {number} phaseId
+		 * @returns {Array}
+		 */
+		getCards(phaseId) {
+			return this.getPhaseState(phaseId)?.cards;
+		}
+
+		/**
+		 * Resposta do servidor para a criação de uma fase.
+		 *
+		 * @param {Object} phaseDTO
+		 * @returns {PhaseState}
+		 */
+		phaseCreated(phaseDTO, fromFetch = false, fromLazyLoader = false) {
+			phaseDTO = phaseDTO?.[0];
+			if (!phaseDTO) {
+				return null;
+			}
+
+			if (this.getPhaseState(phaseDTO.phaseId)) {
+				return null;
+			}
+
+			// Criar o estado da fase
+			const phaseState = new PhaseState(phaseDTO);
+
+			// Adiciona a fase ao estado da fase
+			if (!fromLazyLoader) {
+				this.phases.push(phaseState);
+			}
+
+			this.phasesMap[phaseDTO.phaseId] = phaseState;
+
+			this.totalPhases += fromFetch ? 0 : 1;
+
+			// Atualizar o estado do projeto
+			this.#projectPhasesStateListeners.notify(phaseDTO);
+
+			return phaseState;
+		}
+
+		/**
+		 * Resposta do servidor para a atualização de uma fase.
+		 *
+		 * @param {number} phaseId
+		 * @param {Object} updatedPhaseDTOFields
+		 */
+		phaseUpdated(phaseId, updatedPhaseDTOFields) {}
+
+		/**
+		 * Resposta do servidor para a remoção de uma fase.
+		 *
+		 * @param {number} phaseId
+		 */
+		phaseDeleted(phaseId) {}
+
+		/**
+		 * Resposta do servidor para a movimentação de uma fase.
+		 *
+		 * @param {number} phaseId
+		 * @param {number} oldPositionIndex
+		 * @param {number} targetPositionIndex
+		 */
+		phaseMoved(phaseId, oldPositionIndex, targetPositionIndex) {}
+
+		/**
+		 * Resposta do servidor para a criação de um card.
+		 *
+		 * @param {Object} cardDTO
+		 * @returns {CardState}
+		 */
+		cardCreated(cardDTO, fromFetch = false, fromLazyLoader = false) {
+			cardDTO = cardDTO?.[0];
+			if (!cardDTO) {
+				return null;
+			}
+
+			const phaseState = this.getPhaseState(cardDTO.phaseId);
+			if (!phaseState) {
+				return null;
+			}
+
+			if (this.getCardState(cardDTO.phaseId, cardDTO.cardId)) {
+				return null;
+			}
+
+			// Criar o estado do card
+			const cardState = new CardState(cardDTO);
+
+			// Adiciona o card ao estado da fase
+			if (!fromLazyLoader) {
+				phaseState.cards?.push(cardState);
+			}
+
+			phaseState.cardsMap[cardDTO.cardId] = cardState;
+
+			// Incrimenta o número total de cards
+			phaseState.totalCards += fromFetch ? 0 : 1;
+
+			// Atualizar o estado do projeto
+			this.#projectCardsStateListeners.notify(cardDTO);
+
+			return cardState;
+		}
+
+		/**
+		 * Resposta do servidor para a atualização de um card.
+		 *
+		 * @param {number} cardId
+		 * @param {Object} updatedCardDTOFields
+		 */
+		cardUpdated(cardId, updatedCardDTOFields) {}
+
+		/**
+		 * Resposta do servidor para a remoção de um card.
+		 *
+		 * @param {number} cardId
+		 */
+		cardDeleted(cardId) {}
+
+		/**
+		 * Resposta do servidor para a movimentação de um card.
+		 *
+		 * @param {number} cardId
+		 * @param {number} oldPositionIndex
+		 * @param {number} targetPositionIndex
+		 * @param {number} targetPhaseId
+		 * @param {number} targetPhasePositionIndex
+		 */
+		cardMoved(phaseId, cardId, oldPositionIndex, targetPositionIndex, targetPhaseId, targetPhasePositionIndex) {}
+
+		/**
+		 * Resposta do servidor para o fetch das fases.
+		 *
+		 * @param {Array} phases
+		 */
+		phasesFetched(phases) {
+			phases = phases?.[0]?.taken?.filter(({ phaseId }) => this.phasesMap[phaseId] == undefined);
+			phases.forEach((phase) => {
+				// Cria o estado da fase
+				this.phaseCreated([phase], true);
+
+				// Realiza o fetch dos cards da fase inicial
+				this.#socket.emit("fetchCards", { page: 0, phaseId: phase?.phaseId });
+			});
+		}
+
+		/**
+		 * Resposta do servidor para o fetch dos cards.
+		 *
+		 * @param {number} phaseId
+		 * @param {Array} cards
+		 */
+		cardsFetched(phaseId, cards) {
+			cards?.taken?.forEach((card) => {
+				// Cria o estado do card
+				this.cardCreated([card], true);
+			});
+		}
+
+		/**
+		 *
+		 * @param {*} phaseDTO
+		 * @returns
+		 */
+		newPhaseState(phaseDTO) {
+			return new PhaseState(phaseDTO);
+		}
+
+		/**
+		 *
+		 * @param {*} cardDTO
+		 * @returns
+		 */
+		newCardState(cardDTO) {
+			return new CardState(cardDTO);
+		}
+
+		// ============================== Funções de requisição ============================== //
+		requestCreateNewPhase(phaseName = "Nova Fase") {
+			return new Promise((resolve) => {
+				this.#socket.emit("createPhase", { phaseName }, (success, data) => {
+					success
+						? newPopup("Common", { severity: "success", message: "Fase criada com sucesso" })
+						: newPopup("Common", { severity: "error", message: "Erro ao criar a fase" });
+
+					resolve(success);
+				});
+			});
+		}
+
+		requestCreateNewCard(phaseId, cardName = "Novo Card") {}
+	}
+
 	const [isEditCardModalVisible, setIsEditCardModalVisible] = useState(false);
 	const [isProjectUsersModalVisible, setIsProjectUsersModalVisible] = useState(false);
 
 	const { projectId, cardId } = useParams();
-	const { newPopup } = useSystemPopups();
 	const { participate, leave } = useProjectAuthentication();
 
 	const projectSocketRef = useRef(null);

@@ -50,6 +50,16 @@ class PhasesService extends Service {
 	async deletePhase(phasesDTO) {
 		return await this.PhasesRepository.deletePhase(phasesDTO);
 	}
+
+	/**
+	 *
+	 * @param {*} phaseDTO
+	 * @param {*} targetPositionIndex
+	 * @returns
+	 */
+	async movePhase(phaseDTO, targetPositionIndex) {
+		return await this.PhasesRepository.movePhase(phaseDTO, targetPositionIndex);
+	}
 }
 
 module.exports = PhasesService;
