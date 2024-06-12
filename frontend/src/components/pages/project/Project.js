@@ -381,6 +381,11 @@ function Project() {
 		}
 
 		// ============================== Funções de requisição ============================== //
+		/**
+		 *
+		 * @param {*} phaseName
+		 * @returns
+		 */
 		requestCreateNewPhase(phaseName = "Nova Fase") {
 			return new Promise((resolve) => {
 				this.#socket.emit("createPhase", { phaseName }, (success, data) => {
@@ -393,7 +398,23 @@ function Project() {
 			});
 		}
 
-		requestCreateNewCard(phaseId, cardName = "Novo Card") {}
+		/**
+		 *
+		 * @param {*} phaseId
+		 * @param {*} title
+		 * @returns
+		 */
+		requestCreateNewCard(phaseId, title = "Novo Card") {
+			return new Promise((resolve) => {
+				this.#socket.emit("createCard", { phaseId, title }, (success, data) => {
+					success
+						? newPopup("Common", { severity: "success", message: "Card criado com sucesso" })
+						: newPopup("Common", { severity: "error", message: "Erro ao criar o card" });
+
+					resolve(success);
+				});
+			});
+		}
 	}
 
 	const [isEditCardModalVisible, setIsEditCardModalVisible] = useState(false);
@@ -617,8 +638,7 @@ function Project() {
 											"movePhase",
 											{ phaseId: phaseDTO?.phaseId, targetPositionIndex: newPosition },
 											(success, data) => {
-												!success &&
-													newPopup("Common", { severity: "error", message: "Erro ao mover a fase" });
+												!success && newPopup("Common", { severity: "error", message: "Erro ao mover a fase" });
 											}
 										);
 
@@ -628,15 +648,9 @@ function Project() {
 												return null;
 											}
 
-											if (
-												phaseState.phaseDTO.order < currentPhaseOrder &&
-												phaseState.phaseDTO.order >= newPosition
-											) {
+											if (phaseState.phaseDTO.order < currentPhaseOrder && phaseState.phaseDTO.order >= newPosition) {
 												phaseState.phaseDTO.order += 1;
-											} else if (
-												phaseState.phaseDTO.order > currentPhaseOrder &&
-												phaseState.phaseDTO.order <= newPosition
-											) {
+											} else if (phaseState.phaseDTO.order > currentPhaseOrder && phaseState.phaseDTO.order <= newPosition) {
 												phaseState.phaseDTO.order -= 1;
 											}
 										});

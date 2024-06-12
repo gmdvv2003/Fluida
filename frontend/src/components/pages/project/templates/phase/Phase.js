@@ -13,7 +13,7 @@ import Card from "../card/Card";
 
 import "./Phase.css";
 
-const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectState, currentProjectSocket, callbacks }, ref) => {
+const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectState, projectSocketRef, callbacks }, ref) => {
 	const cardsContainerRef = useRef(null);
 	const cardsContainerScrollBarRef = useRef(null);
 
@@ -63,7 +63,7 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 									<PlusIcon
 										className="PP-header-icon-plus"
 										onClick={() => {
-											projectState.requestCreateNewCard().catch((error) => {
+											projectState.current.requestCreateNewCard(phase?.phaseDTO?.phaseId).catch((error) => {
 												console.error(`Erro ao criar novo card:`, error);
 											});
 										}}
@@ -92,7 +92,13 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 										// Funções de controle do conteúdo
 										fetchMore={(page) => {
 											return new Promise((resolve, reject) => {
-												resolve([]);
+												return projectSocketRef.current?.emit(
+													"fetchCards",
+													{ phaseId: phase?.phaseDTO?.phaseId, page },
+													(response) => {
+														resolve(response?.cards?.taken || []);
+													}
+												);
 											});
 										}}
 										getAvailableContentCountForFetch={async (sync = false) => {
