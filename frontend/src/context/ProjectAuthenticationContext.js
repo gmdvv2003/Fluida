@@ -68,11 +68,7 @@ export function ProjectAuthenticationProvider({ children }) {
 			}
 
 			// Realiza a requisição para participar do projeto
-			const response = await performAuthenticatedRequest(
-				ParticipateInProjectEndpoint,
-				"POST",
-				JSON.stringify({ projectId })
-			);
+			const response = await performAuthenticatedRequest(ParticipateInProjectEndpoint, "POST", JSON.stringify({ projectId }));
 
 			if (response.success) {
 				// Cria uma nova instância do socket com o token de participação
@@ -88,7 +84,7 @@ export function ProjectAuthenticationProvider({ children }) {
 				 * @param {*} error
 				 */
 				function onError(error) {
-					console.error(`Erro no socket: ${error?.message} || ${error?.error}`);
+					console.error("Erro no socket:", error?.message, error?.error);
 				}
 
 				/**
@@ -116,9 +112,7 @@ export function ProjectAuthenticationProvider({ children }) {
 				function onDisconnect(reason) {
 					if (!reason.active) {
 						// Remove a sessão do projeto
-						setAuthenticatedProjectsSessions(
-							authenticatedProjectsSessions.filter((session) => session.projectId !== projectId)
-						);
+						setAuthenticatedProjectsSessions(authenticatedProjectsSessions.filter((session) => session.projectId !== projectId));
 
 						// Disconecta os eventos do socket
 						socket.off("error", onError);
@@ -202,8 +196,6 @@ export function ProjectAuthenticationProvider({ children }) {
 	useEffect(() => {});
 
 	return (
-		<ProjectAuthenticationContext.Provider value={{ getProjectSession, participate, leave }}>
-			{children}
-		</ProjectAuthenticationContext.Provider>
+		<ProjectAuthenticationContext.Provider value={{ getProjectSession, participate, leave }}>{children}</ProjectAuthenticationContext.Provider>
 	);
 }

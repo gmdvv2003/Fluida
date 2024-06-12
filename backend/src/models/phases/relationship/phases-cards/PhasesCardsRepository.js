@@ -13,10 +13,7 @@ class PhasesCardsRepository extends Repository {
 	}
 
 	async getTotalCardsInPhase(phaseId) {
-		return await this.Repository.createQueryBuilder("PhasesCards")
-			.select("totalPhases")
-			.where("phaseId = :phaseId", { phaseId })
-			.getRawOne();
+		return await this.Repository.createQueryBuilder("PhasesCards").select("totalPhases").where("phaseId = :phaseId", { phaseId }).getRawOne();
 	}
 
 	/**
@@ -55,7 +52,6 @@ class PhasesCardsRepository extends Repository {
 			.insert()
 			.into(PhasesCardsEntity, ["phaseId", "cardId"])
 			.values(phasesCards)
-			.orIgnore()
 			.execute();
 	}
 

@@ -26,6 +26,29 @@ function injectFunctionality(name, next, authenticateless) {
 	this.injectProjectFunctionality(name, next, authenticateless);
 }
 
+class Card {
+	project;
+	cardDTO;
+
+	constructor(project, cardDTO) {
+		this.project = project;
+		this.cardDTO = cardDTO;
+	}
+}
+
+class Phase {
+	project;
+	phaseDTO;
+
+	#totalCardsInPhase = undefined;
+	#totalCardsInPhaseBeforeFetch = 0;
+
+	constructor(project, phaseDTO) {
+		this.project = project;
+		this.phaseDTO = phaseDTO;
+	}
+}
+
 class Participant {
 	subscribed = false;
 
@@ -68,7 +91,7 @@ class Project {
 	/**
 	 * Função auxiliar para buscar mais elementos de uma lista.
 	 */
-	async #fetchMore(list, fetchFunction, page, ...data) {
+	async #fetchMore(constructor, list, fetchFunction, page, ...data) {
 		if (page < 1) {
 			return { taken: [] };
 		}
@@ -90,7 +113,7 @@ class Project {
 
 		const { taken, total, hasNextPage } = await fetchFunction({ PAGE: page }, ...data);
 		for (let index = head; index < taken.length; index += 1) {
-			list[index] = taken[index];
+			list[index] = constructor(taken[index]);
 		}
 
 		return { taken, hasNextPage, total };
@@ -105,7 +128,13 @@ class Project {
 	 */
 	async getCards(page, phaseId) {
 		const phasesCardsService = this.ProjectsController.PhasesService.PhasesCardsService;
-		return await this.#fetchMore(this.#cards, phasesCardsService.getCardsOfPhase.bind(phasesCardsService), page, phaseId);
+		return await this.#fetchMore(
+			(cardDTO) => new Card(this, cardDTO),
+			this.#cards,
+			phasesCardsService.getCardsOfPhase.bind(phasesCardsService),
+			page,
+			phaseId
+		);
 	}
 
 	/**
@@ -115,8 +144,17 @@ class Project {
 	 * @returns {number}
 	 */
 	async getTotalCardsInPhase(phaseId) {
-		const projectsPhasesService = this.ProjectsController.Service.ProjectsPhasesService;
-		return await projectsPhasesService.getTotalCardsInPhase(phaseId);
+		const phase = this.getPhase(phaseId);
+		if (phase === undefined) {
+			return 0;
+		}
+
+		if (phase.totalCardsInPhase === undefined) {
+			const cardsCount = (await this.ProjectsController.Service.PhasesService.PhasesCardsService.getTotalCardsInPhase(phaseId))?.totalCards;
+			phase.totalCardsInPhase = cardsCount + phase.totalCardsInPhaseBeforeFetch;
+		}
+
+		return phase.totalCardsInPhase;
 	}
 
 	/**
@@ -128,6 +166,7 @@ class Project {
 	async getPhases(page) {
 		const projectsPhasesService = this.ProjectsController.Service.ProjectsPhasesService;
 		return await this.#fetchMore(
+			(phaseDTO) => new Phase(this, phaseDTO),
 			this.#phases,
 			projectsPhasesService.getPhasesOfProject.bind(projectsPhasesService),
 			page,
@@ -156,21 +195,21 @@ class Project {
 	 * @returns
 	 */
 	getCard(cardId) {
-		return this.#cards.find((card) => card.cardId === cardId);
+		return (this.#cards.find((card) => card.cardDTO.cardId === cardId) || []).map((card) => card.cardDTO);
 	}
 
 	/**
 	 * @param {CardsDTO} cardDTO
 	 */
 	addCard(cardDTO) {
-		this.#cards.push(cardDTO);
+		this.#cards.push(new Card(this, cardDTO));
 	}
 
 	/**
 	 * @param {number} caseId
 	 */
 	removeCard(caseId) {
-		this.#cards = this.#cards.filter((card) => card.cardId !== cardId);
+		this.#cards = this.#cards.filter((card) => card !== undefined && card.cardDTO.cardId !== cardId);
 	}
 
 	/**
@@ -179,14 +218,17 @@ class Project {
 	 * @returns
 	 */
 	getPhase(phaseId) {
-		return this.#phases.find((phase) => phase.phaseId === phaseId);
+		console.log(phaseId);
+		console.log("===============");
+		console.log(this.#phases);
+		return (this.#phases.find((phase) => phase !== undefined && phase.phaseDTO.phaseId === phaseId) || []).map((phase) => phase.phaseDTO);
 	}
 
 	/**
 	 * @param {PhasesDTO} phaseDTO
 	 */
 	addPhase(phaseDTO) {
-		this.#phases.push(phaseDTO);
+		this.#phases.push(new Phase(this, phaseDTO));
 		this.#totalPhasesInProject == undefined ? this.#totalPhasesInProject++ : this.#totalPhasesInProjectBeforeFetch++;
 	}
 
@@ -194,7 +236,7 @@ class Project {
 	 * @param {number} phaseId
 	 */
 	removePhase(phaseId) {
-		this.#phases = this.#phases.filter((phase) => phase.phaseId !== phaseId);
+		this.#phases = this.#phases.filter((phase) => phase.phaseDTO.phaseId !== phaseId);
 		this.#totalPhasesInProject == undefined ? this.#totalPhasesInProject-- : this.#totalPhasesInProjectBeforeFetch--;
 	}
 }
@@ -383,6 +425,10 @@ class ProjectsFunctionalityInterface {
 			socket.disconnect();
 		} catch (error) {
 			socket.emit("error", { message: error.message });
+		}
+
+		if (project.members.length === 0) {
+			delete this.#projects[projectId];
 		}
 	}
 }

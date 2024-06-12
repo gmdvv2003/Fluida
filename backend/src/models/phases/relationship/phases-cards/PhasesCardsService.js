@@ -38,9 +38,7 @@ class PhasesCardsService extends Service {
 	 * @returns {InsertResult}
 	 */
 	async addCardToPhase(phaseId, cardId) {
-		return await this.PhasesCardsRepository.addCardToPhase(
-			new PhasesCardsDTO({ phaseId, cardId })
-		);
+		return await this.PhasesCardsRepository.addCardToPhase(new PhasesCardsDTO({ phaseId, cardId }));
 	}
 
 	/**
@@ -51,9 +49,7 @@ class PhasesCardsService extends Service {
 	 * @returns {DeleteResult}
 	 */
 	async removeCardFromPhase(phaseId, cardId) {
-		return await this.PhasesCardsRepository.removeCardFromPhase(
-			new PhasesCardsDTO({ phaseId, cardId })
-		);
+		return await this.PhasesCardsRepository.removeCardFromPhase(new PhasesCardsDTO({ phaseId, cardId }));
 	}
 }
 

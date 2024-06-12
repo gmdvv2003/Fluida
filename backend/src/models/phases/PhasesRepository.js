@@ -51,8 +51,7 @@ class PhasesRepository extends Repository {
 			.into("Phases")
 			.values({
 				...phasesDTO,
-				order: () =>
-					"(COALESCE((SELECT MAX(`order`) FROM (SELECT * FROM `Phases` WHERE `projectId` = :projectId) AS temporary) + 1, 1))",
+				order: () => "(COALESCE((SELECT MAX(`order`) FROM (SELECT * FROM `Phases` WHERE `projectId` = :projectId) AS temporary) + 1, 1))",
 			})
 			.setParameter("projectId", phasesDTO.projectId)
 			.execute();
@@ -65,11 +64,7 @@ class PhasesRepository extends Repository {
 	 * @returns {DeleteResult}
 	 */
 	async deletePhase(phasesDTO) {
-		return await this.Repository.createQueryBuilder("Phases")
-			.delete()
-			.from("Phases")
-			.where(`phaseId = :phaseId`, phasesDTO)
-			.execute();
+		return await this.Repository.createQueryBuilder("Phases").delete().from("Phases").where(`phaseId = :phaseId`, phasesDTO).execute();
 	}
 
 	/**
@@ -82,10 +77,8 @@ class PhasesRepository extends Repository {
 	async movePhase(phaseDTO, targetPositionIndex) {
 		// Pega a posição atual da fase
 		const { order } =
-			(await this.Repository.createQueryBuilder("Phases")
-				.select("Phases.order", "order")
-				.where(`phaseId = :phaseId`, phaseDTO)
-				.getRawOne()) || {};
+			(await this.Repository.createQueryBuilder("Phases").select("Phases.order", "order").where(`phaseId = :phaseId`, phaseDTO).getRawOne()) ||
+			{};
 
 		if (!order) {
 			throw new Error("Fase não encontrada.");
@@ -127,6 +120,19 @@ class PhasesRepository extends Repository {
 			// Salva as fases atualizadas no banco de dados
 			await transactionalEntityManager.save(phasesToUpdate);
 		});
+	}
+
+	/**
+	 *
+	 * @param {*} phaseId
+	 * @returns
+	 */
+	async incrementTotalCardsInPhase(phaseId) {
+		return await this.Repository.createQueryBuilder("Phases")
+			.update(PhasesEntity)
+			.set({ totalCards: () => "totalCards + 1" })
+			.where("phaseId = :phaseId", { phaseId })
+			.execute();
 	}
 }
 

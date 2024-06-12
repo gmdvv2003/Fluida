@@ -60,6 +60,10 @@ class PhasesService extends Service {
 	async movePhase(phaseDTO, targetPositionIndex) {
 		return await this.PhasesRepository.movePhase(phaseDTO, targetPositionIndex);
 	}
+
+	async incrementTotalCardsInPhase(phaseId) {
+		return await this.PhasesRepository.incrementTotalCardsInPhase(phaseId);
+	}
 }
 
 module.exports = PhasesService;

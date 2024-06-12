@@ -41,7 +41,7 @@ class CardFunctionality {
 				project.addCard(cardDTO);
 
 				// Emite o evento de criaçao de card
-				projectsIO.to(project.projectId).emit("createCard", cardDTO);
+				projectsIO.to(project.projectId).emit("cardCreated", cardDTO);
 			})
 			.catch((error) => socket.emit("error", { message: "Erro ao criar o card da fase", error: error }));
 	}

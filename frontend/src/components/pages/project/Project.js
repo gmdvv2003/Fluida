@@ -35,6 +35,7 @@ function Project() {
 		cardsMap = {};
 
 		totalCards = 0;
+		totalCardsSynced = false;
 
 		constructor(phaseDTO) {
 			this.phaseDTO = phaseDTO;
@@ -160,7 +161,30 @@ function Project() {
 		 * @returns
 		 */
 		async getTotalCards(phaseId, sync = false) {
-			return 0;
+			const phaseState = this.getPhaseState(phaseId);
+			if (!phaseState) {
+				return 0;
+			}
+
+			return new Promise((resolve) => {
+				// Caso sync = true ou o número total de cards na fase ainda não tenha sido sincronizado, então é feito um fetch do número total de cards
+				// Caso contrário, é retornado o número total de cards local
+				if (!phaseState.totalCardsSynced && !sync) {
+					return this.#socket.emit("getTotalCards", null, (response) => {
+						let retrievedCount = response?.amount;
+
+						// Se o número total de cards foi retornado, então o número total de cards foi sincronizado
+						if (retrievedCount != undefined) {
+							phaseState.totalCards = retrievedCount;
+							phaseState.totalCardsSynced = true;
+						}
+
+						resolve(phaseState.totalCards);
+					});
+				}
+
+				return resolve(phaseState.totalCards);
+			});
 		}
 
 		/**
@@ -325,14 +349,7 @@ function Project() {
 		 * @param {number} targetPhaseId
 		 * @param {number} targetPhasePositionIndex
 		 */
-		cardMoved(
-			phaseId,
-			cardId,
-			oldPositionIndex,
-			targetPositionIndex,
-			targetPhaseId,
-			targetPhasePositionIndex
-		) {}
+		cardMoved(phaseId, cardId, oldPositionIndex, targetPositionIndex, targetPhaseId, targetPhasePositionIndex) {}
 
 		/**
 		 * Resposta do servidor para o fetch das fases.
@@ -340,9 +357,7 @@ function Project() {
 		 * @param {Array} phases
 		 */
 		phasesFetched(phases) {
-			phases = phases?.[0]?.taken?.filter(
-				({ phaseId }) => this.phasesMap[phaseId] == undefined
-			);
+			phases = phases?.[0]?.taken?.filter(({ phaseId }) => this.phasesMap[phaseId] == undefined);
 			phases.forEach((phase) => {
 				// Cria o estado da fase
 				this.phaseCreated([phase], true);
@@ -573,16 +588,12 @@ function Project() {
 			socket.on("cardsFetched", cardsFetched);
 
 			// Listeners do estado do projeto
-			const unbindOnProjectPhaseStateChange = newProjectState.onProjectPhasesStateChange(
-				(phases) => {
-					performLazyLoaderUpdateRef.current();
-				}
-			);
+			const unbindOnProjectPhaseStateChange = newProjectState.onProjectPhasesStateChange((phases) => {
+				performLazyLoaderUpdateRef.current();
+			});
 
 			onProjectUnmountCallbackRef.current = () => {
-				leave(projectId).catch((error) =>
-					console.error(`Ocorreu um erro ao sair do projeto: ${error.message}`)
-				);
+				leave(projectId).catch((error) => console.error(`Ocorreu um erro ao sair do projeto: ${error.message}`));
 
 				// Remove os listeners
 				socket.off("disconnect", disconnect);
@@ -634,10 +645,7 @@ function Project() {
 					<div className="P-phases-container-holder">
 						<ol className="P-phases-container" ref={phasesContainerRef}>
 							<div ref={lazyLoaderTopOffsetRef} />
-							<MouseScrollableModal
-								scrollableDivRef={phasesContainerScrollBarRef}
-								ref={mouseScrollableModalRef}
-							>
+							<MouseScrollableModal scrollableDivRef={phasesContainerScrollBarRef} ref={mouseScrollableModalRef}>
 								<DragableModalDropLocationWithLazyLoader
 									// Referência para a div que será arrastada
 									scrollableDivRef={phasesContainerScrollBarRef}
@@ -667,9 +675,7 @@ function Project() {
 									dragMoveRef={dragableModalOnDragMoveRef}
 									// Função chamada quando o drag é concluído
 									dragConcludedCallback={({ phaseDTO }, newPosition) => {
-										const phaseState = projectStateRef.current?.getPhaseState(
-											phaseDTO?.phaseId
-										);
+										const phaseState = projectStateRef.current?.getPhaseState(phaseDTO?.phaseId);
 										if (!phaseState) {
 											return null;
 										}
@@ -700,28 +706,17 @@ function Project() {
 										);
 
 										// Ajusta a ordem das outras fases
-										projectStateRef.current
-											?.getPhases()
-											.forEach((phaseState) => {
-												if (
-													phaseState == undefined ||
-													phaseState.phaseDTO.phaseId == phaseDTO.phaseId
-												) {
-													return null;
-												}
+										projectStateRef.current?.getPhases().forEach((phaseState) => {
+											if (phaseState == undefined || phaseState.phaseDTO.phaseId == phaseDTO.phaseId) {
+												return null;
+											}
 
-												if (
-													phaseState.phaseDTO.order < currentPhaseOrder &&
-													phaseState.phaseDTO.order >= newPosition
-												) {
-													phaseState.phaseDTO.order += 1;
-												} else if (
-													phaseState.phaseDTO.order > currentPhaseOrder &&
-													phaseState.phaseDTO.order <= newPosition
-												) {
-													phaseState.phaseDTO.order -= 1;
-												}
-											});
+											if (phaseState.phaseDTO.order < currentPhaseOrder && phaseState.phaseDTO.order >= newPosition) {
+												phaseState.phaseDTO.order += 1;
+											} else if (phaseState.phaseDTO.order > currentPhaseOrder && phaseState.phaseDTO.order <= newPosition) {
+												phaseState.phaseDTO.order -= 1;
+											}
+										});
 
 										// Atualiza a ordem da fase
 										phaseState.phaseDTO.order = newPosition;
@@ -774,26 +769,16 @@ function Project() {
 										// Funções de controle do conteúdo
 										fetchMore={(page) => {
 											return new Promise((resolve, reject) => {
-												return projectSocketRef.current?.emit(
-													"fetchPhases",
-													{ page },
-													(response) => {
-														resolve(response?.phases?.taken || []);
-													}
-												);
+												return projectSocketRef.current?.emit("fetchPhases", { page }, (response) => {
+													resolve(response?.phases?.taken || []);
+												});
 											});
 										}}
 										getAvailableContentCountForFetch={async (sync = false) => {
-											return await projectStateRef.current?.getTotalPhases(
-												sync
-											);
+											return await projectStateRef.current?.getTotalPhases(sync);
 										}}
 										insertFetchedElement={(element) => {
-											return projectStateRef.current?.phaseCreated(
-												[element],
-												true,
-												true
-											);
+											return projectStateRef.current?.phaseCreated([element], true, true);
 										}}
 										// Tamanho da página
 										pageSize={10}
@@ -811,21 +796,17 @@ function Project() {
 							<button
 								className="P-add-new-phase-button"
 								onClick={() => {
-									projectSocketRef.current?.emit(
-										"createPhase",
-										{ phaseName: "Nova Fase" },
-										(success, data) => {
-											success
-												? newPopup("Common", {
-														severity: "success",
-														message: "Fase criada com sucesso",
-												  })
-												: newPopup("Common", {
-														severity: "error",
-														message: "Erro ao criar a fase",
-												  });
-										}
-									);
+									projectSocketRef.current?.emit("createPhase", { phaseName: "Nova Fase" }, (success, data) => {
+										success
+											? newPopup("Common", {
+													severity: "success",
+													message: "Fase criada com sucesso",
+											  })
+											: newPopup("Common", {
+													severity: "error",
+													message: "Erro ao criar a fase",
+											  });
+									});
 								}}
 							>
 								<AddButtonIcon className="P-add-new-phase-button-icon" />

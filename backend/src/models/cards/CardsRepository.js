@@ -12,9 +12,14 @@ class CardsRepository extends Repository {
 	 * Trigger que adiciona o cartão à fase.
 	 */
 	async afterInsert_addCardToPhasesCards({ entity }) {
-		await this.Service.Service.Controller.PhasesService.PhasesCardsService.addPhaseToProjectPhases(
-			entity.phaseId,
-			entity.projectId
+		await this.Service.Controller.PhasesService.PhasesCardsService.addCardToPhase(entity.phaseId, entity.cardId).catch((error) =>
+			console.error(`Erro ao adicionar o cartão à fase: ${error.message}`)
+		);
+	}
+
+	async afterInsert_incrementPhaseTotalCardsCount({ entity }) {
+		await this.Service.Controller.PhasesService.incrementTotalCardsInPhase(entity.phaseId).catch((error) =>
+			console.error(`Erro ao incrementar o total de cartões na fase: ${error.message}`)
 		);
 	}
 
@@ -52,11 +57,7 @@ class CardsRepository extends Repository {
 	 * @returns {DeleteResult}
 	 */
 	async deleteCard(cardsDTO) {
-		return await this.Repository.createQueryBuilder("Cards")
-			.delete()
-			.from("Cards")
-			.where(`cardId = :cardId`, cardsDTO)
-			.execute();
+		return await this.Repository.createQueryBuilder("Cards").delete().from("Cards").where(`cardId = :cardId`, cardsDTO).execute();
 	}
 }
 
