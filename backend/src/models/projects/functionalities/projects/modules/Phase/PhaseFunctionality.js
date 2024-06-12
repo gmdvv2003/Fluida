@@ -55,9 +55,44 @@ class PhaseFunctionality {
 			});
 	}
 
-	#IODeletePhase(projectsIO, socket, project, data) {}
+	/**
+	 *
+	 * @param {*} projectsIO
+	 * @param {*} socket
+	 * @param {*} project
+	 * @param {*} data
+	 * @returns
+	 */
+	#IODeletePhase(projectsIO, socket, project, data) {
+		const { phaseId } = data;
 
-	#IOUpdatePhase(projectsIO, socket, project, data) {}
+		if (project.getPhase(phaseId) == undefined) {
+			return socket.emit("error", { message: "Fase não encontrada." });
+		}
+
+		this.ProjectsController.PhasesService.deletePhase(new PhasesDTO({ projectId: project.projectId, phaseId }))
+			.then((result) => {
+				// Emite o evento de deleção da fase
+				projectsIO.to(project.projectId).emit("phaseDeleted", { phaseId });
+
+				// Remove a fase do projeto localmente
+				project.removePhase(phaseId);
+			})
+			.catch((error) => {
+				socket.emit("error", { message: "Erro ao deletar a fase", error: error });
+			});
+	}
+
+	/**
+	 *
+	 * @param {*} projectsIO
+	 * @param {*} socket
+	 * @param {*} project
+	 * @param {*} data
+	 */
+	#IOUpdatePhase(projectsIO, socket, project, data) {
+		const { phaseId, fieldsToUpdate } = data;
+	}
 
 	/**
 	 * Realiza a movimentação de uma fase.
@@ -79,9 +114,7 @@ class PhaseFunctionality {
 			new PhasesDTO({ projectId: project.projectId, phaseId }),
 			targetPositionIndex
 		)
-			.then((result) => {
-				console.log(result);
-			})
+			.then((result) => {})
 			.catch((error) => {
 				socket.emit("error", { message: "Erro ao mover a fase", error: error });
 

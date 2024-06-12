@@ -11,6 +11,7 @@ class CardFunctionality {
 		inject("IOUpdateCard", this.#IOUpdateCard);
 		inject("IOMoveCard", this.#IOMoveCard);
 		inject("IOFetchCards", this.#IOFetchCards);
+		inject("IOGetTotalCards", this.#IOGetTotalCards);
 	}
 
 	/**
@@ -45,13 +46,26 @@ class CardFunctionality {
 			.catch((error) => socket.emit("error", { message: "Erro ao criar o card da fase", error: error }));
 	}
 
+	/**
+	 *
+	 * @param {*} projectsIO
+	 * @param {*} socket
+	 * @param {*} project
+	 * @param {*} param3
+	 */
 	#IODeleteCard(projectsIO, socket, project, { cardId }) {
 		const cardDTO = new CardsDTO({ cardId });
 
 		// Deleta o card do banco de dados
 		this.ProjectsController.CardsService.deleteCard(cardDTO)
 			.then(({ generatedMaps }) => {
-				console.log(generatedMaps);
+				let { phaseId } = generatedMaps[0];
+
+				// Emite o evento de deleção da fase
+				projectsIO.to(project.projectId).emit("cardDeleted", { phaseId, cardId });
+
+				// Remove a fase do projeto localmente
+				project.removePhase(phaseId);
 			})
 			.catch((error) => socket.emit("error", { message: "Erro ao deletar o card", error: error }));
 	}
@@ -60,9 +74,31 @@ class CardFunctionality {
 
 	#IOMoveCard(projectsIO, socket, project, data) {}
 
-	#IOFetchCards(projectsIO, socket, project, data) {}
+	/**
+	 *
+	 * @param {*} projectsIO
+	 * @param {*} socket
+	 * @param {*} project
+	 * @param {*} data
+	 */
+	#IOFetchCards(projectsIO, socket, project, data) {
+		project.getCards(data?.phaseId, data?.page).then((result) => {
+			acknowledgement ? acknowledgement({ cards: result }) : socket.emit("cardsFetched", result);
+		});
+	}
 
-	#IOGetTotalCards(projectsIO, socket, project, data) {}
+	/**
+	 *
+	 * @param {*} projectsIO
+	 * @param {*} socket
+	 * @param {*} project
+	 * @param {*} data
+	 */
+	#IOGetTotalCards(projectsIO, socket, project, data) {
+		project.getTotalCardsInPhase(data?.phaseId).then((result) => {
+			acknowledgement && acknowledgement({ amount: result });
+		});
+	}
 }
 
 module.exports = CardFunctionality;
