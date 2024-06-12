@@ -262,10 +262,18 @@ const LazyLoader = React.forwardRef(
 			async function getBottomRightOffset() {
 				switch (direction) {
 					case "horizontal":
-						return (await getAvailableContentCountForFetch()) * (width + padding) + margin - lastSectionEnd * (width + padding);
+						return (
+							Math.max((await getAvailableContentCountForFetch()) - 1, 0) * (width + padding) +
+							margin -
+							lastSectionEnd * (width + padding)
+						);
 
 					case "vertical":
-						return (await getAvailableContentCountForFetch()) * (height + padding) + margin - lastSectionEnd * (height + padding);
+						return (
+							Math.max((await getAvailableContentCountForFetch()) - 1, 0) * (height + padding) +
+							margin -
+							lastSectionEnd * (height + padding)
+						);
 
 					default:
 						break;
@@ -367,7 +375,6 @@ const LazyLoader = React.forwardRef(
 			}
 
 			const initialItemIndex = getCurrentItemIndex();
-			console.log(initialItemIndex);
 			if (initialItemIndex === 0) {
 				setDisplayableContent();
 			}

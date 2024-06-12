@@ -40,8 +40,8 @@ class Phase {
 	project;
 	phaseDTO;
 
-	#totalCardsInPhase = undefined;
-	#totalCardsInPhaseBeforeFetch = 0;
+	totalCardsInPhase = undefined;
+	totalCardsInPhaseBeforeFetch = 0;
 
 	constructor(project, phaseDTO) {
 		this.project = project;
@@ -144,13 +144,13 @@ class Project {
 	 * @returns {number}
 	 */
 	async getTotalCardsInPhase(phaseId) {
-		const phase = this.getPhase(phaseId);
+		const phase = this.getPhase(phaseId, true);
 		if (phase === undefined) {
 			return 0;
 		}
 
 		if (phase.totalCardsInPhase === undefined) {
-			const cardsCount = (await this.ProjectsController.Service.PhasesService.PhasesCardsService.getTotalCardsInPhase(phaseId))?.totalCards;
+			const cardsCount = (await this.ProjectsController.PhasesService.getTotalCardsInPhase(phaseId))?.totalCards;
 			phase.totalCardsInPhase = cardsCount + phase.totalCardsInPhaseBeforeFetch;
 		}
 
@@ -194,8 +194,9 @@ class Project {
 	 * @param {*} cardId
 	 * @returns
 	 */
-	getCard(cardId) {
-		return (this.#cards.find((card) => card.cardDTO.cardId === cardId) || []).map((card) => card.cardDTO);
+	getCard(cardId, returnSuperClass = false) {
+		const card = this.#cards.find((card) => card.cardDTO.cardId === cardId);
+		return returnSuperClass ? card : card?.cardDTO;
 	}
 
 	/**
@@ -217,11 +218,9 @@ class Project {
 	 * @param {*} phaseId
 	 * @returns
 	 */
-	getPhase(phaseId) {
-		console.log(phaseId);
-		console.log("===============");
-		console.log(this.#phases);
-		return (this.#phases.find((phase) => phase !== undefined && phase.phaseDTO.phaseId === phaseId) || []).map((phase) => phase.phaseDTO);
+	getPhase(phaseId, returnSuperClass = false) {
+		const phase = this.#phases.find((phase) => phase !== undefined && phase.phaseDTO.phaseId === phaseId);
+		return returnSuperClass ? phase : phase?.phaseDTO;
 	}
 
 	/**

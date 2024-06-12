@@ -1,17 +1,22 @@
-import "./Phase.css";
-
 import React, { Suspense, useEffect, useImperativeHandle, useRef, useState } from "react";
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleXmark, faUserLarge } from "@fortawesome/free-solid-svg-icons";
 
-import Card from "../card/Card";
 import { ReactComponent as DotsIcon } from "assets/action-icons/dots.svg";
-import DragableModal from "utilities/dragable-modal/DragableModal";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import LazyLoader from "utilities/lazy-loader/LazyLoader";
-import LoadingDots from "components/shared/loading/LoadingDots";
 import { ReactComponent as PlusIcon } from "assets/action-icons/add-circle-unlined.svg";
-import TextInputField from "components/shared/text-input-field/TextInputField";
+
 import { useSystemPopups } from "context/popup/SystemPopupsContext";
+
+import DragableModal from "utilities/dragable-modal/DragableModal";
+import LazyLoader from "utilities/lazy-loader/LazyLoader";
+
+import LoadingDots from "components/shared/loading/LoadingDots";
+import TextInputField from "components/shared/text-input-field/TextInputField";
+
+import Card from "../card/Card";
+
+import "./Phase.css";
 
 const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectState, projectSocketRef, callbacks }, ref) => {
 	const { newPopup } = useSystemPopups();
@@ -54,6 +59,16 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 			}
 		};
 	}, [projectNameUpdateReference]);
+
+	useEffect(() => {
+		if (!phase) {
+			return undefined;
+		}
+
+		return projectState.current?.onProjectCardsStateChange(phase?.phaseDTO?.phaseId, (cardDTO) => {
+			performLazyLoaderUpdateRef.current?.();
+		});
+	});
 
 	/**
 	 * Lida com o dialog de opções do projeto

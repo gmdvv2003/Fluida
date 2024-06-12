@@ -118,8 +118,12 @@ function Project() {
 		 * @param {Function} callback
 		 * @returns {Function}
 		 */
-		onProjectCardsStateChange(callback, phaseId) {
-			return this.#projectCardsStateListeners.subscribe(callback);
+		onProjectCardsStateChange(phaseId, callback) {
+			if (!(phaseId in this.#projectCardsStateListeners)) {
+				this.#projectCardsStateListeners[phaseId] = new ReactSubscriptionHelper();
+			}
+
+			return this.#projectCardsStateListeners[phaseId].subscribe(callback);
 		}
 
 		getMembers() {
@@ -170,7 +174,7 @@ function Project() {
 				// Caso sync = true ou o número total de cards na fase ainda não tenha sido sincronizado, então é feito um fetch do número total de cards
 				// Caso contrário, é retornado o número total de cards local
 				if (!phaseState.totalCardsSynced && !sync) {
-					return this.#socket.emit("getTotalCards", null, (response) => {
+					return this.#socket.emit("getTotalCards", { phaseId }, (response) => {
 						let retrievedCount = response?.amount;
 
 						// Se o número total de cards foi retornado, então o número total de cards foi sincronizado
@@ -320,7 +324,7 @@ function Project() {
 			phaseState.totalCards += fromFetch ? 0 : 1;
 
 			// Atualizar o estado do projeto
-			this.#projectCardsStateListeners.notify(cardDTO);
+			this.#projectCardsStateListeners[cardDTO.phaseId]?.notify(cardDTO);
 
 			return cardState;
 		}
@@ -429,23 +433,21 @@ function Project() {
 		 * @returns
 		 */
 		requestDeletePhase(phaseId) {
-			// return new Promise((resolve) => {
-			// 	this.#socket.emit("deletePhase", phaseId, (success, data) => {
-			// 		success
-			// 			? newPopup("Common", {
-			// 					severity: "success",
-			// 					message: "Fase excluída com sucesso",
-			// 			  })
-			// 			: newPopup("Common", {
-			// 					severity: "error",
-			// 					message: "Erro ao criar a fase",
-			// 			  });
+			return new Promise((resolve) => {
+				this.#socket.emit("deletePhase", { phaseId }, (success, data) => {
+					success
+						? newPopup("Common", {
+								severity: "success",
+								message: "Fase excluída com sucesso",
+						  })
+						: newPopup("Common", {
+								severity: "error",
+								message: "Erro ao criar a fase",
+						  });
 
-			// 		resolve(success);
-			// 	});
-			// });
-
-			console.log("Teste", phaseId);
+					resolve(success);
+				});
+			});
 		}
 
 		/**
@@ -741,7 +743,7 @@ function Project() {
 												isLoading={isLoading}
 												phase={phase}
 												projectState={projectStateRef}
-												currentProjectSocket={projectSocketRef}
+												projectSocketRef={projectSocketRef}
 												callbacks={{
 													dragBegin: [
 														() => {

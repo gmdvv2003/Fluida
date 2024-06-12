@@ -22,6 +22,16 @@ class PhasesService extends Service {
 	}
 
 	/**
+	 * Retorna o total de cartões em uma fase.
+	 *
+	 * @param {*} phaseId
+	 * @returns
+	 */
+	async getTotalCardsInPhase(phaseId) {
+		return await this.PhasesRepository.getTotalCardsInPhase(phaseId);
+	}
+
+	/**
 	 * Retorna uma fase pelo id.
 	 *
 	 * @param {number} phaseId

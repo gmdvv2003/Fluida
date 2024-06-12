@@ -12,10 +12,6 @@ class PhasesCardsRepository extends Repository {
 		super(service, PhasesCardsDTO);
 	}
 
-	async getTotalCardsInPhase(phaseId) {
-		return await this.Repository.createQueryBuilder("PhasesCards").select("totalPhases").where("phaseId = :phaseId", { phaseId }).getRawOne();
-	}
-
 	/**
 	 * Retorna os cartões de uma fase do banco de dados.
 	 *
@@ -35,10 +31,10 @@ class PhasesCardsRepository extends Repository {
 			relations: { card: true },
 
 			// Seleciona apenas os campos necessários.
-			select: { card: true, log: true },
+			// select: { card: true, log: true },
 		};
 
-		return { repository: this.Repository, query: query };
+		return { repository: this.Repository, query: query, pick: "card" };
 	}
 
 	/**

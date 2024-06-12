@@ -11,6 +11,7 @@
 	width: calc(var(--phase-background-width) - 2px);
 	height: 100%;
 	overflow-y: scroll;
+	scrollbar-width: none;
 }
 
 .PP-center-lock {
@@ -39,6 +40,7 @@
 	height: calc(100% - var(--phase-header-height) - 28px);
 	overflow: scroll;
 	scrollbar-width: none;
+	padding-right: 2px;
 }
 
 .PP-header-icon,

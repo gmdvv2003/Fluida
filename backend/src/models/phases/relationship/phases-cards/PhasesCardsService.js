@@ -15,10 +15,6 @@ class PhasesCardsService extends Service {
 		this.PhasesCardsRepository = new PhasesCardsRepository(this);
 	}
 
-	async getTotalCardsInPhase(phaseId) {
-		return await this.PhasesCardsRepository.getTotalCardsInPhase(phaseId);
-	}
-
 	/**
 	 * Retorna as fases de um cartão.
 	 *

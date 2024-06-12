@@ -30,6 +30,15 @@ class PhasesRepository extends Repository {
 	}
 
 	/**
+	 * Retorna o total de cartões em uma fase.
+	 *
+	 * @param {*} phaseId
+	 * @returns
+	 */
+	async getTotalCardsInPhase(phaseId) {
+		return await this.Repository.createQueryBuilder("Phases").select("totalCards").where("phaseId = :phaseId", { phaseId }).getRawOne();
+	}
+	/**
 	 * Retorna uma fase pelo id.
 	 *
 	 * @param {number} phaseId

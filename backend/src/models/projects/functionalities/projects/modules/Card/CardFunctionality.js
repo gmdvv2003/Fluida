@@ -22,7 +22,7 @@ class CardFunctionality {
 	 * @param {Object} data
 	 */
 	@Validate({ NAME: "title", TYPE: "string", LENGTH: 100, INDEX: 3 })
-	#IOCreateCard(projectsIO, socket, project, data) {
+	#IOCreateCard(projectsIO, socket, project, data, acknowledgement) {
 		// Cria o DTO para o card
 		let cardDTO = new CardsDTO({
 			phaseId: data.phaseId,
@@ -42,8 +42,16 @@ class CardFunctionality {
 
 				// Emite o evento de criaçao de card
 				projectsIO.to(project.projectId).emit("cardCreated", cardDTO);
+
+				// Emite a resposta pessoal do evento
+				acknowledgement && acknowledgement(true, { card: cardDTO });
 			})
-			.catch((error) => socket.emit("error", { message: "Erro ao criar o card da fase", error: error }));
+			.catch((error) => {
+				socket.emit("error", { message: "Erro ao criar o card da fase", error: error });
+
+				// Emite a resposta pessoal do evento
+				acknowledgement && acknowledgement(false, { error: error });
+			});
 	}
 
 	/**
@@ -81,7 +89,7 @@ class CardFunctionality {
 	 * @param {*} project
 	 * @param {*} data
 	 */
-	#IOFetchCards(projectsIO, socket, project, data) {
+	#IOFetchCards(projectsIO, socket, project, data, acknowledgement) {
 		project.getCards(data?.phaseId, data?.page).then((result) => {
 			acknowledgement ? acknowledgement({ cards: result }) : socket.emit("cardsFetched", result);
 		});
@@ -94,7 +102,7 @@ class CardFunctionality {
 	 * @param {*} project
 	 * @param {*} data
 	 */
-	#IOGetTotalCards(projectsIO, socket, project, data) {
+	#IOGetTotalCards(projectsIO, socket, project, data, acknowledgement) {
 		project.getTotalCardsInPhase(data?.phaseId).then((result) => {
 			acknowledgement && acknowledgement({ amount: result });
 		});
