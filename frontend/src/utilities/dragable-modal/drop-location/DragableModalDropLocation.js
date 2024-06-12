@@ -24,7 +24,11 @@ function DragableModalDropLocation({
 		 * @param {*} event
 		 */
 		function onDragBegin(ref, _, event) {
-			const { current, data, index } = getComponentDataFromRef(ref);
+			const { current, data, index } = getComponentDataFromRef(ref) || {};
+			if (!current || !data || index === undefined) {
+				return null;
+			}
+
 			associatePlaceholder(current, addPlaceholder(index, createPlaceholder, data));
 		}
 
@@ -39,7 +43,10 @@ function DragableModalDropLocation({
 			const { current, data } = getComponentDataFromRef(ref);
 
 			// Pega o UUID do placeholder associado ao elemento
-			const { uuid } = getAssociatedPlaceholder(current);
+			const { uuid } = getAssociatedPlaceholder(current) || {};
+			if (!uuid) {
+				return null;
+			}
 
 			// Remove o placeholder associado ao elemento
 			removePlaceholder(uuid);
@@ -64,7 +71,10 @@ function DragableModalDropLocation({
 			const { current, data } = getComponentDataFromRef(ref);
 
 			// Pega o placeholder associado ao elemento
-			const { getReference } = getAssociatedPlaceholder(current);
+			const { getReference } = getAssociatedPlaceholder(current) || {};
+			if (!getReference) {
+				return null;
+			}
 
 			const { clientX } = event;
 

@@ -149,7 +149,7 @@ const LazyLoader = React.forwardRef(
 
 					// Remove o placeholder da lista de elementos visíveis
 					setVisibleContent((visibleContent) => {
-						return visibleContent.filter((element) => element.uuid != uuid);
+						return visibleContent.filter((element) => element == undefined || element.uuid != uuid);
 					});
 				},
 
@@ -196,7 +196,7 @@ const LazyLoader = React.forwardRef(
 				// Caso não tenha conteúdo, preenche a lista com conteúdo vazio
 				if (getContent().length < end) {
 					for (let index = getContent().length; index < end; index += 1) {
-						getContent().push(undefined);
+						getContent().splice(index, 0, undefined);
 					}
 				}
 
@@ -206,15 +206,14 @@ const LazyLoader = React.forwardRef(
 					.findIndex((element) => element === undefined);
 
 				if (undefinedContentIndex > -1) {
-					if (end !== lastSectionEnd || start !== lastSectionStart) {
+					if (end !== lastSectionEnd || start !== lastSectionStart || true) {
 						// Cancela o timeout anterior
 						if (sectionFetchTimeoutId) {
 							clearTimeout(sectionFetchTimeoutId);
 						}
-
 						// Inicia um novo timeout
 						sectionFetchTimeoutId = setTimeout(async () => {
-							const fetchedContent = await fetchMore(Math.floor((start + undefinedContentIndex) / pageSize));
+							const fetchedContent = await fetchMore(1 + Math.floor((start + undefinedContentIndex) / pageSize));
 							fetchedContent.forEach((element, index) => {
 								const contentIndex = start + undefinedContentIndex + index;
 								if (getContent()[contentIndex] == undefined) {
@@ -234,9 +233,18 @@ const LazyLoader = React.forwardRef(
 			}
 
 			/**
+			 * Retorna o número máximo de elementos que podem ser exibidos na tela
+			 *
+			 * @returns {number}
+			 */
+			function getMaxPossibleElementsInContainer() {
+				return 5;
+			}
+
+			/**
 			 *
 			 */
-			function getTopLeftOffset() {
+			async function getTopLeftOffset() {
 				switch (direction) {
 					case "horizontal":
 						return currentSectionStart * (width + padding) + margin;
@@ -252,34 +260,24 @@ const LazyLoader = React.forwardRef(
 			/**
 			 *
 			 */
-			function getBottomRightOffset() {
+			async function getBottomRightOffset() {
 				switch (direction) {
 					case "horizontal":
-						return getAvailableContentCountForFetch() * (width + padding) + margin - getTopLeftOffset();
+						return (
+							(await getAvailableContentCountForFetch()) * (width + padding) +
+							margin -
+							lastSectionEnd * (width + padding)
+						);
 
 					case "vertical":
-						return getAvailableContentCountForFetch() * (height + padding) + margin - getTopLeftOffset();
+						return (
+							(await getAvailableContentCountForFetch()) * (height + padding) +
+							margin -
+							lastSectionEnd * (height + padding)
+						);
 
 					default:
 						break;
-				}
-			}
-
-			/**
-			 * Retorna o número máximo de elementos que podem ser exibidos na tela
-			 *
-			 * @returns {number}
-			 */
-			function getMaxPossibleElementsInContainer() {
-				switch (direction) {
-					case "horizontal":
-						return Math.ceil(scrollBarCopy.clientWidth / width);
-
-					case "vertical":
-						return Math.ceil(scrollBarCopy.clientHeight / height);
-
-					default:
-						return 0;
 				}
 			}
 
@@ -289,7 +287,7 @@ const LazyLoader = React.forwardRef(
 			 * @returns {number}
 			 */
 			function getSectionThreshold() {
-				return Math.floor(getMaxPossibleElementsInContainer() * 2);
+				return Math.floor(getMaxPossibleElementsInContainer());
 			}
 
 			/**
@@ -363,11 +361,11 @@ const LazyLoader = React.forwardRef(
 				}
 
 				if (direction === "horizontal") {
-					topLeftOffset.current.style.width = getTopLeftOffset() + "px";
-					bottomRightOffset.current.style.width = getBottomRightOffset() + "px";
+					topLeftOffset.current.style.width = (await getTopLeftOffset()) + "px";
+					bottomRightOffset.current.style.width = (await getBottomRightOffset()) + "px";
 				} else {
-					topLeftOffset.current.style.height = getTopLeftOffset() + "px";
-					bottomRightOffset.current.style.height = getBottomRightOffset() + "px";
+					topLeftOffset.current.style.height = (await getTopLeftOffset()) + "px";
+					bottomRightOffset.current.style.height = (await getBottomRightOffset()) + "px";
 				}
 
 				lastSectionStart = currentSectionStart;
@@ -392,6 +390,9 @@ const LazyLoader = React.forwardRef(
 			bottomRightOffset.current.style.order = "100000000";
 
 			scrollBarCopy.addEventListener("scroll", handleScroll, { passive: true });
+
+			// Update inicial manual
+			handleScroll();
 
 			return () => {
 				scrollBarCopy.removeEventListener("scroll", handleScroll);

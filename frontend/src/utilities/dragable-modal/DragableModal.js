@@ -8,7 +8,7 @@ import {
 	DragableModalContext,
 } from "./DragableModalContext";
 
-const DragableModal = React.forwardRef(({ order, elements, callbacks }, ref) => {
+const DragableModal = React.forwardRef(({ order, elements, callbacks, scrollableDivRef }, ref) => {
 	const { _, useGlobalDragState } = useDragState();
 
 	const [isDragging, setIsDragging] = useGlobalDragState("isDragging");
@@ -62,21 +62,26 @@ const DragableModal = React.forwardRef(({ order, elements, callbacks }, ref) => 
 			onComponentDragBegin(onDragBegin, dragableDivUUID.current),
 			onComponentDragEnd(onDragEnd, dragableDivUUID.current),
 			onComponentDragMove(onDragMove, dragableDivUUID.current),
-
-			// Listeners externos
-			"dragBegin" in callbacks
-				? dragableModalContextRef.current.onDragBegin(wrapExternalDragListener(callbacks.dragBegin))
-				: null,
-			"dragEnd" in callbacks
-				? dragableModalContextRef.current.onDragEnd(wrapExternalDragListener(callbacks.dragEnd))
-				: null,
-			"dragMove" in callbacks
-				? dragableModalContextRef.current.onDragMove(wrapExternalDragListener(callbacks.dragMove))
-				: null,
 		];
 
+		// Listeners externos
+		"dragBegin" in callbacks &&
+			callbacks.dragBegin.forEach((callback) =>
+				listeners.push(dragableModalContextRef.current.onDragBegin(wrapExternalDragListener(callback)))
+			);
+
+		"dragEnd" in callbacks &&
+			callbacks.dragEnd.forEach((callback) =>
+				listeners.push(dragableModalContextRef.current.onDragEnd(wrapExternalDragListener(callback)))
+			);
+
+		"dragMove" in callbacks &&
+			callbacks.dragMove.forEach((callback) =>
+				listeners.push(dragableModalContextRef.current.onDragMove(wrapExternalDragListener(callback)))
+			);
+
 		return () => {
-			listeners.forEach((remove) => remove != null && remove());
+			listeners.forEach((remove) => remove());
 		};
 	}, [callbacks]);
 
@@ -84,6 +89,9 @@ const DragableModal = React.forwardRef(({ order, elements, callbacks }, ref) => 
 		<DragableModalContext modal={dragableDivRef} uuid={dragableDivUUID} ref={dragableModalContextRef}>
 			{(() => {
 				const isDraggingThisModal = isDraggingThis();
+
+				const { scrollLeft, scrollTop } = scrollableDivRef.current;
+
 				return (
 					<div
 						ref={dragableDivRef}
@@ -95,8 +103,8 @@ const DragableModal = React.forwardRef(({ order, elements, callbacks }, ref) => 
 							...(isDraggingThisModal
 								? {
 										position: "absolute",
-										left: position[0],
-										top: position[1],
+										left: position[0] + scrollLeft,
+										top: position[1] + scrollTop,
 										transform: "translate(-50%, -50%)",
 										zIndex: "1000",
 								  }

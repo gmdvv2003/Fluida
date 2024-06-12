@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import DragableModalDropLocation from "./DragableModalDropLocation";
 
 function DragableModalDropLocationWithLazyLoader({
+	scrollableDivRef,
 	lazyLoaderRef,
 	createPlaceholder,
 	getComponentFromRef,
@@ -45,7 +46,10 @@ function DragableModalDropLocationWithLazyLoader({
 		const { width, height, margin, padding, direction } = lazyLoaderRef.current?.settings;
 		switch (direction) {
 			case "horizontal":
-				return Math.max(0, Math.floor((clientX - margin) / (width + padding)));
+				return Math.max(
+					0,
+					Math.floor((clientX - margin) / (width + padding) + scrollableDivRef.current?.scrollLeft / (width + padding))
+				);
 
 			case "vertical":
 				break;

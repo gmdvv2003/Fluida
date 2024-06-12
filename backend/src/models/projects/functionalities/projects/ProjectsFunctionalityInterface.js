@@ -56,6 +56,8 @@ class Project {
 	members = [];
 
 	#totalPhasesInProject = undefined;
+	#totalPhasesInProjectBeforeFetch = 0;
+
 	#totalMembersInProject = undefined;
 
 	constructor(projectId, ProjectsController) {
@@ -67,6 +69,10 @@ class Project {
 	 * Função auxiliar para buscar mais elementos de uma lista.
 	 */
 	async #fetchMore(list, fetchFunction, page, ...data) {
+		if (page < 1) {
+			return { taken: [] };
+		}
+
 		const head = (page - 1) * DEFAULT_PAGE_SIZE;
 		const tail = page * DEFAULT_PAGE_SIZE;
 
@@ -78,7 +84,7 @@ class Project {
 
 		// Pega a "fatia" do conteúdo que está sendo exibido no momento e verifica se há algum elemento indefinido
 		const undefinedContentIndex = list.slice(head, tail).findIndex((element) => element === undefined);
-		if (undefinedContentIndex > -1) {
+		if (undefinedContentIndex === -1) {
 			return { taken: list.slice(head, tail), hasNextPage: true, total: DEFAULT_PAGE_SIZE, cached: true };
 		}
 
@@ -135,10 +141,12 @@ class Project {
 	 * @returns {number}
 	 */
 	async getTotalPhasesInProject() {
+		if (this.#totalPhasesInProject === undefined) {
+			const phasesCount = (await this.ProjectsController.Service.getTotalPhasesInProject(this.projectId))?.totalPhases;
+			this.#totalPhasesInProject = phasesCount + this.#totalPhasesInProjectBeforeFetch;
+		}
+
 		// Retorno o valor já calculado caso ele exista, caso contrário, é feita a busca no banco de dados
-		this.#totalPhasesInProject =
-			this.#totalPhasesInProject ||
-			(await this.ProjectsController.Service.getTotalPhasesInProject(this.projectId))?.totalPhases;
 		return this.#totalPhasesInProject;
 	}
 
@@ -179,7 +187,7 @@ class Project {
 	 */
 	addPhase(phaseDTO) {
 		this.#phases.push(phaseDTO);
-		this.#totalPhasesInProject = this.#phases.length;
+		this.#totalPhasesInProject == undefined ? this.#totalPhasesInProject++ : this.#totalPhasesInProjectBeforeFetch++;
 	}
 
 	/**
@@ -187,7 +195,7 @@ class Project {
 	 */
 	removePhase(phaseId) {
 		this.#phases = this.#phases.filter((phase) => phase.phaseId !== phaseId);
-		this.#totalPhasesInProject = this.#phases.length;
+		this.#totalPhasesInProject == undefined ? this.#totalPhasesInProject-- : this.#totalPhasesInProjectBeforeFetch--;
 	}
 }
 

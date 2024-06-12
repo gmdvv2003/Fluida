@@ -83,7 +83,6 @@ const DragableModalContext = React.forwardRef(({ children, uuid, modal }, ref) =
 		function onMouseMove(event) {
 			invokeListeners(onDragMove, uuid, event);
 			event.preventDefault();
-			event.stopPropagation();
 		}
 
 		/**
@@ -100,7 +99,6 @@ const DragableModalContext = React.forwardRef(({ children, uuid, modal }, ref) =
 			currentMouseUpEventHandler = null;
 
 			event.preventDefault();
-			event.stopPropagation();
 		}
 
 		/**
@@ -134,6 +132,8 @@ const DragableModalContext = React.forwardRef(({ children, uuid, modal }, ref) =
 			requestAnimationFrame(() => {
 				invokeListeners(onDragMove, uuid, event);
 			});
+
+			event.preventDefault();
 		}
 
 		// Pega o elemento atual

@@ -1,7 +1,7 @@
 .loader {
 	--border: 8px;
 	border: var(--border) solid #f3f3f3; /* Light grey */
-	border-top: var(--border) solid #3498db; /* Blue */
+	border-top: var(--border) solid #c1c1c1; /* Blue */
 	border-radius: 50%;
 	width: calc(64px - var(--border) * 2);
 	height: calc(64px - var(--border) * 2);

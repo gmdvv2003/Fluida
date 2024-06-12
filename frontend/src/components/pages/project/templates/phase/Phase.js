@@ -13,7 +13,7 @@ import Card from "../card/Card";
 
 import "./Phase.css";
 
-const Phase = React.forwardRef(({ isLoading, phase, projectState, currentProjectSocket, ...callbacks }, ref) => {
+const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectState, currentProjectSocket, callbacks }, ref) => {
 	const cardsContainerRef = useRef(null);
 	const cardsContainerScrollBarRef = useRef(null);
 
@@ -36,6 +36,9 @@ const Phase = React.forwardRef(({ isLoading, phase, projectState, currentProject
 
 	return (
 		<DragableModal
+			// Referência para o div que pode ser arrastado
+			scrollableDivRef={scrollableDivRef}
+			// Ordem do modal
 			order={phase?.phaseDTO?.order}
 			// Elementos do modal
 			elements={(isDragging) => (
@@ -60,8 +63,8 @@ const Phase = React.forwardRef(({ isLoading, phase, projectState, currentProject
 									<PlusIcon
 										className="PP-header-icon-plus"
 										onClick={() => {
-											projectState.requestCreateNewPhase().catch((error) => {
-												console.error(`Erro ao criar nova fase:`, error);
+											projectState.requestCreateNewCard().catch((error) => {
+												console.error(`Erro ao criar novo card:`, error);
 											});
 										}}
 									/>

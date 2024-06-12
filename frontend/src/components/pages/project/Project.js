@@ -16,6 +16,7 @@ import ProjectUsers from "./project-users/ProjectUsers";
 import LazyLoader from "utilities/lazy-loader/LazyLoader";
 import DragableModalDropLocationWithLazyLoader from "utilities/dragable-modal/drop-location/DragableModalDropLocationWithLazyLoader";
 import ReactSubscriptionHelper from "utilities/react-subscription-helper/ReactSubscriptionHelper";
+import MouseScrollableModal from "utilities/MouseScrollableModal/MouseScrollableModal";
 
 import Phase from "./templates/phase/Phase";
 import ConnectionFailure from "./ConnectionFailure";
@@ -411,7 +412,9 @@ function Project() {
 	const lazyLoaderBottomOffsetRef = useRef(null);
 
 	const lazyLoaderRef = useRef(null);
+
 	const dragableModalDropLocationRef = useRef(null);
+	const mouseScrollableModalRef = useRef(null);
 
 	const dragableModalOnDragBeginRef = useRef(null);
 	const dragableModalOnDragEndRef = useRef(null);
@@ -565,132 +568,150 @@ function Project() {
 					<div className="P-phases-container-holder">
 						<ol className="P-phases-container" ref={phasesContainerRef}>
 							<div ref={lazyLoaderTopOffsetRef} />
-							<DragableModalDropLocationWithLazyLoader
-								lazyLoaderRef={lazyLoaderRef}
-								// Função para criar um placeholder
-								createPlaceholder={(setPlaceholder, { order }) => {
-									return (
-										<div
-											className="PP-background PP-background-placeholder"
-											style={{ order: order + 1 }}
-											ref={(element) => setPlaceholder(element)}
-										/>
-									);
-								}}
-								// Referência para o dragable modal
-								getComponentFromRef={(ref) => {
-									return ref.current?.children?.[0];
-								}}
-								// Função para obter a ordem de um elemento
-								getComponentOrderFromData={({ phaseDTO }) => {
-									return phaseDTO?.order;
-								}}
-								// Referências das funções de drag
-								dragBeginRef={dragableModalOnDragBeginRef}
-								dragEndRef={dragableModalOnDragEndRef}
-								dragMoveRef={dragableModalOnDragMoveRef}
-								// Função chamada quando o drag é concluído
-								dragConcludedCallback={({ phaseDTO }, newPosition) => {
-									const phaseState = projectStateRef.current?.getPhaseState(phaseDTO?.phaseId);
-									if (!phaseState) {
-										return null;
-									}
-
-									// "Salva" a ordem atual da fase
-									const currentPhaseOrder = phaseState.phaseDTO.order;
-
-									// Para caso a nova posição seja posterior a posição atual
-									newPosition += newPosition <= currentPhaseOrder ? 1 : 0;
-
-									if (currentPhaseOrder == newPosition) {
-										return null;
-									}
-
-									projectSocketRef.current?.emit(
-										"movePhase",
-										{ phaseId: phaseDTO?.phaseId, targetPositionIndex: newPosition },
-										(success, data) => {
-											!success &&
-												newPopup("Common", { severity: "error", message: "Erro ao mover a fase" });
-										}
-									);
-
-									// Ajusta a ordem das outras fases
-									projectStateRef.current?.getPhases().forEach((phaseState) => {
-										if (phaseState.phaseDTO.phaseId == phaseDTO.phaseId) {
+							<MouseScrollableModal scrollableDivRef={phasesContainerScrollBarRef} ref={mouseScrollableModalRef}>
+								<DragableModalDropLocationWithLazyLoader
+									// Referência para a div que será arrastada
+									scrollableDivRef={phasesContainerScrollBarRef}
+									// Referência para o lazy loader
+									lazyLoaderRef={lazyLoaderRef}
+									// Função para criar um placeholder
+									createPlaceholder={(setPlaceholder, { order }) => {
+										return (
+											<div
+												className="PP-background PP-background-placeholder"
+												style={{ order: order + 1 }}
+												ref={(element) => setPlaceholder(element)}
+											/>
+										);
+									}}
+									// Referência para o dragable modal
+									getComponentFromRef={(ref) => {
+										return ref.current?.children?.[0];
+									}}
+									// Função para obter a ordem de um elemento
+									getComponentOrderFromData={({ phaseDTO }) => {
+										return phaseDTO?.order;
+									}}
+									// Referências das funções de drag
+									dragBeginRef={dragableModalOnDragBeginRef}
+									dragEndRef={dragableModalOnDragEndRef}
+									dragMoveRef={dragableModalOnDragMoveRef}
+									// Função chamada quando o drag é concluído
+									dragConcludedCallback={({ phaseDTO }, newPosition) => {
+										const phaseState = projectStateRef.current?.getPhaseState(phaseDTO?.phaseId);
+										if (!phaseState) {
 											return null;
 										}
 
-										if (
-											phaseState.phaseDTO.order < currentPhaseOrder &&
-											phaseState.phaseDTO.order >= newPosition
-										) {
-											phaseState.phaseDTO.order += 1;
-										} else if (
-											phaseState.phaseDTO.order > currentPhaseOrder &&
-											phaseState.phaseDTO.order <= newPosition
-										) {
-											phaseState.phaseDTO.order -= 1;
+										// "Salva" a ordem atual da fase
+										const currentPhaseOrder = phaseState.phaseDTO.order;
+
+										// Para caso a nova posição seja posterior a posição atual
+										newPosition += newPosition <= currentPhaseOrder ? 1 : 0;
+
+										if (currentPhaseOrder == newPosition) {
+											return null;
 										}
-									});
 
-									// Atualiza a ordem da fase
-									phaseState.phaseDTO.order = newPosition;
+										projectSocketRef.current?.emit(
+											"movePhase",
+											{ phaseId: phaseDTO?.phaseId, targetPositionIndex: newPosition },
+											(success, data) => {
+												!success &&
+													newPopup("Common", { severity: "error", message: "Erro ao mover a fase" });
+											}
+										);
 
-									// Atualiza a ordem das fases
-									performLazyLoaderUpdateRef.current();
-								}}
-							>
-								<LazyLoader
-									// Função para atualizar o lazy loader
-									update={performLazyLoaderUpdateRef}
-									// Referências para os offsets
-									topLeftOffset={lazyLoaderBottomOffsetRef}
-									bottomRightOffset={lazyLoaderBottomOffsetRef}
-									// Container e barra de rolagem
-									container={phasesContainerRef}
-									scrollBar={phasesContainerScrollBarRef}
-									// Função para construir os elementos
-									constructElement={(phase, _, isLoading, setReference) => (
-										<Phase
-											isLoading={isLoading}
-											phase={phase}
-											projectState={projectStateRef}
-											currentProjectSocket={projectSocketRef}
-											dragBegin={dragableModalOnDragBeginRef.current}
-											dragEnd={dragableModalOnDragEndRef.current}
-											dragMove={dragableModalOnDragMoveRef.current}
-											ref={(element) => setReference(element)}
-										/>
-									)}
-									// Dimensões dos elementos
-									width={320}
-									margin={20}
-									padding={20}
-									// Direção de rolagem
-									direction={"horizontal"}
-									// Funções de controle do conteúdo
-									fetchMore={(page) => {
-										return new Promise((resolve, reject) => {
-											return projectSocketRef.current?.emit("fetchPhases", { page }, (response) => {
-												resolve(response?.phases?.taken || []);
-											});
+										// Ajusta a ordem das outras fases
+										projectStateRef.current?.getPhases().forEach((phaseState) => {
+											if (phaseState == undefined || phaseState.phaseDTO.phaseId == phaseDTO.phaseId) {
+												return null;
+											}
+
+											if (
+												phaseState.phaseDTO.order < currentPhaseOrder &&
+												phaseState.phaseDTO.order >= newPosition
+											) {
+												phaseState.phaseDTO.order += 1;
+											} else if (
+												phaseState.phaseDTO.order > currentPhaseOrder &&
+												phaseState.phaseDTO.order <= newPosition
+											) {
+												phaseState.phaseDTO.order -= 1;
+											}
 										});
+
+										// Atualiza a ordem da fase
+										phaseState.phaseDTO.order = newPosition;
+
+										// Atualiza a ordem das fases
+										performLazyLoaderUpdateRef.current();
 									}}
-									getAvailableContentCountForFetch={async (sync = false) => {
-										return await projectStateRef.current?.getTotalPhases(sync);
-									}}
-									insertFetchedElement={(element) => {
-										return projectStateRef.current?.phaseCreated([element], true, true);
-									}}
-									// Tamanho da página
-									pageSize={10}
-									// Função para obter o conteúdo
-									getContent={() => projectStateRef.current?.getPhases()}
-									// Referência para o lazy loader
-									ref={lazyLoaderRef}
-								/>
-							</DragableModalDropLocationWithLazyLoader>
+								>
+									<LazyLoader
+										// Função para atualizar o lazy loader
+										update={performLazyLoaderUpdateRef}
+										// Referências para os offsets
+										topLeftOffset={lazyLoaderTopOffsetRef}
+										bottomRightOffset={lazyLoaderBottomOffsetRef}
+										// Container e barra de rolagem
+										container={phasesContainerRef}
+										scrollBar={phasesContainerScrollBarRef}
+										// Função para construir os elementos
+										constructElement={(phase, _, isLoading, setReference) => (
+											<Phase
+												scrollableDivRef={phasesContainerScrollBarRef}
+												isLoading={isLoading}
+												phase={phase}
+												projectState={projectStateRef}
+												currentProjectSocket={projectSocketRef}
+												callbacks={{
+													dragBegin: [
+														() => {
+															mouseScrollableModalRef.current?.enableMouseScrolling();
+														},
+														dragableModalOnDragBeginRef.current,
+													],
+													dragEnd: [
+														() => {
+															mouseScrollableModalRef.current?.disableMouseScrolling();
+														},
+														dragableModalOnDragEndRef.current,
+													],
+													dragMove: [dragableModalOnDragMoveRef.current],
+												}}
+												ref={(element) => setReference(element)}
+											/>
+										)}
+										// Dimensões dos elementos
+										width={280}
+										margin={20}
+										padding={20}
+										// Direção de rolagem
+										direction={"horizontal"}
+										// Funções de controle do conteúdo
+										fetchMore={(page) => {
+											return new Promise((resolve, reject) => {
+												return projectSocketRef.current?.emit("fetchPhases", { page }, (response) => {
+													resolve(response?.phases?.taken || []);
+												});
+											});
+										}}
+										getAvailableContentCountForFetch={async (sync = false) => {
+											return await projectStateRef.current?.getTotalPhases(sync);
+										}}
+										insertFetchedElement={(element) => {
+											return projectStateRef.current?.phaseCreated([element], true, true);
+										}}
+										// Tamanho da página
+										pageSize={10}
+										// Função para obter o conteúdo
+										getContent={() => projectStateRef.current?.getPhases()}
+										// Referência para o lazy loader
+										ref={lazyLoaderRef}
+									/>
+								</DragableModalDropLocationWithLazyLoader>
+							</MouseScrollableModal>
 							<div ref={lazyLoaderBottomOffsetRef} />
 						</ol>
 
