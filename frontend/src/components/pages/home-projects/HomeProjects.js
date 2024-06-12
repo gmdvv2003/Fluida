@@ -90,6 +90,7 @@ function HomeProjects() {
 		if (response.success) {
 			setProjects(response.data);
 		} else {
+			setProjects([]);
 			console.log("Erro ao obter projetos:", response.error);
 		}
 	}
@@ -139,6 +140,10 @@ function HomeProjects() {
 			setProjectName("");
 			setIsDialogOpen(false);
 		} else {
+			newPopup("Common", {
+				severity: "warning",
+				message: "É necessário informar um nome para o projeto.",
+			});
 			console.log(response.data.message);
 		}
 	}
