@@ -70,7 +70,6 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 									/>
 									<DotsIcon className="PP-header-icon" />
 								</div>
-
 								<div className="PP-cards-container" ref={cardsContainerRef}>
 									<div ref={lazyLoaderTopOffsetRef} />
 									<LazyLoader

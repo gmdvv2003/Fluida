@@ -593,7 +593,7 @@ function Project() {
 								<DragableModalDropLocationWithLazyLoader
 									// Referência para a div que será arrastada
 									scrollableDivRef={phasesContainerScrollBarRef}
-									// Referência para o lazy loader
+									// Referência para o LazyLoader
 									lazyLoaderRef={lazyLoaderRef}
 									// Função para criar um placeholder
 									createPlaceholder={(setPlaceholder, { order }) => {
