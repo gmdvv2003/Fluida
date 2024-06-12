@@ -1,27 +1,21 @@
 import "./Project.css";
 
-import { useRef, useState, useEffect } from "react";
 import { Navigate, useParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 
 import { ReactComponent as AddButtonIcon } from "assets/action-icons/add-circle-unlined.svg";
-
+import Backdrop from "components/shared/backdrop/Backdrop";
+import ConnectionFailure from "./ConnectionFailure";
+import DragableModalDropLocationWithLazyLoader from "utilities/dragable-modal/drop-location/DragableModalDropLocationWithLazyLoader";
+import EditCard from "./edit-card/EditCard";
+import HomeHeader from "components/shared/login-registration/header-home/HeaderHome";
+import LazyLoader from "utilities/lazy-loader/LazyLoader";
+import MouseScrollableModal from "utilities/MouseScrollableModal/MouseScrollableModal";
+import Phase from "./templates/phase/Phase";
+import ProjectUsers from "./project-users/ProjectUsers";
+import ReactSubscriptionHelper from "utilities/react-subscription-helper/ReactSubscriptionHelper";
 import { useProjectAuthentication } from "context/ProjectAuthenticationContext";
 import { useSystemPopups } from "context/popup/SystemPopupsContext";
-
-import HomeHeader from "components/shared/login-registration/header-home/HeaderHome";
-
-import EditCard from "./edit-card/EditCard";
-import ProjectUsers from "./project-users/ProjectUsers";
-
-import LazyLoader from "utilities/lazy-loader/LazyLoader";
-import DragableModalDropLocationWithLazyLoader from "utilities/dragable-modal/drop-location/DragableModalDropLocationWithLazyLoader";
-import ReactSubscriptionHelper from "utilities/react-subscription-helper/ReactSubscriptionHelper";
-import MouseScrollableModal from "utilities/MouseScrollableModal/MouseScrollableModal";
-
-import Phase from "./templates/phase/Phase";
-import ConnectionFailure from "./ConnectionFailure";
-
-import Backdrop from "components/shared/backdrop/Backdrop";
 
 function Project() {
 	const { newPopup } = useSystemPopups();
@@ -331,7 +325,14 @@ function Project() {
 		 * @param {number} targetPhaseId
 		 * @param {number} targetPhasePositionIndex
 		 */
-		cardMoved(phaseId, cardId, oldPositionIndex, targetPositionIndex, targetPhaseId, targetPhasePositionIndex) {}
+		cardMoved(
+			phaseId,
+			cardId,
+			oldPositionIndex,
+			targetPositionIndex,
+			targetPhaseId,
+			targetPhasePositionIndex
+		) {}
 
 		/**
 		 * Resposta do servidor para o fetch das fases.
@@ -339,7 +340,9 @@ function Project() {
 		 * @param {Array} phases
 		 */
 		phasesFetched(phases) {
-			phases = phases?.[0]?.taken?.filter(({ phaseId }) => this.phasesMap[phaseId] == undefined);
+			phases = phases?.[0]?.taken?.filter(
+				({ phaseId }) => this.phasesMap[phaseId] == undefined
+			);
 			phases.forEach((phase) => {
 				// Cria o estado da fase
 				this.phaseCreated([phase], true);
@@ -390,12 +393,44 @@ function Project() {
 			return new Promise((resolve) => {
 				this.#socket.emit("createPhase", { phaseName }, (success, data) => {
 					success
-						? newPopup("Common", { severity: "success", message: "Fase criada com sucesso" })
-						: newPopup("Common", { severity: "error", message: "Erro ao criar a fase" });
+						? newPopup("Common", {
+								severity: "success",
+								message: "Fase criada com sucesso",
+						  })
+						: newPopup("Common", {
+								severity: "error",
+								message: "Erro ao criar a fase",
+						  });
 
 					resolve(success);
 				});
 			});
+		}
+
+		/**
+		 * Responsável por deletar uma phase
+		 *
+		 * @param {*} phaseId
+		 * @returns
+		 */
+		requestDeletePhase(phaseId) {
+			// return new Promise((resolve) => {
+			// 	this.#socket.emit("deletePhase", phaseId, (success, data) => {
+			// 		success
+			// 			? newPopup("Common", {
+			// 					severity: "success",
+			// 					message: "Fase excluída com sucesso",
+			// 			  })
+			// 			: newPopup("Common", {
+			// 					severity: "error",
+			// 					message: "Erro ao criar a fase",
+			// 			  });
+
+			// 		resolve(success);
+			// 	});
+			// });
+
+			console.log("Teste", phaseId);
 		}
 
 		/**
@@ -408,8 +443,14 @@ function Project() {
 			return new Promise((resolve) => {
 				this.#socket.emit("createCard", { phaseId, title }, (success, data) => {
 					success
-						? newPopup("Common", { severity: "success", message: "Card criado com sucesso" })
-						: newPopup("Common", { severity: "error", message: "Erro ao criar o card" });
+						? newPopup("Common", {
+								severity: "success",
+								message: "Card criado com sucesso",
+						  })
+						: newPopup("Common", {
+								severity: "error",
+								message: "Erro ao criar o card",
+						  });
 
 					resolve(success);
 				});
@@ -532,12 +573,16 @@ function Project() {
 			socket.on("cardsFetched", cardsFetched);
 
 			// Listeners do estado do projeto
-			const unbindOnProjectPhaseStateChange = newProjectState.onProjectPhasesStateChange((phases) => {
-				performLazyLoaderUpdateRef.current();
-			});
+			const unbindOnProjectPhaseStateChange = newProjectState.onProjectPhasesStateChange(
+				(phases) => {
+					performLazyLoaderUpdateRef.current();
+				}
+			);
 
 			onProjectUnmountCallbackRef.current = () => {
-				leave(projectId).catch((error) => console.error(`Ocorreu um erro ao sair do projeto: ${error.message}`));
+				leave(projectId).catch((error) =>
+					console.error(`Ocorreu um erro ao sair do projeto: ${error.message}`)
+				);
 
 				// Remove os listeners
 				socket.off("disconnect", disconnect);
@@ -589,7 +634,10 @@ function Project() {
 					<div className="P-phases-container-holder">
 						<ol className="P-phases-container" ref={phasesContainerRef}>
 							<div ref={lazyLoaderTopOffsetRef} />
-							<MouseScrollableModal scrollableDivRef={phasesContainerScrollBarRef} ref={mouseScrollableModalRef}>
+							<MouseScrollableModal
+								scrollableDivRef={phasesContainerScrollBarRef}
+								ref={mouseScrollableModalRef}
+							>
 								<DragableModalDropLocationWithLazyLoader
 									// Referência para a div que será arrastada
 									scrollableDivRef={phasesContainerScrollBarRef}
@@ -619,7 +667,9 @@ function Project() {
 									dragMoveRef={dragableModalOnDragMoveRef}
 									// Função chamada quando o drag é concluído
 									dragConcludedCallback={({ phaseDTO }, newPosition) => {
-										const phaseState = projectStateRef.current?.getPhaseState(phaseDTO?.phaseId);
+										const phaseState = projectStateRef.current?.getPhaseState(
+											phaseDTO?.phaseId
+										);
 										if (!phaseState) {
 											return null;
 										}
@@ -636,24 +686,42 @@ function Project() {
 
 										projectSocketRef.current?.emit(
 											"movePhase",
-											{ phaseId: phaseDTO?.phaseId, targetPositionIndex: newPosition },
+											{
+												phaseId: phaseDTO?.phaseId,
+												targetPositionIndex: newPosition,
+											},
 											(success, data) => {
-												!success && newPopup("Common", { severity: "error", message: "Erro ao mover a fase" });
+												!success &&
+													newPopup("Common", {
+														severity: "error",
+														message: "Erro ao mover a fase",
+													});
 											}
 										);
 
 										// Ajusta a ordem das outras fases
-										projectStateRef.current?.getPhases().forEach((phaseState) => {
-											if (phaseState == undefined || phaseState.phaseDTO.phaseId == phaseDTO.phaseId) {
-												return null;
-											}
+										projectStateRef.current
+											?.getPhases()
+											.forEach((phaseState) => {
+												if (
+													phaseState == undefined ||
+													phaseState.phaseDTO.phaseId == phaseDTO.phaseId
+												) {
+													return null;
+												}
 
-											if (phaseState.phaseDTO.order < currentPhaseOrder && phaseState.phaseDTO.order >= newPosition) {
-												phaseState.phaseDTO.order += 1;
-											} else if (phaseState.phaseDTO.order > currentPhaseOrder && phaseState.phaseDTO.order <= newPosition) {
-												phaseState.phaseDTO.order -= 1;
-											}
-										});
+												if (
+													phaseState.phaseDTO.order < currentPhaseOrder &&
+													phaseState.phaseDTO.order >= newPosition
+												) {
+													phaseState.phaseDTO.order += 1;
+												} else if (
+													phaseState.phaseDTO.order > currentPhaseOrder &&
+													phaseState.phaseDTO.order <= newPosition
+												) {
+													phaseState.phaseDTO.order -= 1;
+												}
+											});
 
 										// Atualiza a ordem da fase
 										phaseState.phaseDTO.order = newPosition;
@@ -706,16 +774,26 @@ function Project() {
 										// Funções de controle do conteúdo
 										fetchMore={(page) => {
 											return new Promise((resolve, reject) => {
-												return projectSocketRef.current?.emit("fetchPhases", { page }, (response) => {
-													resolve(response?.phases?.taken || []);
-												});
+												return projectSocketRef.current?.emit(
+													"fetchPhases",
+													{ page },
+													(response) => {
+														resolve(response?.phases?.taken || []);
+													}
+												);
 											});
 										}}
 										getAvailableContentCountForFetch={async (sync = false) => {
-											return await projectStateRef.current?.getTotalPhases(sync);
+											return await projectStateRef.current?.getTotalPhases(
+												sync
+											);
 										}}
 										insertFetchedElement={(element) => {
-											return projectStateRef.current?.phaseCreated([element], true, true);
+											return projectStateRef.current?.phaseCreated(
+												[element],
+												true,
+												true
+											);
 										}}
 										// Tamanho da página
 										pageSize={10}
@@ -733,11 +811,21 @@ function Project() {
 							<button
 								className="P-add-new-phase-button"
 								onClick={() => {
-									projectSocketRef.current?.emit("createPhase", { phaseName: "Nova Fase" }, (success, data) => {
-										success
-											? newPopup("Common", { severity: "success", message: "Fase criada com sucesso" })
-											: newPopup("Common", { severity: "error", message: "Erro ao criar a fase" });
-									});
+									projectSocketRef.current?.emit(
+										"createPhase",
+										{ phaseName: "Nova Fase" },
+										(success, data) => {
+											success
+												? newPopup("Common", {
+														severity: "success",
+														message: "Fase criada com sucesso",
+												  })
+												: newPopup("Common", {
+														severity: "error",
+														message: "Erro ao criar a fase",
+												  });
+										}
+									);
 								}}
 							>
 								<AddButtonIcon className="P-add-new-phase-button-icon" />
