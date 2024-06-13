@@ -1,4 +1,4 @@
-const DEFAULT_PAGE_SIZE = 10;
+const DEFAULT_PAGE_SIZE = 100;
 
 class Page {
 	constructor({ taken, total, page, pageSize, hasNextPage, retrieveNextPage }) {
@@ -32,7 +32,7 @@ function Paginate({ GROUP_BY }) {
 			let { PAGE, PAGE_SIZE } = options || { PAGE: 1, PAGE_SIZE: DEFAULT_PAGE_SIZE };
 
 			PAGE = PAGE || 1;
-			PAGE_SIZE = PAGE_SIZE || 10;
+			PAGE_SIZE = PAGE_SIZE || DEFAULT_PAGE_SIZE;
 
 			const { repository, query, pick } = await handler.apply(this, [data]);
 			if (!query) {

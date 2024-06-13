@@ -237,7 +237,7 @@ const LazyLoader = React.forwardRef(
 			 * @returns {number}
 			 */
 			function getMaxPossibleElementsInContainer() {
-				return 5;
+				return 100;
 			}
 
 			/**
@@ -262,18 +262,10 @@ const LazyLoader = React.forwardRef(
 			async function getBottomRightOffset() {
 				switch (direction) {
 					case "horizontal":
-						return (
-							Math.max((await getAvailableContentCountForFetch()) - 1, 0) * (width + padding) +
-							margin -
-							lastSectionEnd * (width + padding)
-						);
+						return Math.max((await getAvailableContentCountForFetch()) - 1, 0) * (width + padding) - getContent().length * (width + padding);
 
 					case "vertical":
-						return (
-							Math.max((await getAvailableContentCountForFetch()) - 1, 0) * (height + padding) +
-							margin -
-							lastSectionEnd * (height + padding)
-						);
+						return Math.max((await getAvailableContentCountForFetch()) - 1, 0) * (height + padding) - getContent().length * (height + padding);
 
 					default:
 						break;
@@ -327,7 +319,13 @@ const LazyLoader = React.forwardRef(
 			 * Função responsável por carregar o conteúdo a ser exibido na tela
 			 */
 			async function setDisplayableContent() {
+				setVisibleContent([]);
+
 				let update = (visibleContent) => {
+					// Reseta as referências dos elementos que estão sendo exibidos na tela
+					visibleContentDataRefs.current = [];
+
+					// Atualiza o conteúdo a ser exibido na tela
 					setVisibleContent(visibleContent);
 				};
 

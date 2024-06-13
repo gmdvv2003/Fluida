@@ -11,6 +11,7 @@ function EditCard({ projectState, card }) {
 	const [isLabelsDialogOpen, setIsLabelsDialogOpen] = useState(false);
 	const [isDueDateDialogOpen, setIsDueDateDialogOpen] = useState(false);
 	const [isMoveCardDialogOpen, setIsMoveCardDialogOpen] = useState(false);
+
 	const [cardTitle, setCardTitle] = useState(null);
 
 	const [thisCardPhaseState, setThisCardPhaseState] = useState(card.phase);
@@ -19,7 +20,7 @@ function EditCard({ projectState, card }) {
 	const cardDescriptionFieldReference = useRef(null);
 
 	function handleOnCardTitleChange(event) {
-		setCardTitle(event.target.value); // Atualiza o estado do título do card
+		setCardTitle(event.target.value);
 	}
 
 	function handleOnCardDescriptionChange(event) {}
@@ -28,11 +29,8 @@ function EditCard({ projectState, card }) {
 		const phaseState = projectState.current?.getPhaseState(card?.cardDTO?.phaseId);
 		setThisCardPhaseState(phaseState);
 
-		const unbindTitleChangeSubscription =
-			cardTitleFieldReference.current.onTextChange(handleOnCardTitleChange);
-		const unbindEmailChangeSubscription = cardDescriptionFieldReference.current.onTextChange(
-			handleOnCardDescriptionChange
-		);
+		const unbindTitleChangeSubscription = cardTitleFieldReference.current.onTextChange(handleOnCardTitleChange);
+		const unbindEmailChangeSubscription = cardDescriptionFieldReference.current.onTextChange(handleOnCardDescriptionChange);
 
 		return () => {
 			unbindTitleChangeSubscription();
@@ -48,15 +46,13 @@ function EditCard({ projectState, card }) {
 						<div className="EC-header-card">CARD #{card?.cardDTO.cardId}</div>
 						<div className="EC-header-phase">
 							<div className="EC-header-phase-label">Fase </div>
-							<div className="EC-header-phase-phase">
-								{thisCardPhaseState?.phaseName}
-							</div>
+							<div className="EC-header-phase-phase">{thisCardPhaseState?.phaseName}</div>
 						</div>
 					</div>
 					<div className="EC-container-interno-card">
 						<div className="EC-container-interno-card-esquerda">
 							<TextInputField
-								placeholder={card?.cardDTO?.title}
+								placeholder={card?.cardDTO?.cardName}
 								container_style={{ marginBottom: "8px", height: "35px" }}
 								style={{
 									backgroundColor: "rgb(244, 244, 244)",
@@ -70,7 +66,7 @@ function EditCard({ projectState, card }) {
 							<div className="EC-container-descricao">
 								<div className="EC-label-descricao">Descrição</div>
 								<TextInputField
-									placeholder={card?.cardDTO?.description}
+									placeholder={card?.cardDTO?.cardDescription}
 									container_style={{ marginBottom: "8px" }}
 									style={{
 										backgroundColor: "rgb(244, 244, 244)",
@@ -88,20 +84,10 @@ function EditCard({ projectState, card }) {
 							<div className="EC-container-anexo">
 								<div className="EC-label-anexo">Anexo</div>
 								<div className="EC-container-files">
-									<input
-										type="file"
-										id="fileUpload"
-										style={{ display: "none" }}
-										multiple
-									/>
-									<ModularButton
-										label="+ adicionar novo arquivo"
-										customClassName={"EC-botao-anexo"}
-									/>
+									<input type="file" id="fileUpload" style={{ display: "none" }} multiple />
+									<ModularButton label="+ adicionar novo arquivo" customClassName={"EC-botao-anexo"} />
 									<div>
-										<div className="EC-label-anexo">
-											Nenhum arquivo anexado!
-										</div>
+										<div className="EC-label-anexo">Nenhum arquivo anexado!</div>
 									</div>
 								</div>
 							</div>
@@ -127,31 +113,18 @@ function EditCard({ projectState, card }) {
 										<ModularButton
 											label="Membros"
 											customClassName={"EC-button"}
-											action={() =>
-												setIsMembersDialogOpen(!isMembersDialogOpen)
-											}
+											action={() => setIsMembersDialogOpen(!isMembersDialogOpen)}
 										/>
-										<ModularButton
-											label="Etiquetas"
-											customClassName={"EC-button"}
-										/>
+										<ModularButton label="Etiquetas" customClassName={"EC-button"} />
 										<ModularButton label="Data" customClassName={"EC-button"} />
-										<ModularButton
-											label="Mover"
-											customClassName={"EC-button"}
-										/>
+										<ModularButton label="Mover" customClassName={"EC-button"} />
 										<ModularButton
 											label="Excluir este card"
 											customClassName={"EC-button"}
 											action={() => {
-												projectState.current
-													?.requestDeleteCard(card?.cardDTO?.cardId)
-													?.catch((error) => {
-														console.error(
-															`Erro ao excluir o card:`,
-															error
-														);
-													});
+												projectState.current?.requestDeleteCard(card?.cardDTO?.cardId)?.catch((error) => {
+													console.error(`Erro ao excluir o card:`, error);
+												});
 											}}
 										/>
 										{cardTitle && (
@@ -159,17 +132,9 @@ function EditCard({ projectState, card }) {
 												label="Atualizar card"
 												customClassName={"EC-button-update"}
 												action={() => {
-													projectState.current
-														?.requestUpdateCard(
-															card?.cardDTO?.cardId,
-															cardTitle
-														)
-														?.catch((error) => {
-															console.error(
-																`Erro ao atualizar o card:`,
-																error
-															);
-														});
+													projectState.current?.requestUpdateCard(card?.cardDTO?.cardId, cardTitle)?.catch((error) => {
+														console.error(`Erro ao atualizar o card:`, error);
+													});
 												}}
 											/>
 										)}
@@ -186,11 +151,7 @@ function EditCard({ projectState, card }) {
 						<div className="EC-container-header-dialog">
 							<div className="EC-label-members">Membros</div>
 							<div className="EC-label-members-button">
-								<ModularButton
-									label="X"
-									customClassName={"EC-button-remover"}
-									action={() => setIsMembersDialogOpen(!isMembersDialogOpen)}
-								/>
+								<ModularButton label="X" customClassName={"EC-button-remover"} action={() => setIsMembersDialogOpen(!isMembersDialogOpen)} />
 							</div>
 						</div>
 						<div className="EC-container-icons-members">

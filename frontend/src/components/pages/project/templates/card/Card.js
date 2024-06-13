@@ -108,7 +108,7 @@ const Card = React.forwardRef(({ scrollableDivRef, isLoading, card, projectState
 			)}
 
 			<div className={`PC-card-title-label ${labels.length <= 0 && "extended-PC-title-label"}`}>
-				<p>{card?.cardDTO?.title}</p>
+				<p>{`${card?.cardDTO?.cardName} (#${card?.cardDTO?.cardId})`}</p>
 			</div>
 
 			<div className="PC-footer-container">

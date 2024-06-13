@@ -71,6 +71,26 @@ class CardsRepository extends Repository {
 	async deleteCard(cardsDTO) {
 		return await this.Repository.remove(cardsDTO);
 	}
+
+	/**
+	 *
+	 * @param {*} cardId
+	 * @param {*} cardName
+	 * @param {*} cardDescription
+	 * @returns
+	 */
+	async updateCard(cardId, cardName, cardDescription) {
+		console.log("FUBNCIONA VAI KRL POIR FAVOR QUERO MDORMI");
+		cardName = cardName || "Novo Card";
+		cardDescription = cardDescription || "Descrição do card";
+
+		console.log(cardId, cardName, cardDescription);
+		return await this.Repository.createQueryBuilder("Cards")
+			.update(CardsEntity)
+			.set({ cardName, cardDescription })
+			.where("cardId = :cardId", { cardId })
+			.execute();
+	}
 }
 
 module.exports = CardsRepository;

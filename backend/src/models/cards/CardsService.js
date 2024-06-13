@@ -40,6 +40,17 @@ class CardsService extends Service {
 	async deleteCard(cardsDTO) {
 		return await this.CardsRepository.deleteCard(cardsDTO);
 	}
+
+	/**
+	 *
+	 * @param {*} cardId
+	 * @param {*} newCardName
+	 * @param {*} newCardDescription
+	 * @returns
+	 */
+	async updateCard(cardId, newCardName, newCardDescription) {
+		return await this.CardsRepository.updateCard(cardId, newCardName, newCardDescription);
+	}
 }
 
 module.exports = CardsService;

@@ -1,12 +1,7 @@
 import React, { Suspense, useEffect, useImperativeHandle, useRef, useState } from "react";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleXmark, faUserLarge } from "@fortawesome/free-solid-svg-icons";
-
 import { ReactComponent as DotsIcon } from "assets/action-icons/dots.svg";
 import { ReactComponent as PlusIcon } from "assets/action-icons/add-circle-unlined.svg";
-
-import { useSystemPopups } from "context/popup/SystemPopupsContext";
 
 import DragableModal from "utilities/dragable-modal/DragableModal";
 import LazyLoader from "utilities/lazy-loader/LazyLoader";
@@ -19,8 +14,6 @@ import Card from "../card/Card";
 import "./Phase.css";
 
 const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectState, projectSocketRef, callbacks }, ref) => {
-	const { newPopup } = useSystemPopups();
-
 	const cardsContainerRef = useRef(null);
 	const cardsContainerScrollBarRef = useRef(null);
 
@@ -28,12 +21,7 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 	const lazyLoaderBottomOffsetRef = useRef(null);
 
 	const lazyLoaderRef = useRef(null);
-
 	const performLazyLoaderUpdateRef = useRef(null);
-	const projectNameUpdateReference = useRef(null);
-
-	const [isDialogOpenProjectOptions, setDialogOptionsOpen] = useState(false);
-	const [projectNameUpdate, setProjectNameUpdate] = useState("");
 
 	useImperativeHandle(
 		ref,
@@ -44,80 +32,14 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 	);
 
 	useEffect(() => {
-		let unsubscribeProjectNameUpdater;
-
-		async function prepareProjectNameUpdater() {
-			unsubscribeProjectNameUpdater = await handleInputChangeUpdateProjectName();
-		}
-
-		prepareProjectNameUpdater();
-
-		return () => {
-			if (unsubscribeProjectNameUpdater) {
-				unsubscribeProjectNameUpdater();
-			}
-		};
-	});
-
-	useEffect(() => {
 		if (!phase) {
 			return undefined;
 		}
 
-		return projectState.current?.onProjectCardsStateChange(phase?.phaseDTO?.phaseId, (cardDTO) => {
+		return projectState.current?.onProjectCardsStateChange(phase?.phaseDTO?.phaseId, () => {
 			performLazyLoaderUpdateRef.current?.();
 		});
 	});
-
-	/**
-	 * Lida com o dialog de opções do projeto
-	 */
-	function handleOptionsProjectClick(boolean, project) {
-		setDialogOptionsOpen(boolean);
-		setProjectNameUpdate("");
-	}
-
-	/**
-	 * Atualiza o valor do input de atualização do novo nome do projeto
-	 */
-	async function handleInputChangeUpdateProjectName() {
-		if (projectNameUpdateReference.current) {
-			const unsubscribe = projectNameUpdateReference.current.onTextChange((event) => {
-				setProjectNameUpdate(event.target.value);
-			});
-
-			return unsubscribe;
-		}
-
-		return () => {};
-	}
-
-	async function handleDeletePhase(phaseId) {
-		if (projectState && projectState.current.requestDeletePhase) {
-			try {
-				await projectState.current.requestDeletePhase(phaseId);
-				console.log("Fase excluída com sucesso!");
-			} catch (error) {
-				console.error("Erro ao excluir fase:", error);
-			}
-		} else {
-			console.error("requestDeletePhase não está definido ou projectState está indefinido.");
-		}
-	}
-
-	async function handleUpdatePhase(phaseId) {
-		if (projectState && projectState.current.requestUpdatePhase) {
-			console.log("AAAAAAAAAAAAAAAAAAAAAAAAEEEEEEEEEEEE", phaseId, projectNameUpdate);
-			try {
-				await projectState.current.requestUpdatePhase(phaseId, projectNameUpdate);
-				console.log("Fase atualizada com sucesso!");
-			} catch (error) {
-				console.error("Erro ao atualizar fase:", error);
-			}
-		} else {
-			console.error("requestUpdatePhase não está definido ou projectState está indefinido.");
-		}
-	}
 
 	return (
 		<DragableModal
@@ -153,8 +75,9 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 											});
 										}}
 									/>
-									<DotsIcon className="PP-header-icon" onClick={() => handleOptionsProjectClick(true)} />
+									<DotsIcon className="PP-header-icon" onClick={() => projectState.current?.previewPhaseConfiguration(phase)} />
 								</div>
+
 								<div className="PP-cards-container" ref={cardsContainerRef}>
 									<div ref={lazyLoaderTopOffsetRef} />
 									<LazyLoader
@@ -166,16 +89,18 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 										container={cardsContainerRef}
 										scrollBar={cardsContainerScrollBarRef}
 										// Função para construir os elementos
-										constructElement={(card, _, isLoading, setReference) => (
-											<Card
-												scrollableDivRef={cardsContainerScrollBarRef}
-												isLoading={isLoading}
-												card={card}
-												projectState={projectState}
-												projectSocketRef={projectSocketRef}
-												ref={(element) => setReference(element)}
-											/>
-										)}
+										constructElement={(card, _, isLoading, setReference) => {
+											return (
+												<Card
+													scrollableDivRef={cardsContainerScrollBarRef}
+													isLoading={isLoading}
+													card={card}
+													projectState={projectState}
+													projectSocketRef={projectSocketRef}
+													ref={(element) => setReference(element)}
+												/>
+											);
+										}}
 										// Dimensões dos elementos
 										height={138}
 										margin={8}
@@ -185,13 +110,9 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 										// Funções de controle do conteúdo
 										fetchMore={(page) => {
 											return new Promise((resolve, reject) => {
-												return projectSocketRef.current?.emit(
-													"fetchCards",
-													{ phaseId: phase?.phaseDTO?.phaseId, page },
-													(response) => {
-														resolve(response?.cards?.taken || []);
-													}
-												);
+												return projectSocketRef.current?.emit("fetchCards", { phaseId: phase?.phaseDTO?.phaseId, page }, (response) => {
+													resolve(response?.cards?.taken || []);
+												});
 											});
 										}}
 										getAvailableContentCountForFetch={async (sync = false) => {
@@ -201,69 +122,18 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 											return projectState.current?.cardCreated([element], true, true);
 										}}
 										// Tamanho da página
-										pageSize={10}
+										pageSize={100}
 										// Função para obter o conteúdo
-										getContent={() => projectState.current?.getCards(phase?.phaseDTO?.phaseId)}
+										getContent={() => projectState.current?.getCards(phase?.phaseDTO?.phaseId) || []}
 										// Referência para o lazy loader
 										ref={lazyLoaderRef}
 									/>
+
 									<div ref={lazyLoaderBottomOffsetRef} />
 								</div>
 							</div>
 						)}
 					</Suspense>
-
-					{isDialogOpenProjectOptions && (
-						<div className="PP-dialog-overlay">
-							<div className="PP-dialog-update-name-project-container">
-								<div className="PP-container-label-update-project-name">
-									<div className="PP-container-label-current-name-project">
-										<div>Nome atual da fase:</div>
-										<div className="PP-label-current-project-name">{phase?.phaseDTO?.phaseName}</div>
-									</div>
-									<div className="PP-container-close-dialog-project-update">
-										<FontAwesomeIcon
-											onClick={() => handleOptionsProjectClick(false)}
-											icon={faCircleXmark}
-											size="xl"
-											style={{
-												color: "#8c8c8c",
-												cursor: "pointer",
-												borderRadius: "50%",
-											}}
-										/>
-									</div>
-								</div>
-								<div>
-									<TextInputField
-										style={{
-											marginTop: "10px",
-											marginBottom: "10px",
-											borderRadius: "var(--border-radius)",
-											backgroundColor: "rgb(244, 244, 244)",
-										}}
-										name="projectUpdate"
-										placeholder="Novo nome da fase"
-										ref={projectNameUpdateReference}
-									/>
-								</div>
-								<div className="PP-container-buttons-update-project">
-									<button
-										className={`PP-button-update-project ${
-											projectNameUpdate.length <= 0 ? "PP-button-update-project-disabled" : ""
-										}`}
-										disabled={projectNameUpdate.length <= 0}
-										onClick={() => handleUpdatePhase(phase?.phaseDTO?.phaseId)}
-									>
-										Atualizar fase
-									</button>
-									<button className="PP-button-delete-project" onClick={() => handleDeletePhase(phase?.phaseDTO?.phaseId)}>
-										Excluir fase
-									</button>
-								</div>
-							</div>
-						</div>
-					)}
 				</div>
 			)}
 			// Callbacks

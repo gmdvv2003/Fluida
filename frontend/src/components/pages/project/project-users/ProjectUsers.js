@@ -11,7 +11,7 @@ import { ReactComponent as ShareChain } from "assets/action-icons/share-chain.sv
 import { ReactComponent as Lens } from "assets/action-icons/lens.svg";
 
 function ProjectUsers({ projectState }) {
-	const [projectUsers, setProjectUsers] = useState(projectState.getMembers());
+	const [projectUsers, setProjectUsers] = useState(projectState.current?.getMembers());
 
 	const [showInvitationLink, setShowInvitationLink] = useState(false);
 	const [invitationLinkSent, setInvitationLinkSent] = useState(false);
@@ -25,7 +25,7 @@ function ProjectUsers({ projectState }) {
 	}
 
 	useEffect(() => {
-		return projectState.onProjectMembersStateChange((members) => {
+		return projectState.current?.onProjectMembersStateChange((members) => {
 			setProjectUsers(members);
 		});
 	}, []);

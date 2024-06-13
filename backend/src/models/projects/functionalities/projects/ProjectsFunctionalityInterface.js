@@ -40,6 +40,8 @@ class Phase {
 	project;
 	phaseDTO;
 
+	cards = [];
+
 	totalCardsInPhase = undefined;
 	totalCardsInPhaseBeforeFetch = 0;
 
@@ -73,7 +75,6 @@ class Project {
 	projectId;
 	ProjectsController;
 
-	#cards = [];
 	#phases = [];
 
 	members = [];
@@ -86,6 +87,27 @@ class Project {
 	constructor(projectId, ProjectsController) {
 		this.projectId = projectId;
 		this.ProjectsController = ProjectsController;
+	}
+
+	/**
+	 *
+	 * @param {*} cardId
+	 * @returns
+	 */
+	#getPhaseOfCard(cardId) {
+		for (let index = 0; index < this.#phases.length; index += 1) {
+			const phase = this.#phases[index];
+			if (phase == undefined) {
+				continue;
+			}
+
+			const cardIndex = phase.cards.findIndex((card) => card !== undefined && card.cardDTO.cardId === cardId);
+			if (cardIndex !== -1) {
+				return { phase, card: phase.cards[cardIndex], index: cardIndex };
+			}
+		}
+
+		return {};
 	}
 
 	/**
@@ -129,11 +151,16 @@ class Project {
 	 * @returns {Array}
 	 */
 	async getCards(page, phaseId) {
+		const phase = this.getPhase(phaseId, true);
+		if (phase === undefined) {
+			return [];
+		}
+
 		const phasesCardsService = this.ProjectsController.PhasesService.PhasesCardsService;
 		return await this.#fetchMore(
 			await this.getTotalCardsInPhase(phaseId),
 			(cardDTO) => new Card(this, cardDTO),
-			this.#cards,
+			phase.cards,
 			phasesCardsService.getCardsOfPhase.bind(phasesCardsService),
 			page,
 			phaseId
@@ -199,7 +226,11 @@ class Project {
 	 * @returns
 	 */
 	getCard(cardId, returnSuperClass = false) {
-		const card = this.#cards.find((card) => card.cardDTO.cardId === cardId);
+		const { phase, card } = this.#getPhaseOfCard(cardId);
+		if (!phase || !card) {
+			return null;
+		}
+
 		return returnSuperClass ? card : card?.cardDTO;
 	}
 
@@ -212,7 +243,10 @@ class Project {
 			return null;
 		}
 
-		this.#cards.push(new Card(this, cardDTO));
+		// Adiciona o card a fase
+		phase.cards.push(new Card(this, cardDTO));
+
+		// Atualiza o total de cards na fase
 		phase.totalCardsInProject !== undefined ? ++phase.totalCardsInProject : ++phase.totalCardsInProjectBeforeFetch;
 	}
 
@@ -220,12 +254,25 @@ class Project {
 	 * @param {number} caseId
 	 */
 	removeCard(cardId) {
-		const phase = this.getPhase(cardDTO?.phaseId, true);
-		if (!phase) {
+		const { phase, card, index } = this.#getPhaseOfCard(cardId);
+		if (!phase || !card) {
 			return null;
 		}
 
-		this.#cards = this.#cards.filter((card) => card != undefined || card.cardDTO.cardId !== cardId);
+		console.log("=========================");
+		console.log(card);
+
+		console.log(index);
+		console.log("================== ANTES");
+		console.log(phase.cards.forEach((x) => console.log(x?.cardDTO)));
+
+		// Remove o card da fase
+		phase.cards.splice(index, 1);
+
+		console.log("================== DEPOIS");
+		console.log(phase.cards.forEach((x) => console.log(x?.cardDTO)));
+
+		// Atualiza o total de cards na fase
 		phase.totalCardsInProject !== undefined ? --phase.totalCardsInProject : --phase.totalCardsInProjectBeforeFetch;
 	}
 
@@ -234,7 +281,15 @@ class Project {
 	 * @param {*} cardId
 	 * @param {*} cardDTO
 	 */
-	updateCard(cardId, cardDTO) {}
+	updateCard(cardId, newCardName, newCardDescription) {
+		const { phase, card } = this.#getPhaseOfCard(cardId);
+		if (!phase || !card) {
+			return null;
+		}
+
+		card.cardDTO.cardName = newCardName || card.cardDTO.cardName;
+		card.cardDTO.cardDescription = newCardDescription || card.cardDTO.cardDescription;
+	}
 
 	/**
 	 *
@@ -331,6 +386,7 @@ class ProjectsFunctionalityInterface {
 			try {
 				next(projectsIO, socket, project, data, acknowledgement);
 			} catch (error) {
+				console.error("Erro ao executar a funcionalidade do projeto:", error);
 				this.#acknowledgeError(socket, acknowledgement, error.message);
 			}
 		};

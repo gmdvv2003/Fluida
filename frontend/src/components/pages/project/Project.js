@@ -4,6 +4,7 @@ import { Navigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 
 import { ReactComponent as AddButtonIcon } from "assets/action-icons/add-circle-unlined.svg";
+
 import Backdrop from "components/shared/backdrop/Backdrop";
 import ConnectionFailure from "./ConnectionFailure";
 import DragableModalDropLocationWithLazyLoader from "utilities/dragable-modal/drop-location/DragableModalDropLocationWithLazyLoader";
@@ -13,7 +14,9 @@ import LazyLoader from "utilities/lazy-loader/LazyLoader";
 import MouseScrollableModal from "utilities/MouseScrollableModal/MouseScrollableModal";
 import Phase from "./templates/phase/Phase";
 import ProjectUsers from "./project-users/ProjectUsers";
+import PhaseConfiguration from "./phase-configuration/PhaseConfiguration";
 import ReactSubscriptionHelper from "utilities/react-subscription-helper/ReactSubscriptionHelper";
+
 import { useProjectAuthentication } from "context/ProjectAuthenticationContext";
 import { useSystemPopups } from "context/popup/SystemPopupsContext";
 
@@ -21,6 +24,7 @@ function Project() {
 	const { newPopup } = useSystemPopups();
 
 	const [cardBeingEdited, setCardBeingEdited] = useState(null);
+	const [phaseBeingConfigurated, setPhaseBeingConfigurated] = useState(null);
 	const [isProjectUsersModalVisible, setIsProjectUsersModalVisible] = useState(false);
 
 	const { projectId, cardId } = useParams();
@@ -306,9 +310,7 @@ function Project() {
 			const { phaseId, newPhaseName } = data?.[0];
 
 			// Pega o índice da fase removida
-			const phaseIndex = this.phases.findIndex(
-				(phaseState) => phaseState?.phaseDTO?.phaseId == phaseId
-			);
+			const phaseIndex = this.phases.findIndex((phaseState) => phaseState?.phaseDTO?.phaseId == phaseId);
 			if (phaseIndex == -1) {
 				return null;
 			}
@@ -328,9 +330,7 @@ function Project() {
 			const { phaseId } = data?.[0];
 
 			// Pega o índice da fase removida
-			const phaseIndex = this.phases.findIndex(
-				(phaseState) => phaseState?.phaseDTO?.phaseId == phaseId
-			);
+			const phaseIndex = this.phases.findIndex((phaseState) => phaseState?.phaseDTO?.phaseId == phaseId);
 			if (phaseIndex == -1) {
 				return null;
 			}
@@ -345,6 +345,10 @@ function Project() {
 
 			// Decrementa o número total de fases
 			this.totalPhases -= 1;
+
+			if (phaseId in this.#projectCardsStateListeners) {
+				delete this.#projectCardsStateListeners[phaseId];
+			}
 
 			this.#projectPhasesStateListeners.notify(phaseDTO);
 		}
@@ -405,7 +409,28 @@ function Project() {
 		 * @param {number} cardId
 		 * @param {Object} updatedCardDTOFields
 		 */
-		cardUpdated(cardId, updatedCardDTOFields) {}
+		cardUpdated(data /*updatedCardDTOFields*/) {
+			const { phaseId, cardId, newCardName, newCardDescription } = data?.[0];
+
+			const phaseState = this.getPhaseState(phaseId);
+			if (!phaseState) {
+				return null;
+			}
+
+			// Pega o índice da fase removida
+			const cardIndex = phaseState.cards.findIndex((cardState) => cardState?.cardDTO?.cardId == cardId);
+			if (cardIndex == -1) {
+				return null;
+			}
+
+			const { cardDTO } = phaseState.cards[cardIndex];
+
+			cardDTO.cardName = newCardName || cardDTO.phaseName;
+			cardDTO.cardDescription = newCardDescription || cardDTO.cardDescription;
+
+			this.#projectCardsStateListeners[cardDTO.phaseId]?.notify(cardDTO);
+			this.#projectCardsStateListeners[-1]?.notify(cardDTO);
+		}
 
 		/**
 		 * Resposta do servidor para a remoção de um card.
@@ -421,9 +446,7 @@ function Project() {
 			}
 
 			// Pega o índice do card removida
-			const cardIndex = phaseState.cards.findIndex(
-				(cardState) => cardState.cardDTO.cardId == cardId
-			);
+			const cardIndex = phaseState.cards.findIndex((cardState) => cardState.cardDTO.cardId == cardId);
 			if (cardIndex == -1) {
 				return null;
 			}
@@ -452,14 +475,7 @@ function Project() {
 		 * @param {number} targetPhaseId
 		 * @param {number} targetPhasePositionIndex
 		 */
-		cardMoved(
-			phaseId,
-			cardId,
-			oldPositionIndex,
-			targetPositionIndex,
-			targetPhaseId,
-			targetPhasePositionIndex
-		) {}
+		cardMoved(phaseId, cardId, oldPositionIndex, targetPositionIndex, targetPhaseId, targetPhasePositionIndex) {}
 
 		/**
 		 * Resposta do servidor para o fetch das fases.
@@ -467,9 +483,7 @@ function Project() {
 		 * @param {Array} phases
 		 */
 		phasesFetched(phases) {
-			phases = phases?.[0]?.taken?.filter(
-				({ phaseId }) => this.phasesMap[phaseId] == undefined
-			);
+			phases = phases?.[0]?.taken?.filter(({ phaseId }) => this.phasesMap[phaseId] == undefined);
 			phases.forEach((phase) => {
 				// Cria o estado da fase
 				this.phaseCreated([phase], true);
@@ -588,12 +602,12 @@ function Project() {
 		 *	Faz o request para criar o Card
 		 *
 		 * @param {*} phaseId
-		 * @param {*} title
+		 * @param {*} cardName
 		 * @returns
 		 */
-		requestCreateNewCard(phaseId, title = "Novo Card") {
+		requestCreateNewCard(phaseId, cardName = "Novo Card") {
 			return new Promise((resolve) => {
-				this.#socket.emit("createCard", { phaseId, title }, (success, data) => {
+				this.#socket.emit("createCard", { phaseId, cardName }, (success, data) => {
 					success
 						? newPopup("Common", {
 								severity: "success",
@@ -662,6 +676,18 @@ function Project() {
 		previewCard(cardState) {
 			setCardBeingEdited(cardState);
 		}
+
+		previewPhaseConfiguration(phaseState) {
+			setPhaseBeingConfigurated(phaseState);
+		}
+
+		dismissCardPreview() {
+			setCardBeingEdited(null);
+		}
+
+		dismissPhaseConfigurationPreview() {
+			setPhaseBeingConfigurated(null);
+		}
 	}
 
 	// ============================== Edição de um card ============================== //
@@ -670,6 +696,14 @@ function Project() {
 	 */
 	function toggleEditCardModal() {
 		setCardBeingEdited(null);
+	}
+
+	// ============================== Configuração da fase ============================== //
+	/**
+	 *
+	 */
+	function togglePhaseConfigurationModal() {
+		setPhaseBeingConfigurated(null);
 	}
 
 	// ============================== Usuários do projeto ============================== //
@@ -749,15 +783,12 @@ function Project() {
 			socket.on("cardsFetched", cardsFetched);
 
 			// Listener para quando o estado das fases do projeto mudar
-			const unbindOnPhaseStateChangeLazyLoaderUpdate =
-				newProjectState.onProjectPhasesStateChange(() => {
-					performLazyLoaderUpdateRef.current?.();
-				});
+			const unbindOnPhaseStateChangeLazyLoaderUpdate = newProjectState.onProjectPhasesStateChange((phaseDTO) => {
+				performLazyLoaderUpdateRef.current?.();
+			});
 
 			onProjectUnmountCallbackRef.current = () => {
-				leave(projectId).catch((error) =>
-					console.error(`Ocorreu um erro ao sair do projeto: ${error.message}`)
-				);
+				leave(projectId).catch((error) => console.error(`Ocorreu um erro ao sair do projeto: ${error.message}`));
 
 				// Remove os listeners
 				socket.off("disconnect", disconnect);
@@ -799,12 +830,26 @@ function Project() {
 
 		// Listener para quando o estado dos cards do projeto mudar
 		return projectStateRef.current?.onProjectCardsStateChange(-1, (cardDTO) => {
-			// Invallida o EditCard caso o card sendo editado tenha sido deletado
+			// Invalida o EditCard caso o card sendo editado tenha sido deletado
 			if (cardBeingEdited?.cardDTO?.cardId == cardDTO.cardId) {
 				toggleEditCardModal();
 			}
 		});
 	}, [projectStateRef, cardBeingEdited]);
+
+	useEffect(() => {
+		if (projectStateRef.current == null) {
+			return undefined;
+		}
+
+		// Listener para quando o estado das fase do projeto mudar
+		return projectStateRef.current?.onProjectPhasesStateChange((phaseDTO) => {
+			// Invalida o PhaseConfiguration caso a fase sendo configurada tenha sido deletada
+			if (phaseBeingConfigurated?.phaseDTO?.phaseId == phaseDTO.phaseId) {
+				togglePhaseConfigurationModal();
+			}
+		});
+	}, [projectStateRef, phaseBeingConfigurated]);
 
 	return redirectToHome ? (
 		<Navigate to="/" />
@@ -813,12 +858,13 @@ function Project() {
 			<HomeHeader onUsersInProjectClick={toggleProjectUsersModal} />
 			<ConnectionFailure connectionFailure={waitingForReconnect} />
 
-			{cardBeingEdited != null && (
-				<EditCard projectState={projectStateRef} card={cardBeingEdited} />
-			)}
+			{cardBeingEdited != null && <EditCard projectState={projectStateRef} card={cardBeingEdited} />}
 			<Backdrop show={cardBeingEdited != null} onClick={toggleEditCardModal} />
 
-			{isProjectUsersModalVisible && <ProjectUsers projectState={projectStateRef.current} />}
+			{phaseBeingConfigurated != null && <PhaseConfiguration projectState={projectStateRef} phase={phaseBeingConfigurated} />}
+			<Backdrop show={phaseBeingConfigurated != null} onClick={togglePhaseConfigurationModal} />
+
+			{isProjectUsersModalVisible && <ProjectUsers projectState={projectStateRef} />}
 			<Backdrop show={isProjectUsersModalVisible} onClick={toggleProjectUsersModal} />
 
 			{projectStateRef.current && (
@@ -826,10 +872,7 @@ function Project() {
 					<div className="P-phases-container-holder">
 						<ol className="P-phases-container" ref={phasesContainerRef}>
 							<div ref={lazyLoaderTopOffsetRef} />
-							<MouseScrollableModal
-								scrollableDivRef={phasesContainerScrollBarRef}
-								ref={mouseScrollableModalRef}
-							>
+							<MouseScrollableModal scrollableDivRef={phasesContainerScrollBarRef} ref={mouseScrollableModalRef}>
 								<DragableModalDropLocationWithLazyLoader
 									// Referência para a div que será arrastada
 									scrollableDivRef={phasesContainerScrollBarRef}
@@ -859,9 +902,7 @@ function Project() {
 									dragMoveRef={dragableModalOnDragMoveRef}
 									// Função chamada quando o drag é concluído
 									dragConcludedCallback={({ phaseDTO }, newPosition) => {
-										const phaseState = projectStateRef.current?.getPhaseState(
-											phaseDTO?.phaseId
-										);
+										const phaseState = projectStateRef.current?.getPhaseState(phaseDTO?.phaseId);
 										if (!phaseState) {
 											return null;
 										}
@@ -892,28 +933,17 @@ function Project() {
 										);
 
 										// Ajusta a ordem das outras fases
-										projectStateRef.current
-											?.getPhases()
-											.forEach((phaseState) => {
-												if (
-													phaseState == undefined ||
-													phaseState.phaseDTO.phaseId == phaseDTO.phaseId
-												) {
-													return null;
-												}
+										projectStateRef.current?.getPhases().forEach((phaseState) => {
+											if (phaseState == undefined || phaseState.phaseDTO.phaseId == phaseDTO.phaseId) {
+												return null;
+											}
 
-												if (
-													phaseState.phaseDTO.order < currentPhaseOrder &&
-													phaseState.phaseDTO.order >= newPosition
-												) {
-													phaseState.phaseDTO.order += 1;
-												} else if (
-													phaseState.phaseDTO.order > currentPhaseOrder &&
-													phaseState.phaseDTO.order <= newPosition
-												) {
-													phaseState.phaseDTO.order -= 1;
-												}
-											});
+											if (phaseState.phaseDTO.order < currentPhaseOrder && phaseState.phaseDTO.order >= newPosition) {
+												phaseState.phaseDTO.order += 1;
+											} else if (phaseState.phaseDTO.order > currentPhaseOrder && phaseState.phaseDTO.order <= newPosition) {
+												phaseState.phaseDTO.order -= 1;
+											}
+										});
 
 										// Atualiza a ordem da fase
 										phaseState.phaseDTO.order = newPosition;
@@ -966,31 +996,21 @@ function Project() {
 										// Funções de controle do conteúdo
 										fetchMore={(page) => {
 											return new Promise((resolve, reject) => {
-												return projectSocketRef.current?.emit(
-													"fetchPhases",
-													{ page },
-													(response) => {
-														resolve(response?.phases?.taken || []);
-													}
-												);
+												return projectSocketRef.current?.emit("fetchPhases", { page }, (response) => {
+													resolve(response?.phases?.taken || []);
+												});
 											});
 										}}
 										getAvailableContentCountForFetch={async (sync = false) => {
-											return await projectStateRef.current?.getTotalPhases(
-												sync
-											);
+											return await projectStateRef.current?.getTotalPhases(sync);
 										}}
 										insertFetchedElement={(element) => {
-											return projectStateRef.current?.phaseCreated(
-												[element],
-												true,
-												true
-											);
+											return projectStateRef.current?.phaseCreated([element], true, true);
 										}}
 										// Tamanho da página
-										pageSize={10}
+										pageSize={100}
 										// Função para obter o conteúdo
-										getContent={() => projectStateRef.current?.getPhases()}
+										getContent={() => projectStateRef.current?.getPhases() || []}
 										// Referência para o lazy loader
 										ref={lazyLoaderRef}
 									/>
@@ -1000,12 +1020,7 @@ function Project() {
 						</ol>
 
 						<div className="P-add-new-phase-button-container">
-							<button
-								className="P-add-new-phase-button"
-								onClick={() =>
-									projectStateRef.current?.requestCreateNewPhase("Nova Fase")
-								}
-							>
+							<button className="P-add-new-phase-button" onClick={() => projectStateRef.current?.requestCreateNewPhase("Nova Fase")}>
 								<AddButtonIcon className="P-add-new-phase-button-icon" />
 							</button>
 						</div>

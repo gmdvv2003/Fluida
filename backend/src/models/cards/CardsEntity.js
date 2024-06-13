@@ -19,15 +19,15 @@ module.exports = new EntitySchema({
 			type: "int",
 		},
 
-		// title VARCHAR(100) NOT NULL
-		title: {
+		// cardName VARCHAR(100) NOT NULL
+		cardName: {
 			nullable: false,
 			type: "varchar",
 			length: 100,
 		},
 
-		// description VARCHAR(2000) NOT NULL
-		description: {
+		// cardDescription VARCHAR(2000) NOT NULL
+		cardDescription: {
 			nullable: false,
 			type: "varchar",
 			length: 2000,

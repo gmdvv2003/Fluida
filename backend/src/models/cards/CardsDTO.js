@@ -2,8 +2,8 @@ class CardsDTO {
 	constructor(card) {
 		this.cardId = card?.cardId;
 		this.phaseId = card?.phaseId;
-		this.title = card?.title;
-		this.description = card?.description || "";
+		this.cardName = card?.cardName;
+		this.cardDescription = card?.cardDescription || "";
 		this.dueDate = card?.dueDate || "";
 		this.creationDate = card?.creationDate;
 		this.order = card?.order;
@@ -13,8 +13,8 @@ class CardsDTO {
 		return {
 			cardId: this.cardId,
 			phaseId: this.phaseId,
-			title: this.title,
-			description: this.description,
+			cardName: this.cardName,
+			cardDescription: this.cardDescription,
 			dueDate: this.dueDate,
 			creationDate: this.creationDate,
 			order: this.order,
