@@ -14,6 +14,7 @@
 	--action-button-background-color: #ff8c00; /* Padrão */
 	--action-button-background-color-inactive: #e87f00; /* Inativo */
 	--action-button-selected-background-color: #f18500; /* Selecionado */
+	--action-button-hover: #ffa83f; /* Hover */
 
 	--action-button-height: 50px;
 	--action-button-font-size: 20px;

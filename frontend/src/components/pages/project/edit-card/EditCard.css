@@ -1,8 +1,8 @@
 .EC-container {
-	z-index: 1000;
 	display: flex;
 	position: fixed;
 	justify-content: center;
+	z-index: 1000;
 	padding-top: 30px;
 	width: 100%;
 	height: calc(100vh - var(--header-height));
@@ -463,5 +463,27 @@ textarea:focus {
 }
 
 .EC-button:active {
+	filter: brightness(70%); /* Reduz a luminosidade do botão quando clicado */
+}
+
+.EC-button-update {
+	display: flex;
+	cursor: pointer;
+	margin-bottom: 5px;
+	border: 1px solid rgba(0, 0, 0, 0.139);
+	border-radius: 4px;
+	background-color: var(--action-button-background-color);
+	padding: 5px;
+	width: 100%;
+	height: 25px;
+	font-weight: bold;
+	font-size: 12px;
+}
+
+.EC-button-update:hover {
+	background-color: var(--action-button-hover);
+}
+
+.EC-button-update:active {
 	filter: brightness(70%); /* Reduz a luminosidade do botão quando clicado */
 }

@@ -1,25 +1,21 @@
-import { useEffect, useRef, useState } from "react";
-import { Navigate, useParams } from "react-router-dom";
+import "./Project.css";
 
-import { useProjectAuthentication } from "context/ProjectAuthenticationContext";
-import { useSystemPopups } from "context/popup/SystemPopupsContext";
+import { Navigate, useParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 
 import { ReactComponent as AddButtonIcon } from "assets/action-icons/add-circle-unlined.svg";
-
 import Backdrop from "components/shared/backdrop/Backdrop";
-import HomeHeader from "components/shared/login-registration/header-home/HeaderHome";
-
-import LazyLoader from "utilities/lazy-loader/LazyLoader";
-import ReactSubscriptionHelper from "utilities/react-subscription-helper/ReactSubscriptionHelper";
-import MouseScrollableModal from "utilities/MouseScrollableModal/MouseScrollableModal";
-import DragableModalDropLocationWithLazyLoader from "utilities/dragable-modal/drop-location/DragableModalDropLocationWithLazyLoader";
-
-import Phase from "./templates/phase/Phase";
-import EditCard from "./edit-card/EditCard";
-import ProjectUsers from "./project-users/ProjectUsers";
 import ConnectionFailure from "./ConnectionFailure";
-
-import "./Project.css";
+import DragableModalDropLocationWithLazyLoader from "utilities/dragable-modal/drop-location/DragableModalDropLocationWithLazyLoader";
+import EditCard from "./edit-card/EditCard";
+import HomeHeader from "components/shared/login-registration/header-home/HeaderHome";
+import LazyLoader from "utilities/lazy-loader/LazyLoader";
+import MouseScrollableModal from "utilities/MouseScrollableModal/MouseScrollableModal";
+import Phase from "./templates/phase/Phase";
+import ProjectUsers from "./project-users/ProjectUsers";
+import ReactSubscriptionHelper from "utilities/react-subscription-helper/ReactSubscriptionHelper";
+import { useProjectAuthentication } from "context/ProjectAuthenticationContext";
+import { useSystemPopups } from "context/popup/SystemPopupsContext";
 
 function Project() {
 	const { newPopup } = useSystemPopups();
@@ -310,7 +306,9 @@ function Project() {
 			const { phaseId, newPhaseName } = data?.[0];
 
 			// Pega o índice da fase removida
-			const phaseIndex = this.phases.findIndex((phaseState) => phaseState?.phaseDTO?.phaseId == phaseId);
+			const phaseIndex = this.phases.findIndex(
+				(phaseState) => phaseState?.phaseDTO?.phaseId == phaseId
+			);
 			if (phaseIndex == -1) {
 				return null;
 			}
@@ -330,7 +328,9 @@ function Project() {
 			const { phaseId } = data?.[0];
 
 			// Pega o índice da fase removida
-			const phaseIndex = this.phases.findIndex((phaseState) => phaseState?.phaseDTO?.phaseId == phaseId);
+			const phaseIndex = this.phases.findIndex(
+				(phaseState) => phaseState?.phaseDTO?.phaseId == phaseId
+			);
 			if (phaseIndex == -1) {
 				return null;
 			}
@@ -421,7 +421,9 @@ function Project() {
 			}
 
 			// Pega o índice do card removida
-			const cardIndex = phaseState.cards.findIndex((cardState) => cardState.cardDTO.cardId == cardId);
+			const cardIndex = phaseState.cards.findIndex(
+				(cardState) => cardState.cardDTO.cardId == cardId
+			);
 			if (cardIndex == -1) {
 				return null;
 			}
@@ -450,7 +452,14 @@ function Project() {
 		 * @param {number} targetPhaseId
 		 * @param {number} targetPhasePositionIndex
 		 */
-		cardMoved(phaseId, cardId, oldPositionIndex, targetPositionIndex, targetPhaseId, targetPhasePositionIndex) {}
+		cardMoved(
+			phaseId,
+			cardId,
+			oldPositionIndex,
+			targetPositionIndex,
+			targetPhaseId,
+			targetPhasePositionIndex
+		) {}
 
 		/**
 		 * Resposta do servidor para o fetch das fases.
@@ -458,7 +467,9 @@ function Project() {
 		 * @param {Array} phases
 		 */
 		phasesFetched(phases) {
-			phases = phases?.[0]?.taken?.filter(({ phaseId }) => this.phasesMap[phaseId] == undefined);
+			phases = phases?.[0]?.taken?.filter(
+				({ phaseId }) => this.phasesMap[phaseId] == undefined
+			);
 			phases.forEach((phase) => {
 				// Cria o estado da fase
 				this.phaseCreated([phase], true);
@@ -501,6 +512,7 @@ function Project() {
 
 		// ============================== Funções de requisição ============================== //
 		/**
+		 * Faz o request para criar a Fase
 		 *
 		 * @param {*} phaseName
 		 * @returns
@@ -524,7 +536,7 @@ function Project() {
 		}
 
 		/**
-		 * Responsável por deletar uma phase
+		 * Faz o request para deletar a Fase
 		 *
 		 * @param {*} phaseId
 		 * @returns
@@ -548,7 +560,9 @@ function Project() {
 		}
 
 		/**
+		 * Faz o request para atualizar o nome da Fase
 		 *
+		 * @param {*} phaseId
 		 * @param {*} newPhaseName
 		 * @returns
 		 */
@@ -571,6 +585,7 @@ function Project() {
 		}
 
 		/**
+		 *	Faz o request para criar o Card
 		 *
 		 * @param {*} phaseId
 		 * @param {*} title
@@ -595,8 +610,34 @@ function Project() {
 		}
 
 		/**
+		 * Faz o request para atualizar o nome do card
 		 *
-		 * @param {*} phaseId
+		 * @param {*} cardId
+		 * @param {*} newCardName
+		 * @returns
+		 */
+		requestUpdateCard(cardId, newCardName) {
+			return new Promise((resolve) => {
+				this.#socket.emit("updateCard", { cardId, newCardName }, (success, data) => {
+					success
+						? newPopup("Common", {
+								severity: "success",
+								message: "Card atualizado com sucesso",
+						  })
+						: newPopup("Common", {
+								severity: "error",
+								message: "Erro ao atualizar o card",
+						  });
+
+					resolve(success);
+				});
+			});
+		}
+
+		/**
+		 * Faz o request para excluir o card
+		 *
+		 * @param {*} cardId
 		 * @returns
 		 */
 		requestDeleteCard(cardId) {
@@ -708,12 +749,15 @@ function Project() {
 			socket.on("cardsFetched", cardsFetched);
 
 			// Listener para quando o estado das fases do projeto mudar
-			const unbindOnPhaseStateChangeLazyLoaderUpdate = newProjectState.onProjectPhasesStateChange(() => {
-				performLazyLoaderUpdateRef.current?.();
-			});
+			const unbindOnPhaseStateChangeLazyLoaderUpdate =
+				newProjectState.onProjectPhasesStateChange(() => {
+					performLazyLoaderUpdateRef.current?.();
+				});
 
 			onProjectUnmountCallbackRef.current = () => {
-				leave(projectId).catch((error) => console.error(`Ocorreu um erro ao sair do projeto: ${error.message}`));
+				leave(projectId).catch((error) =>
+					console.error(`Ocorreu um erro ao sair do projeto: ${error.message}`)
+				);
 
 				// Remove os listeners
 				socket.off("disconnect", disconnect);
@@ -769,7 +813,9 @@ function Project() {
 			<HomeHeader onUsersInProjectClick={toggleProjectUsersModal} />
 			<ConnectionFailure connectionFailure={waitingForReconnect} />
 
-			{cardBeingEdited != null && <EditCard projectState={projectStateRef} card={cardBeingEdited} />}
+			{cardBeingEdited != null && (
+				<EditCard projectState={projectStateRef} card={cardBeingEdited} />
+			)}
 			<Backdrop show={cardBeingEdited != null} onClick={toggleEditCardModal} />
 
 			{isProjectUsersModalVisible && <ProjectUsers projectState={projectStateRef.current} />}
@@ -780,7 +826,10 @@ function Project() {
 					<div className="P-phases-container-holder">
 						<ol className="P-phases-container" ref={phasesContainerRef}>
 							<div ref={lazyLoaderTopOffsetRef} />
-							<MouseScrollableModal scrollableDivRef={phasesContainerScrollBarRef} ref={mouseScrollableModalRef}>
+							<MouseScrollableModal
+								scrollableDivRef={phasesContainerScrollBarRef}
+								ref={mouseScrollableModalRef}
+							>
 								<DragableModalDropLocationWithLazyLoader
 									// Referência para a div que será arrastada
 									scrollableDivRef={phasesContainerScrollBarRef}
@@ -810,7 +859,9 @@ function Project() {
 									dragMoveRef={dragableModalOnDragMoveRef}
 									// Função chamada quando o drag é concluído
 									dragConcludedCallback={({ phaseDTO }, newPosition) => {
-										const phaseState = projectStateRef.current?.getPhaseState(phaseDTO?.phaseId);
+										const phaseState = projectStateRef.current?.getPhaseState(
+											phaseDTO?.phaseId
+										);
 										if (!phaseState) {
 											return null;
 										}
@@ -841,17 +892,28 @@ function Project() {
 										);
 
 										// Ajusta a ordem das outras fases
-										projectStateRef.current?.getPhases().forEach((phaseState) => {
-											if (phaseState == undefined || phaseState.phaseDTO.phaseId == phaseDTO.phaseId) {
-												return null;
-											}
+										projectStateRef.current
+											?.getPhases()
+											.forEach((phaseState) => {
+												if (
+													phaseState == undefined ||
+													phaseState.phaseDTO.phaseId == phaseDTO.phaseId
+												) {
+													return null;
+												}
 
-											if (phaseState.phaseDTO.order < currentPhaseOrder && phaseState.phaseDTO.order >= newPosition) {
-												phaseState.phaseDTO.order += 1;
-											} else if (phaseState.phaseDTO.order > currentPhaseOrder && phaseState.phaseDTO.order <= newPosition) {
-												phaseState.phaseDTO.order -= 1;
-											}
-										});
+												if (
+													phaseState.phaseDTO.order < currentPhaseOrder &&
+													phaseState.phaseDTO.order >= newPosition
+												) {
+													phaseState.phaseDTO.order += 1;
+												} else if (
+													phaseState.phaseDTO.order > currentPhaseOrder &&
+													phaseState.phaseDTO.order <= newPosition
+												) {
+													phaseState.phaseDTO.order -= 1;
+												}
+											});
 
 										// Atualiza a ordem da fase
 										phaseState.phaseDTO.order = newPosition;
@@ -904,16 +966,26 @@ function Project() {
 										// Funções de controle do conteúdo
 										fetchMore={(page) => {
 											return new Promise((resolve, reject) => {
-												return projectSocketRef.current?.emit("fetchPhases", { page }, (response) => {
-													resolve(response?.phases?.taken || []);
-												});
+												return projectSocketRef.current?.emit(
+													"fetchPhases",
+													{ page },
+													(response) => {
+														resolve(response?.phases?.taken || []);
+													}
+												);
 											});
 										}}
 										getAvailableContentCountForFetch={async (sync = false) => {
-											return await projectStateRef.current?.getTotalPhases(sync);
+											return await projectStateRef.current?.getTotalPhases(
+												sync
+											);
 										}}
 										insertFetchedElement={(element) => {
-											return projectStateRef.current?.phaseCreated([element], true, true);
+											return projectStateRef.current?.phaseCreated(
+												[element],
+												true,
+												true
+											);
 										}}
 										// Tamanho da página
 										pageSize={10}
@@ -928,7 +1000,12 @@ function Project() {
 						</ol>
 
 						<div className="P-add-new-phase-button-container">
-							<button className="P-add-new-phase-button" onClick={() => projectStateRef.current?.requestCreateNewPhase("Nova Fase")}>
+							<button
+								className="P-add-new-phase-button"
+								onClick={() =>
+									projectStateRef.current?.requestCreateNewPhase("Nova Fase")
+								}
+							>
 								<AddButtonIcon className="P-add-new-phase-button-icon" />
 							</button>
 						</div>

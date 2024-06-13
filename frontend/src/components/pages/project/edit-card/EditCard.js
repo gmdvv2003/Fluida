@@ -1,24 +1,26 @@
 import "./EditCard.css";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import ModularButton from "components/shared/modular-button/ModularButton";
-import UserIcon from "components/shared/user-icon/UserIcon";
-
 import TextInputField from "components/shared/text-input-field/TextInputField";
+import UserIcon from "components/shared/user-icon/UserIcon";
 
 function EditCard({ projectState, card }) {
 	const [isMembersDialogOpen, setIsMembersDialogOpen] = useState(false);
 	const [isLabelsDialogOpen, setIsLabelsDialogOpen] = useState(false);
 	const [isDueDateDialogOpen, setIsDueDateDialogOpen] = useState(false);
 	const [isMoveCardDialogOpen, setIsMoveCardDialogOpen] = useState(false);
+	const [cardTitle, setCardTitle] = useState(null);
 
 	const [thisCardPhaseState, setThisCardPhaseState] = useState(card.phase);
 
 	const cardTitleFieldReference = useRef(null);
 	const cardDescriptionFieldReference = useRef(null);
 
-	function handleOnCardTitleChange(event) {}
+	function handleOnCardTitleChange(event) {
+		setCardTitle(event.target.value); // Atualiza o estado do título do card
+	}
 
 	function handleOnCardDescriptionChange(event) {}
 
@@ -26,8 +28,11 @@ function EditCard({ projectState, card }) {
 		const phaseState = projectState.current?.getPhaseState(card?.cardDTO?.phaseId);
 		setThisCardPhaseState(phaseState);
 
-		const unbindTitleChangeSubscription = cardTitleFieldReference.current.onTextChange(handleOnCardTitleChange);
-		const unbindEmailChangeSubscription = cardDescriptionFieldReference.current.onTextChange(handleOnCardDescriptionChange);
+		const unbindTitleChangeSubscription =
+			cardTitleFieldReference.current.onTextChange(handleOnCardTitleChange);
+		const unbindEmailChangeSubscription = cardDescriptionFieldReference.current.onTextChange(
+			handleOnCardDescriptionChange
+		);
 
 		return () => {
 			unbindTitleChangeSubscription();
@@ -43,7 +48,9 @@ function EditCard({ projectState, card }) {
 						<div className="EC-header-card">CARD #{card?.cardDTO.cardId}</div>
 						<div className="EC-header-phase">
 							<div className="EC-header-phase-label">Fase </div>
-							<div className="EC-header-phase-phase">{thisCardPhaseState?.phaseName}</div>
+							<div className="EC-header-phase-phase">
+								{thisCardPhaseState?.phaseName}
+							</div>
 						</div>
 					</div>
 					<div className="EC-container-interno-card">
@@ -81,10 +88,20 @@ function EditCard({ projectState, card }) {
 							<div className="EC-container-anexo">
 								<div className="EC-label-anexo">Anexo</div>
 								<div className="EC-container-files">
-									<input type="file" id="fileUpload" style={{ display: "none" }} multiple />
-									<ModularButton label="+ adicionar novo arquivo" customClassName={"EC-botao-anexo"} />
+									<input
+										type="file"
+										id="fileUpload"
+										style={{ display: "none" }}
+										multiple
+									/>
+									<ModularButton
+										label="+ adicionar novo arquivo"
+										customClassName={"EC-botao-anexo"}
+									/>
 									<div>
-										<div className="EC-label-anexo">Nenhum arquivo anexado!</div>
+										<div className="EC-label-anexo">
+											Nenhum arquivo anexado!
+										</div>
 									</div>
 								</div>
 							</div>
@@ -110,20 +127,52 @@ function EditCard({ projectState, card }) {
 										<ModularButton
 											label="Membros"
 											customClassName={"EC-button"}
-											action={() => setIsMembersDialogOpen(!isMembersDialogOpen)}
+											action={() =>
+												setIsMembersDialogOpen(!isMembersDialogOpen)
+											}
 										/>
-										<ModularButton label="Etiquetas" customClassName={"EC-button"} />
+										<ModularButton
+											label="Etiquetas"
+											customClassName={"EC-button"}
+										/>
 										<ModularButton label="Data" customClassName={"EC-button"} />
-										<ModularButton label="Mover" customClassName={"EC-button"} />
+										<ModularButton
+											label="Mover"
+											customClassName={"EC-button"}
+										/>
 										<ModularButton
 											label="Excluir este card"
 											customClassName={"EC-button"}
 											action={() => {
-												projectState.current?.requestDeleteCard(card?.cardDTO?.cardId).catch((error) => {
-													console.error(`Erro ao excluir o card:`, error);
-												});
+												projectState.current
+													?.requestDeleteCard(card?.cardDTO?.cardId)
+													?.catch((error) => {
+														console.error(
+															`Erro ao excluir o card:`,
+															error
+														);
+													});
 											}}
 										/>
+										{cardTitle && (
+											<ModularButton
+												label="Atualizar card"
+												customClassName={"EC-button-update"}
+												action={() => {
+													projectState.current
+														?.requestUpdateCard(
+															card?.cardDTO?.cardId,
+															cardTitle
+														)
+														?.catch((error) => {
+															console.error(
+																`Erro ao atualizar o card:`,
+																error
+															);
+														});
+												}}
+											/>
+										)}
 									</div>
 								</div>
 							</div>
