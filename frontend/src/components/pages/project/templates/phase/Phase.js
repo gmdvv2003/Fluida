@@ -33,7 +33,6 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 	const projectNameUpdateReference = useRef(null);
 
 	const [isDialogOpenProjectOptions, setDialogOptionsOpen] = useState(false);
-	const [getEnteredProjectDialog, setProjectDialog] = useState([]);
 	const [projectNameUpdate, setProjectNameUpdate] = useState("");
 
 	useImperativeHandle(
@@ -58,7 +57,7 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 				unsubscribeProjectNameUpdater();
 			}
 		};
-	}, [projectNameUpdateReference]);
+	});
 
 	useEffect(() => {
 		if (!phase) {
@@ -75,7 +74,6 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 	 */
 	function handleOptionsProjectClick(boolean, project) {
 		setDialogOptionsOpen(boolean);
-		setProjectDialog(project);
 		setProjectNameUpdate("");
 	}
 
@@ -94,6 +92,33 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 		return () => {};
 	}
 
+	async function handleDeletePhase(phaseId) {
+		if (projectState && projectState.current.requestDeletePhase) {
+			try {
+				await projectState.current.requestDeletePhase(phaseId);
+				console.log("Fase excluída com sucesso!");
+			} catch (error) {
+				console.error("Erro ao excluir fase:", error);
+			}
+		} else {
+			console.error("requestDeletePhase não está definido ou projectState está indefinido.");
+		}
+	}
+
+	async function handleUpdatePhase(phaseId) {
+		if (projectState && projectState.current.requestUpdatePhase) {
+			console.log("AAAAAAAAAAAAAAAAAAAAAAAAEEEEEEEEEEEE", phaseId, projectNameUpdate);
+			try {
+				await projectState.current.requestUpdatePhase(phaseId, projectNameUpdate);
+				console.log("Fase atualizada com sucesso!");
+			} catch (error) {
+				console.error("Erro ao atualizar fase:", error);
+			}
+		} else {
+			console.error("requestUpdatePhase não está definido ou projectState está indefinido.");
+		}
+	}
+
 	return (
 		<DragableModal
 			// Referência para o div que pode ser arrastado
@@ -106,7 +131,7 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 					<Suspense fallback={<LoadingDots />}>
 						{isLoading ? (
 							<div className="PP-center-lock">
-								<LoadingDots style={{ width: "32px", height: "32px" }} />
+								<LoadingDots scale={0.8} />
 							</div>
 						) : (
 							<div>
@@ -228,17 +253,11 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 											projectNameUpdate.length <= 0 ? "PP-button-update-project-disabled" : ""
 										}`}
 										disabled={projectNameUpdate.length <= 0}
+										onClick={() => handleUpdatePhase(phase?.phaseDTO?.phaseId)}
 									>
 										Atualizar fase
 									</button>
-									<button
-										className="PP-button-delete-project"
-										onClick={() => {
-											projectState.current.requestDeletePhase(phase?.phaseDTO?.phaseId).catch((error) => {
-												console.error(`Erro ao excluir a fase:`, error);
-											});
-										}}
-									>
+									<button className="PP-button-delete-project" onClick={() => handleDeletePhase(phase?.phaseDTO?.phaseId)}>
 										Excluir fase
 									</button>
 								</div>

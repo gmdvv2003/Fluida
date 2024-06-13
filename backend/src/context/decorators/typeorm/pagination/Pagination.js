@@ -52,7 +52,7 @@ function Paginate({ GROUP_BY }) {
 			}
 
 			// Verifica se existe uma próxima página.
-			const hasNextPage = (PAGE - 1) * PAGE_SIZE < total;
+			const hasNextPage = total > PAGE * PAGE_SIZE;
 
 			return new Page({
 				taken: taken,

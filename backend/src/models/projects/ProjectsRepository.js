@@ -14,10 +14,7 @@ class ProjectsRepository extends Repository {
 	 * Trigger que adiciona o criador do projeto como membro do projeto.
 	 */
 	async afterInsert_addProjectManagerAsMember({ entity }) {
-		await this.Service.ProjectsMembersService.addUserAsMemberOfProject(
-			entity.createdBy,
-			entity.projectId
-		);
+		await this.Service.ProjectsMembersService.addUserAsMemberOfProject(entity.createdBy, entity.projectId);
 	}
 
 	constructor(service) {
@@ -32,10 +29,7 @@ class ProjectsRepository extends Repository {
 	 * @returns {number}
 	 */
 	async getTotalPhasesInProject(projectId) {
-		return await this.Repository.createQueryBuilder("Projects")
-			.select("totalPhases")
-			.where("projectId = :projectId", { projectId })
-			.getRawOne();
+		return await this.Repository.createQueryBuilder("Projects").select("totalPhases").where("projectId = :projectId", { projectId }).getRawOne();
 	}
 
 	/**
@@ -44,9 +38,7 @@ class ProjectsRepository extends Repository {
 	 * @returns
 	 */
 	async getProjectsOfUser(userId) {
-		return await this.Repository.createQueryBuilder("Projects")
-			.where(`createdBy = ${userId}`)
-			.getMany();
+		return await this.Repository.createQueryBuilder("Projects").where(`createdBy = ${userId}`).getMany();
 	}
 
 	/**
@@ -56,9 +48,7 @@ class ProjectsRepository extends Repository {
 	 * @returns {ProjectsDTO}
 	 */
 	async getProjectById(projectId) {
-		return await this.Repository.createQueryBuilder("Projects")
-			.where(`projectId = :projectId`, { projectId })
-			.getOne();
+		return await this.Repository.createQueryBuilder("Projects").where(`projectId = :projectId`, { projectId }).getOne();
 	}
 
 	/**
@@ -81,11 +71,7 @@ class ProjectsRepository extends Repository {
 	 */
 	@Validate({ NAME: "projectName", TYPE: "string", INDEX: 0, LENGTH: 100 })
 	async createProject(projectsDTO) {
-		return await this.Repository.createQueryBuilder("Projects")
-			.insert()
-			.into("Projects")
-			.values(projectsDTO)
-			.execute();
+		return await this.Repository.createQueryBuilder("Projects").insert().into("Projects").values(projectsDTO).execute();
 	}
 
 	/**
@@ -115,11 +101,7 @@ class ProjectsRepository extends Repository {
 	 * @returns {DeleteResult}
 	 */
 	async deleteProject(projectsDTO) {
-		return await this.Repository.createQueryBuilder("Projects")
-			.delete()
-			.from("Projects")
-			.where(`projectId = :projectId`, projectsDTO)
-			.execute();
+		return await this.Repository.createQueryBuilder("Projects").delete().from("Projects").where(`projectId = :projectId`, projectsDTO).execute();
 	}
 
 	/**
@@ -132,6 +114,19 @@ class ProjectsRepository extends Repository {
 		return await this.Repository.createQueryBuilder("Projects")
 			.update(ProjectsEntity)
 			.set({ totalPhases: () => "totalPhases + 1" })
+			.where("projectId = :projectId", { projectId })
+			.execute();
+	}
+
+	/**
+	 *
+	 * @param {*} projectId
+	 * @returns
+	 */
+	async decrementTotalPhasesInProject(projectId) {
+		return await this.Repository.createQueryBuilder("Projects")
+			.update(ProjectsEntity)
+			.set({ totalPhases: () => "GREATEST(totalPhases - 1, 0)" })
 			.where("projectId = :projectId", { projectId })
 			.execute();
 	}

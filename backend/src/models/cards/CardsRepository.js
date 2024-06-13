@@ -17,13 +17,25 @@ class CardsRepository extends Repository {
 		);
 	}
 
+	/**
+	 *
+	 * @param {*} param0
+	 */
 	async afterInsert_incrementPhaseTotalCardsCount({ entity }) {
 		await this.Service.Controller.PhasesService.incrementTotalCardsInPhase(entity.phaseId).catch((error) =>
 			console.error(`Erro ao incrementar o total de cartões na fase: ${error.message}`)
 		);
 	}
 
-	async afterDelete_removeCardFromPhasesCards({ entity }) {}
+	/**
+	 *
+	 * @param {*} param0
+	 */
+	async afterRemove_decrementPhaseTotalCardsCount({ databaseEntity }) {
+		await this.Service.Controller.PhasesService.decrementTotalCardsInPhase(databaseEntity.phaseId).catch((error) =>
+			console.error(`Erro ao decrementar o total de cartões na fase: ${error.message}`)
+		);
+	}
 
 	constructor(service) {
 		super(service, CardsDTO);
@@ -57,7 +69,7 @@ class CardsRepository extends Repository {
 	 * @returns {DeleteResult}
 	 */
 	async deleteCard(cardsDTO) {
-		return await this.Repository.createQueryBuilder("Cards").delete().from("Cards").where(`cardId = :cardId`, cardsDTO).execute();
+		return await this.Repository.remove(cardsDTO);
 	}
 }
 

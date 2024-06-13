@@ -61,21 +61,34 @@ class CardFunctionality {
 	 * @param {*} project
 	 * @param {*} param3
 	 */
-	#IODeleteCard(projectsIO, socket, project, { cardId }) {
-		const cardDTO = new CardsDTO({ cardId });
+	#IODeleteCard(projectsIO, socket, project, data, acknowledgement) {
+		const { cardId } = data;
+
+		const card = project.getCard(cardId);
+		if (!card) {
+			return socket.emit("error", { message: "Card não encontrado." });
+		}
+
+		const { phaseId } = card;
 
 		// Deleta o card do banco de dados
-		this.ProjectsController.CardsService.deleteCard(cardDTO)
-			.then(({ generatedMaps }) => {
-				let { phaseId } = generatedMaps[0];
-
-				// Emite o evento de deleção da fase
+		this.ProjectsController.CardsService.deleteCard(new CardsDTO({ cardId }))
+			.then(() => {
+				// Emite o evento de deleção do card
 				projectsIO.to(project.projectId).emit("cardDeleted", { phaseId, cardId });
 
-				// Remove a fase do projeto localmente
-				project.removePhase(phaseId);
+				// Remove o card do projeto localmente
+				project.removeCard(cardId);
+
+				// Emite a resposta pessoal do evento
+				acknowledgement && acknowledgement(true, { cardId });
 			})
-			.catch((error) => socket.emit("error", { message: "Erro ao deletar o card", error: error }));
+			.catch((error) => {
+				socket.emit("error", { message: "Erro ao deletar o card", error: error });
+
+				// Emite a resposta pessoal do evento
+				acknowledgement && acknowledgement(false, { error: error });
+			});
 	}
 
 	#IOUpdateCard(projectsIO, socket, project, data) {}
@@ -90,7 +103,7 @@ class CardFunctionality {
 	 * @param {*} data
 	 */
 	#IOFetchCards(projectsIO, socket, project, data, acknowledgement) {
-		project.getCards(data?.phaseId, data?.page).then((result) => {
+		project.getCards(data?.page, data?.phaseId).then((result) => {
 			acknowledgement ? acknowledgement({ cards: result }) : socket.emit("cardsFetched", result);
 		});
 	}

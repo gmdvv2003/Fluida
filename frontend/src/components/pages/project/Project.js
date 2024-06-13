@@ -1,25 +1,60 @@
-import "./Project.css";
-
-import { Navigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
+import { Navigate, useParams } from "react-router-dom";
 
-import { ReactComponent as AddButtonIcon } from "assets/action-icons/add-circle-unlined.svg";
-import Backdrop from "components/shared/backdrop/Backdrop";
-import ConnectionFailure from "./ConnectionFailure";
-import DragableModalDropLocationWithLazyLoader from "utilities/dragable-modal/drop-location/DragableModalDropLocationWithLazyLoader";
-import EditCard from "./edit-card/EditCard";
-import HomeHeader from "components/shared/login-registration/header-home/HeaderHome";
-import LazyLoader from "utilities/lazy-loader/LazyLoader";
-import MouseScrollableModal from "utilities/MouseScrollableModal/MouseScrollableModal";
-import Phase from "./templates/phase/Phase";
-import ProjectUsers from "./project-users/ProjectUsers";
-import ReactSubscriptionHelper from "utilities/react-subscription-helper/ReactSubscriptionHelper";
 import { useProjectAuthentication } from "context/ProjectAuthenticationContext";
 import { useSystemPopups } from "context/popup/SystemPopupsContext";
+
+import { ReactComponent as AddButtonIcon } from "assets/action-icons/add-circle-unlined.svg";
+
+import Backdrop from "components/shared/backdrop/Backdrop";
+import HomeHeader from "components/shared/login-registration/header-home/HeaderHome";
+
+import LazyLoader from "utilities/lazy-loader/LazyLoader";
+import ReactSubscriptionHelper from "utilities/react-subscription-helper/ReactSubscriptionHelper";
+import MouseScrollableModal from "utilities/MouseScrollableModal/MouseScrollableModal";
+import DragableModalDropLocationWithLazyLoader from "utilities/dragable-modal/drop-location/DragableModalDropLocationWithLazyLoader";
+
+import Phase from "./templates/phase/Phase";
+import EditCard from "./edit-card/EditCard";
+import ProjectUsers from "./project-users/ProjectUsers";
+import ConnectionFailure from "./ConnectionFailure";
+
+import "./Project.css";
 
 function Project() {
 	const { newPopup } = useSystemPopups();
 
+	const [cardBeingEdited, setCardBeingEdited] = useState(null);
+	const [isProjectUsersModalVisible, setIsProjectUsersModalVisible] = useState(false);
+
+	const { projectId, cardId } = useParams();
+	const { participate, leave } = useProjectAuthentication();
+
+	const projectSocketRef = useRef(null);
+	const projectStateRef = useRef(null);
+
+	const phasesContainerRef = useRef(null);
+	const phasesContainerScrollBarRef = useRef(null);
+
+	const lazyLoaderTopOffsetRef = useRef(null);
+	const lazyLoaderBottomOffsetRef = useRef(null);
+
+	const lazyLoaderRef = useRef(null);
+
+	const dragableModalDropLocationRef = useRef(null);
+	const mouseScrollableModalRef = useRef(null);
+
+	const dragableModalOnDragBeginRef = useRef(null);
+	const dragableModalOnDragEndRef = useRef(null);
+	const dragableModalOnDragMoveRef = useRef(null);
+
+	const performLazyLoaderUpdateRef = useRef(null);
+	const onProjectUnmountCallbackRef = useRef(null);
+
+	const [waitingForReconnect, setWaitingForReconnect] = useState(false);
+	const [redirectToHome, setRedirectToHome] = useState(false);
+
+	// ============================== Classes ============================== //
 	class CardState {
 		cardDTO;
 
@@ -80,7 +115,7 @@ function Project() {
 							resolve();
 						}
 
-						this.#projectPhasesStateListeners.notify({ members });
+						this.#projectMembersStateListeners.notify({ members });
 					});
 				}
 
@@ -271,14 +306,48 @@ function Project() {
 		 * @param {number} phaseId
 		 * @param {Object} updatedPhaseDTOFields
 		 */
-		phaseUpdated(phaseId, updatedPhaseDTOFields) {}
+		phaseUpdated(data /* updatedPhaseDTOFields */) {
+			const { phaseId, newPhaseName } = data?.[0];
+
+			// Pega o índice da fase removida
+			const phaseIndex = this.phases.findIndex((phaseState) => phaseState?.phaseDTO?.phaseId == phaseId);
+			if (phaseIndex == -1) {
+				return null;
+			}
+
+			const { phaseDTO } = this.phases[phaseIndex];
+			phaseDTO.phaseName = newPhaseName;
+
+			this.#projectPhasesStateListeners.notify(phaseDTO);
+		}
 
 		/**
 		 * Resposta do servidor para a remoção de uma fase.
 		 *
 		 * @param {number} phaseId
 		 */
-		phaseDeleted(phaseId) {}
+		phaseDeleted(data) {
+			const { phaseId } = data?.[0];
+
+			// Pega o índice da fase removida
+			const phaseIndex = this.phases.findIndex((phaseState) => phaseState?.phaseDTO?.phaseId == phaseId);
+			if (phaseIndex == -1) {
+				return null;
+			}
+
+			const { phaseDTO } = this.phases[phaseIndex];
+
+			// Remove a fase do estado do projeto
+			this.phases.splice(phaseIndex, 1);
+
+			// Remove a fase do mapa
+			delete this.phasesMap[phaseId];
+
+			// Decrementa o número total de fases
+			this.totalPhases -= 1;
+
+			this.#projectPhasesStateListeners.notify(phaseDTO);
+		}
 
 		/**
 		 * Resposta do servidor para a movimentação de uma fase.
@@ -325,6 +394,7 @@ function Project() {
 
 			// Atualizar o estado do projeto
 			this.#projectCardsStateListeners[cardDTO.phaseId]?.notify(cardDTO);
+			this.#projectCardsStateListeners[-1]?.notify(cardDTO);
 
 			return cardState;
 		}
@@ -342,7 +412,34 @@ function Project() {
 		 *
 		 * @param {number} cardId
 		 */
-		cardDeleted(cardId) {}
+		cardDeleted(data) {
+			const { phaseId, cardId } = data?.[0];
+
+			const phaseState = this.getPhaseState(phaseId);
+			if (!phaseState) {
+				return null;
+			}
+
+			// Pega o índice do card removida
+			const cardIndex = phaseState.cards.findIndex((cardState) => cardState.cardDTO.cardId == cardId);
+			if (cardIndex == -1) {
+				return null;
+			}
+
+			const { cardDTO } = phaseState.cards[cardIndex];
+
+			// Remove o card do estado da fase
+			phaseState.cards.splice(cardIndex, 1);
+
+			// Remove o card do mapa
+			delete phaseState.cardsMap[cardId];
+
+			// Decrementa o número total de cards
+			phaseState.totalCards -= 1;
+
+			this.#projectCardsStateListeners[phaseId]?.notify(cardDTO);
+			this.#projectCardsStateListeners[-1]?.notify(cardDTO);
+		}
 
 		/**
 		 * Resposta do servidor para a movimentação de um card.
@@ -442,7 +539,30 @@ function Project() {
 						  })
 						: newPopup("Common", {
 								severity: "error",
-								message: "Erro ao criar a fase",
+								message: "Erro ao excluír a fase",
+						  });
+
+					resolve(success);
+				});
+			});
+		}
+
+		/**
+		 *
+		 * @param {*} newPhaseName
+		 * @returns
+		 */
+		requestUpdatePhase(phaseId, newPhaseName) {
+			return new Promise((resolve) => {
+				this.#socket.emit("updatePhase", { phaseId, newPhaseName }, (success, data) => {
+					success
+						? newPopup("Common", {
+								severity: "success",
+								message: "Fase atualizada com sucesso",
+						  })
+						: newPopup("Common", {
+								severity: "error",
+								message: "Erro ao atualizar a fase",
 						  });
 
 					resolve(success);
@@ -473,44 +593,42 @@ function Project() {
 				});
 			});
 		}
+
+		/**
+		 *
+		 * @param {*} phaseId
+		 * @returns
+		 */
+		requestDeleteCard(cardId) {
+			return new Promise((resolve) => {
+				this.#socket.emit("deleteCard", { cardId }, (success, data) => {
+					success
+						? newPopup("Common", {
+								severity: "success",
+								message: "Card excluído com sucesso",
+						  })
+						: newPopup("Common", {
+								severity: "error",
+								message: "Erro ao excluído o card",
+						  });
+
+					resolve(success);
+				});
+			});
+		}
+
+		// ============================== Funções intermeditárias ============================== //
+		previewCard(cardState) {
+			setCardBeingEdited(cardState);
+		}
 	}
-
-	const [isEditCardModalVisible, setIsEditCardModalVisible] = useState(false);
-	const [isProjectUsersModalVisible, setIsProjectUsersModalVisible] = useState(false);
-
-	const { projectId, cardId } = useParams();
-	const { participate, leave } = useProjectAuthentication();
-
-	const projectSocketRef = useRef(null);
-	const projectStateRef = useRef(null);
-
-	const phasesContainerRef = useRef(null);
-	const phasesContainerScrollBarRef = useRef(null);
-
-	const lazyLoaderTopOffsetRef = useRef(null);
-	const lazyLoaderBottomOffsetRef = useRef(null);
-
-	const lazyLoaderRef = useRef(null);
-
-	const dragableModalDropLocationRef = useRef(null);
-	const mouseScrollableModalRef = useRef(null);
-
-	const dragableModalOnDragBeginRef = useRef(null);
-	const dragableModalOnDragEndRef = useRef(null);
-	const dragableModalOnDragMoveRef = useRef(null);
-
-	const performLazyLoaderUpdateRef = useRef(null);
-	const onProjectUnmountCallbackRef = useRef(null);
-
-	const [waitingForReconnect, setWaitingForReconnect] = useState(false);
-	const [redirectToHome, setRedirectToHome] = useState(false);
 
 	// ============================== Edição de um card ============================== //
 	/**
 	 * Abre o modal de edição de um card.
 	 */
 	function toggleEditCardModal() {
-		setIsEditCardModalVisible(!isEditCardModalVisible);
+		setCardBeingEdited(null);
 	}
 
 	// ============================== Usuários do projeto ============================== //
@@ -518,7 +636,7 @@ function Project() {
 	 * Abre o modal de usuários do projeto.
 	 */
 	function toggleProjectUsersModal() {
-		setIsProjectUsersModalVisible(!isProjectUsersModalVisible);
+		setIsProjectUsersModalVisible(false);
 	}
 
 	// ============================== Socket ============================== //
@@ -589,9 +707,9 @@ function Project() {
 			socket.on("phasesFetched", phasesFetched);
 			socket.on("cardsFetched", cardsFetched);
 
-			// Listeners do estado do projeto
-			const unbindOnProjectPhaseStateChange = newProjectState.onProjectPhasesStateChange((phases) => {
-				performLazyLoaderUpdateRef.current();
+			// Listener para quando o estado das fases do projeto mudar
+			const unbindOnPhaseStateChangeLazyLoaderUpdate = newProjectState.onProjectPhasesStateChange(() => {
+				performLazyLoaderUpdateRef.current?.();
 			});
 
 			onProjectUnmountCallbackRef.current = () => {
@@ -614,7 +732,7 @@ function Project() {
 				socket.off("phasesFetched", phasesFetched);
 				socket.off("cardsFetched", cardsFetched);
 
-				unbindOnProjectPhaseStateChange();
+				unbindOnPhaseStateChangeLazyLoaderUpdate();
 			};
 		}
 
@@ -630,6 +748,20 @@ function Project() {
 		};
 	}, []);
 
+	useEffect(() => {
+		if (projectStateRef.current == null) {
+			return undefined;
+		}
+
+		// Listener para quando o estado dos cards do projeto mudar
+		return projectStateRef.current?.onProjectCardsStateChange(-1, (cardDTO) => {
+			// Invallida o EditCard caso o card sendo editado tenha sido deletado
+			if (cardBeingEdited?.cardDTO?.cardId == cardDTO.cardId) {
+				toggleEditCardModal();
+			}
+		});
+	}, [projectStateRef, cardBeingEdited]);
+
 	return redirectToHome ? (
 		<Navigate to="/" />
 	) : (
@@ -637,7 +769,8 @@ function Project() {
 			<HomeHeader onUsersInProjectClick={toggleProjectUsersModal} />
 			<ConnectionFailure connectionFailure={waitingForReconnect} />
 
-			{isEditCardModalVisible && <EditCard />}
+			{cardBeingEdited != null && <EditCard projectState={projectStateRef} card={cardBeingEdited} />}
+			<Backdrop show={cardBeingEdited != null} onClick={toggleEditCardModal} />
 
 			{isProjectUsersModalVisible && <ProjectUsers projectState={projectStateRef.current} />}
 			<Backdrop show={isProjectUsersModalVisible} onClick={toggleProjectUsersModal} />
@@ -795,22 +928,7 @@ function Project() {
 						</ol>
 
 						<div className="P-add-new-phase-button-container">
-							<button
-								className="P-add-new-phase-button"
-								onClick={() => {
-									projectSocketRef.current?.emit("createPhase", { phaseName: "Nova Fase" }, (success, data) => {
-										success
-											? newPopup("Common", {
-													severity: "success",
-													message: "Fase criada com sucesso",
-											  })
-											: newPopup("Common", {
-													severity: "error",
-													message: "Erro ao criar a fase",
-											  });
-									});
-								}}
-							>
+							<button className="P-add-new-phase-button" onClick={() => projectStateRef.current?.requestCreateNewPhase("Nova Fase")}>
 								<AddButtonIcon className="P-add-new-phase-button-icon" />
 							</button>
 						</div>

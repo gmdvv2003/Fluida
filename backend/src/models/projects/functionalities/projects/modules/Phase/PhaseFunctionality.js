@@ -63,23 +63,29 @@ class PhaseFunctionality {
 	 * @param {*} data
 	 * @returns
 	 */
-	#IODeletePhase(projectsIO, socket, project, data) {
+	#IODeletePhase(projectsIO, socket, project, data, acknowledgement) {
 		const { phaseId } = data;
 
 		if (project.getPhase(phaseId) == undefined) {
 			return socket.emit("error", { message: "Fase não encontrada." });
 		}
 
-		this.ProjectsController.PhasesService.deletePhase(new PhasesDTO({ projectId: project.projectId, phaseId }))
+		this.ProjectsController.PhasesService.deletePhase(new PhasesDTO({ phaseId }))
 			.then((result) => {
 				// Emite o evento de deleção da fase
 				projectsIO.to(project.projectId).emit("phaseDeleted", { phaseId });
 
 				// Remove a fase do projeto localmente
 				project.removePhase(phaseId);
+
+				// Emite a resposta pessoal do evento
+				acknowledgement && acknowledgement(true, { phaseId });
 			})
 			.catch((error) => {
 				socket.emit("error", { message: "Erro ao deletar a fase", error: error });
+
+				// Emite a resposta pessoal do evento
+				acknowledgement && acknowledgement(false, { error: error });
 			});
 	}
 
@@ -90,8 +96,30 @@ class PhaseFunctionality {
 	 * @param {*} project
 	 * @param {*} data
 	 */
-	#IOUpdatePhase(projectsIO, socket, project, data) {
-		const { phaseId, fieldsToUpdate } = data;
+	#IOUpdatePhase(projectsIO, socket, project, data, acknowledgement) {
+		const { phaseId, newPhaseName } = data;
+
+		if (project.getPhase(phaseId) == undefined) {
+			return socket.emit("error", { message: "Fase não encontrada." });
+		}
+
+		this.ProjectsController.PhasesService.updatePhase(phaseId, newPhaseName)
+			.then((result) => {
+				// Emite o evento de deleção da fase
+				projectsIO.to(project.projectId).emit("phaseUpdated", { phaseId, newPhaseName });
+
+				// Atualiza a fase do projeto localmente
+				project.updatePhase(phaseId, newPhaseName);
+
+				// Emite a resposta pessoal do evento
+				acknowledgement && acknowledgement(true, { phaseId });
+			})
+			.catch((error) => {
+				socket.emit("error", { message: "Erro ao atualizar a fase", error: error });
+
+				// Emite a resposta pessoal do evento
+				acknowledgement && acknowledgement(false, { error: error });
+			});
 	}
 
 	/**
@@ -110,10 +138,7 @@ class PhaseFunctionality {
 			return socket.emit("error", { message: "Fase não encontrada." });
 		}
 
-		this.ProjectsController.PhasesService.movePhase(
-			new PhasesDTO({ projectId: project.projectId, phaseId }),
-			targetPositionIndex
-		)
+		this.ProjectsController.PhasesService.movePhase(new PhasesDTO({ projectId: project.projectId, phaseId }), targetPositionIndex)
 			.then((result) => {})
 			.catch((error) => {
 				socket.emit("error", { message: "Erro ao mover a fase", error: error });

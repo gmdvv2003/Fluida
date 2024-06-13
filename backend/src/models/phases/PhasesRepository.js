@@ -4,7 +4,7 @@ const PhasesDTO = require("./PhasesDTO");
 const PhasesEntity = require("./PhasesEntity");
 
 const { Subscribe } = require("../../context/decorators/typeorm/subscriber/Subscriber");
-const { InsertResult, DeleteResult } = require("typeorm");
+const { InsertResult, DeleteResult, UpdateResult } = require("typeorm");
 
 class PhasesRepository extends Repository {
 	// ==================================== Triggers ==================================== //
@@ -22,6 +22,11 @@ class PhasesRepository extends Repository {
 	async afterInsert_incrementProjectTotalPhasesCount({ entity }) {
 		const ProjectsService = this.Service.Controller.Service;
 		await ProjectsService.incrementTotalPhasesInProject(entity.projectId);
+	}
+
+	async afterRemove_decrementProjectTotalPhasesCount({ databaseEntity }) {
+		const ProjectsService = this.Service.Controller.Service;
+		await ProjectsService.decrementTotalPhasesInProject(databaseEntity.projectId);
 	}
 
 	constructor(service) {
@@ -73,7 +78,21 @@ class PhasesRepository extends Repository {
 	 * @returns {DeleteResult}
 	 */
 	async deletePhase(phasesDTO) {
-		return await this.Repository.createQueryBuilder("Phases").delete().from("Phases").where(`phaseId = :phaseId`, phasesDTO).execute();
+		return await this.Repository.remove(phasesDTO);
+	}
+
+	/**
+	 * Atualiza uma fase do banco de dados.
+	 *
+	 * @param {PhasesDTO} phasesDTO
+	 * @returns {UpdateResult}
+	 */
+	async updatePhase(phaseId, phaseName) {
+		return await this.Repository.createQueryBuilder("Phases")
+			.update(PhasesEntity)
+			.set({ phaseName })
+			.where("phaseId = :phaseId", { phaseId })
+			.execute();
 	}
 
 	/**
@@ -140,6 +159,19 @@ class PhasesRepository extends Repository {
 		return await this.Repository.createQueryBuilder("Phases")
 			.update(PhasesEntity)
 			.set({ totalCards: () => "totalCards + 1" })
+			.where("phaseId = :phaseId", { phaseId })
+			.execute();
+	}
+
+	/**
+	 *
+	 * @param {*} phaseId
+	 * @returns
+	 */
+	async decrementTotalCardsInPhase(phaseId) {
+		return await this.Repository.createQueryBuilder("Phases")
+			.update(PhasesEntity)
+			.set({ totalCards: () => "GREATEST(totalCards - 1, 0)" })
 			.where("phaseId = :phaseId", { phaseId })
 			.execute();
 	}

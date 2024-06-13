@@ -91,7 +91,9 @@ class Project {
 	/**
 	 * Função auxiliar para buscar mais elementos de uma lista.
 	 */
-	async #fetchMore(constructor, list, fetchFunction, page, ...data) {
+	async #fetchMore(total, constructor, list, fetchFunction, page, ...data) {
+		page = Math.min(page, Math.floor(total / DEFAULT_PAGE_SIZE) + 1);
+
 		if (page < 1) {
 			return { taken: [] };
 		}
@@ -111,7 +113,7 @@ class Project {
 			return { taken: list.slice(head, tail), hasNextPage: true, total: DEFAULT_PAGE_SIZE, cached: true };
 		}
 
-		const { taken, total, hasNextPage } = await fetchFunction({ PAGE: page }, ...data);
+		const { taken, hasNextPage } = await fetchFunction({ PAGE: page }, ...data);
 		for (let index = head; index < taken.length; index += 1) {
 			list[index] = constructor(taken[index]);
 		}
@@ -129,6 +131,7 @@ class Project {
 	async getCards(page, phaseId) {
 		const phasesCardsService = this.ProjectsController.PhasesService.PhasesCardsService;
 		return await this.#fetchMore(
+			await this.getTotalCardsInPhase(phaseId),
 			(cardDTO) => new Card(this, cardDTO),
 			this.#cards,
 			phasesCardsService.getCardsOfPhase.bind(phasesCardsService),
@@ -166,6 +169,7 @@ class Project {
 	async getPhases(page) {
 		const projectsPhasesService = this.ProjectsController.Service.ProjectsPhasesService;
 		return await this.#fetchMore(
+			await this.getTotalPhasesInProject(),
 			(phaseDTO) => new Phase(this, phaseDTO),
 			this.#phases,
 			projectsPhasesService.getPhasesOfProject.bind(projectsPhasesService),
@@ -203,15 +207,34 @@ class Project {
 	 * @param {CardsDTO} cardDTO
 	 */
 	addCard(cardDTO) {
+		const phase = this.getPhase(cardDTO?.phaseId, true);
+		if (!phase) {
+			return null;
+		}
+
 		this.#cards.push(new Card(this, cardDTO));
+		phase.totalCardsInProject !== undefined ? ++phase.totalCardsInProject : ++phase.totalCardsInProjectBeforeFetch;
 	}
 
 	/**
 	 * @param {number} caseId
 	 */
-	removeCard(caseId) {
-		this.#cards = this.#cards.filter((card) => card !== undefined && card.cardDTO.cardId !== cardId);
+	removeCard(cardId) {
+		const phase = this.getPhase(cardDTO?.phaseId, true);
+		if (!phase) {
+			return null;
+		}
+
+		this.#cards = this.#cards.filter((card) => card != undefined || card.cardDTO.cardId !== cardId);
+		phase.totalCardsInProject !== undefined ? --phase.totalCardsInProject : --phase.totalCardsInProjectBeforeFetch;
 	}
+
+	/**
+	 *
+	 * @param {*} cardId
+	 * @param {*} cardDTO
+	 */
+	updateCard(cardId, cardDTO) {}
 
 	/**
 	 *
@@ -228,15 +251,29 @@ class Project {
 	 */
 	addPhase(phaseDTO) {
 		this.#phases.push(new Phase(this, phaseDTO));
-		this.#totalPhasesInProject == undefined ? this.#totalPhasesInProject++ : this.#totalPhasesInProjectBeforeFetch++;
+		this.#totalPhasesInProject !== undefined ? ++this.#totalPhasesInProject : ++this.#totalPhasesInProjectBeforeFetch;
 	}
 
 	/**
 	 * @param {number} phaseId
 	 */
 	removePhase(phaseId) {
-		this.#phases = this.#phases.filter((phase) => phase.phaseDTO.phaseId !== phaseId);
-		this.#totalPhasesInProject == undefined ? this.#totalPhasesInProject-- : this.#totalPhasesInProjectBeforeFetch--;
+		this.#phases = this.#phases.filter((phase) => phase == undefined || phase.phaseDTO.phaseId !== phaseId);
+		this.#totalPhasesInProject !== undefined ? --this.#totalPhasesInProject : --this.#totalPhasesInProjectBeforeFetch;
+	}
+
+	/**
+	 *
+	 * @param {*} phaseId
+	 * @param {*} phaseDTO
+	 */
+	updatePhase(phaseId, newPhaseName) {
+		const phase = this.#phases.find((phase) => phase?.phaseDTO?.phaseId === phaseId);
+		if (!phase) {
+			return null;
+		}
+
+		phase.phaseDTO.phaseName = newPhaseName;
 	}
 }
 

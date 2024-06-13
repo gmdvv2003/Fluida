@@ -1,3 +1,5 @@
+const { UpdateResult } = require("typeorm");
+
 const Service = require("../__types/Service");
 
 const PhasesDTO = require("./PhasesDTO");
@@ -62,6 +64,16 @@ class PhasesService extends Service {
 	}
 
 	/**
+	 * Atualiza uma fase do banco de dados.
+	 *
+	 * @param {PhasesDTO} phasesDTO
+	 * @returns {UpdateResult}
+	 */
+	async updatePhase(phaseId, phaseName) {
+		return await this.PhasesRepository.updatePhase(phaseId, phaseName);
+	}
+
+	/**
 	 *
 	 * @param {*} phaseDTO
 	 * @param {*} targetPositionIndex
@@ -71,8 +83,22 @@ class PhasesService extends Service {
 		return await this.PhasesRepository.movePhase(phaseDTO, targetPositionIndex);
 	}
 
+	/**
+	 *
+	 * @param {*} phaseId
+	 * @returns
+	 */
 	async incrementTotalCardsInPhase(phaseId) {
 		return await this.PhasesRepository.incrementTotalCardsInPhase(phaseId);
+	}
+
+	/**
+	 *
+	 * @param {*} phaseId
+	 * @returns
+	 */
+	async decrementTotalCardsInPhase(phaseId) {
+		return await this.PhasesRepository.decrementTotalCardsInPhase(phaseId);
 	}
 }
 

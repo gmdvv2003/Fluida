@@ -73,8 +73,7 @@ function SendPasswordReset() {
 							<div>
 								<h2 className="SPR-form-title">Esqueceu sua senha?</h2>
 								<h5 className="SPR-form-description">
-									Insira o email da sua conta, caso ele esteja correto, você receberá um email para redefinição
-									de senha.
+									Insira o email da sua conta, caso ele esteja correto, você receberá um email para redefinição de senha.
 								</h5>
 							</div>
 						)}
@@ -93,9 +92,7 @@ function SendPasswordReset() {
 									placeholder="Endereço de email"
 								/>
 								{invalidEmailFormat && !invalidEmail && <InputFieldError error="O email informado é inválido." />}
-								{invalidEmail && invalidEmailFormat && (
-									<InputFieldError error="Você deve preencher o campo do email." />
-								)}
+								{invalidEmail && invalidEmailFormat && <InputFieldError error="Você deve preencher o campo do email." />}
 							</div>
 						)}
 						{(() => {

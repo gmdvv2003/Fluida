@@ -1,10 +1,6 @@
 import "./HomeProjects.css";
 
-import {
-	CreateProjectByUserEndpoint,
-	DeleteProjectByProjectId,
-	UpdateProjectAuthenticated,
-} from "utilities/Endpoints";
+import { CreateProjectByUserEndpoint, DeleteProjectByProjectId, UpdateProjectAuthenticated } from "utilities/Endpoints";
 import React, { useEffect, useRef, useState } from "react";
 import { faCircleXmark, faUserLarge } from "@fortawesome/free-solid-svg-icons";
 
@@ -153,10 +149,7 @@ function HomeProjects() {
 	 */
 	async function handleOnDeleteProjectButton(projectId) {
 		console.log(projectId);
-		const response = await performAuthenticatedRequest(
-			DeleteProjectByProjectId(projectId),
-			"DELETE"
-		);
+		const response = await performAuthenticatedRequest(DeleteProjectByProjectId(projectId), "DELETE");
 
 		if (response.status === 200) {
 			fetchProjects();
@@ -210,27 +203,15 @@ function HomeProjects() {
 		fileInputRef.current.click();
 	};
 
-	function teste() {
-		console.log("TESTE");
-	}
-
 	return (
 		<div>
 			<HeaderHome hideUsersInProject={true} />
-			<div
-				className={`HP-container-user-projects ${
-					isDialogOpen || isDialogAddPhotoOpen ? "blur-background" : ""
-				}`}
-			>
+			<div className={`HP-container-user-projects ${isDialogOpen || isDialogAddPhotoOpen ? "blur-background" : ""}`}>
 				<div className="HP-container-user">
 					<div className="HP-container-image-label">
-						<i
-							className="HP-user-image"
-							onClick={() => handleDialogPhotoClick(true)}
-						></i>
+						<i className="HP-user-image" onClick={() => handleDialogPhotoClick(true)}></i>
 						<p className="HP-label">
-							<span className="username-style">{`@${getUserName}`}</span>, bem-vindo
-							de volta!
+							<span className="username-style">{`@${getUserName}`}</span>, bem-vindo de volta!
 						</p>
 					</div>
 				</div>
@@ -253,23 +234,15 @@ function HomeProjects() {
 										>
 											{project.projectName}
 										</div>
-										<div
-											onClick={() => handleOptionsProjectClick(true, project)}
-											className="HP-project-options"
-										>
+										<div onClick={() => handleOptionsProjectClick(true, project)} className="HP-project-options">
 											<DotsIcon className="HP-header-icon" />
 										</div>
 									</div>
 								))}
-								<div
-									className="HP-grid-item-new-project"
-									onClick={() => handleNewProjectClickDialog(true)}
-								>
+								<div className="HP-grid-item-new-project" onClick={() => handleNewProjectClickDialog(true)}>
 									<div className="HP-container-new-project">
 										<i className="HP-add-new-project"></i>
-										<div className="HP-label-new-project">
-											Criar novo projeto
-										</div>
+										<div className="HP-label-new-project">Criar novo projeto</div>
 									</div>
 								</div>
 							</div>
@@ -305,10 +278,7 @@ function HomeProjects() {
 						</div>
 
 						<div className="HP-container-button-new-project">
-							<button
-								className="HP-button-new-project"
-								onClick={() => handleOnCreateProjectButton()}
-							>
+							<button className="HP-button-new-project" onClick={() => handleOnCreateProjectButton()}>
 								Criar novo projeto
 							</button>
 						</div>
@@ -322,9 +292,7 @@ function HomeProjects() {
 						<div className="HP-container-label-update-project-name">
 							<div className="HP-container-label-current-name-project">
 								<div>Nome atual do projeto:</div>
-								<div className="HP-label-current-project-name">
-									{getEnteredProjectDialog.projectName}
-								</div>
+								<div className="HP-label-current-project-name">{getEnteredProjectDialog.projectName}</div>
 							</div>
 							<div className="HP-container-close-dialog-project-update">
 								<FontAwesomeIcon
@@ -354,23 +322,15 @@ function HomeProjects() {
 						</div>
 						<div className="HP-container-buttons-update-project">
 							<button
-								className={`HP-button-update-project ${
-									projectNameUpdate.length <= 0
-										? "HP-button-update-project-disabled"
-										: ""
-								}`}
-								onClick={() =>
-									handleOnUpdateProjectButton(getEnteredProjectDialog.projectId)
-								}
+								className={`HP-button-update-project ${projectNameUpdate.length <= 0 ? "HP-button-update-project-disabled" : ""}`}
+								onClick={() => handleOnUpdateProjectButton(getEnteredProjectDialog.projectId)}
 								disabled={projectNameUpdate.length <= 0}
 							>
 								Atualizar projeto
 							</button>
 							<button
 								className="HP-button-delete-project"
-								onClick={() =>
-									handleOnDeleteProjectButton(getEnteredProjectDialog.projectId)
-								}
+								onClick={() => handleOnDeleteProjectButton(getEnteredProjectDialog.projectId)}
 							>
 								Excluir projeto
 							</button>
@@ -393,8 +353,7 @@ function HomeProjects() {
 
 						<div className="HP-container-username-label">
 							<div className="HP-username-label">
-								<span className="HP-hello">Olá,</span>{" "}
-								<span className="username-style">{`@${getUserName}`}</span>
+								<span className="HP-hello">Olá,</span> <span className="username-style">{`@${getUserName}`}</span>
 							</div>
 							<div className="HP-welcome">Seja bem-vindo ao Fluida.</div>
 						</div>
@@ -402,26 +361,12 @@ function HomeProjects() {
 						<div className="HP-container-photo">
 							<div className="HP-user-photo-container" onClick={handleDivClick}>
 								{selectedImage ? (
-									<img
-										src={selectedImage}
-										alt="Selected"
-										className="photoSelected"
-									/>
+									<img src={selectedImage} alt="Selected" className="photoSelected" />
 								) : (
-									<FontAwesomeIcon
-										icon={faUserLarge}
-										style={{ color: "#e4e4e4" }}
-										className="photo"
-									/>
+									<FontAwesomeIcon icon={faUserLarge} style={{ color: "#e4e4e4" }} className="photo" />
 								)}
 
-								<input
-									type="file"
-									accept="image/*"
-									onChange={handleImageChange}
-									style={{ display: "none" }}
-									ref={fileInputRef}
-								/>
+								<input type="file" accept="image/*" onChange={handleImageChange} style={{ display: "none" }} ref={fileInputRef} />
 							</div>
 							<div className="HP-label-new-photo">Adicione uma foto.</div>
 						</div>

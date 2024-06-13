@@ -75,10 +75,7 @@ class ProjectsService extends Service {
 		/**
 		 * Checa a existência de projeto com o mesmo nome
 		 */
-		const existingProject = await this.ProjectsRepository.getProjectByName(
-			createdBy,
-			projectName
-		);
+		const existingProject = await this.ProjectsRepository.getProjectByName(createdBy, projectName);
 
 		if (existingProject) {
 			return {
@@ -91,9 +88,7 @@ class ProjectsService extends Service {
 
 		try {
 			// Cria um novo projeto e armazena o objeto retornado em newProject
-			const newProject = await this.ProjectsRepository.createProject(
-				new ProjectsDTO({ createdBy, projectName })
-			);
+			const newProject = await this.ProjectsRepository.createProject(new ProjectsDTO({ createdBy, projectName }));
 
 			const projectId = newProject.identifiers[0].projectId;
 
@@ -154,6 +149,15 @@ class ProjectsService extends Service {
 	 */
 	async incrementTotalPhasesInProject(projectId) {
 		return await this.ProjectsRepository.incrementTotalPhasesInProject(projectId);
+	}
+
+	/**
+	 * 
+	 * @param {*} projectId 
+	 * @returns 
+	 */
+	async decrementTotalPhasesInProject(projectId) {
+		return await this.ProjectsRepository.decrementTotalPhasesInProject(projectId);
 	}
 }
 

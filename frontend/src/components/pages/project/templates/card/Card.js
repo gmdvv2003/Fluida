@@ -73,10 +73,6 @@ const Card = React.forwardRef(({ scrollableDivRef, isLoading, card, projectState
 	);
 
 	useEffect(() => {
-		console.log(projectState);
-	});
-
-	useEffect(() => {
 		addNotification(AttachmentIcon, "0");
 		addNotification(ChatBaloonIcon, "0");
 
@@ -86,37 +82,44 @@ const Card = React.forwardRef(({ scrollableDivRef, isLoading, card, projectState
 		};
 	}, []);
 
-	return (
-		<div className="PC-background">
-			{isLoading ? (
+	if (isLoading || !card) {
+		return (
+			<div className="PC-background">
 				<div className="PC-center-lock">
-					<LoadingDots style={{ width: "32px", height: "32px" }} />
+					<LoadingDots scale={0.7} />
 				</div>
-			) : (
-				<div>
-					{labels.length > 0 && (
-						<div className="PC-card-labels-container">
-							{labels.map(({ text, color }) => (
-								<Label text={text} color={color} />
-							))}
-						</div>
-					)}
+			</div>
+		);
+	}
 
-					<div className={`PC-card-title-label ${labels.length <= 0 && "extended-PC-title-label"}`}>
-						<p>Schedule new automation flow for the client</p>
-					</div>
-
-					<div className="PC-footer-container">
-						<div className="PC-footer-notifications-container">
-							{notifications.map(({ Icon, text }) => (
-								<Notification Icon={Icon} text={text} />
-							))}
-						</div>
-
-						<div className="PC-footer-assignments-container">{assignments}</div>
-					</div>
+	return (
+		<div
+			className="PC-background"
+			onClick={() => {
+				projectState.current?.previewCard(card);
+			}}
+		>
+			{labels.length > 0 && (
+				<div className="PC-card-labels-container">
+					{labels.map(({ text, color }) => (
+						<Label text={text} color={color} />
+					))}
 				</div>
 			)}
+
+			<div className={`PC-card-title-label ${labels.length <= 0 && "extended-PC-title-label"}`}>
+				<p>{card?.cardDTO?.title}</p>
+			</div>
+
+			<div className="PC-footer-container">
+				<div className="PC-footer-notifications-container">
+					{notifications.map(({ Icon, text }) => (
+						<Notification Icon={Icon} text={text} />
+					))}
+				</div>
+
+				<div className="PC-footer-assignments-container">{assignments}</div>
+			</div>
 		</div>
 	);
 });

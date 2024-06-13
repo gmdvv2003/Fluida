@@ -1,20 +1,22 @@
 .EC-container {
+	z-index: 1000;
 	display: flex;
 	position: fixed;
 	justify-content: center;
 	padding-top: 30px;
 	width: 100%;
 	height: calc(100vh - var(--header-height));
+	pointer-events: none;
 }
 
-.EC-container-externo{
+.EC-container-externo {
 	display: flex;
 	justify-content: flex-end;
 	width: 70%;
 	height: 100%;
 }
 
-.EC-dialog{
+.EC-dialog {
 	width: 30%;
 }
 
@@ -27,6 +29,7 @@
 	background-color: #ffffff;
 	width: 55%;
 	height: 90%;
+	pointer-events: all;
 }
 
 .EC-container-header {
@@ -163,14 +166,14 @@
 	display: flex;
 }
 
-.EC-container-anexo{
+.EC-container-anexo {
 	display: flex;
 	flex-direction: column;
 	margin-bottom: 8px;
 	width: 100%;
 }
 
-.EC-label-anexo{
+.EC-label-anexo {
 	display: flex;
 	margin-top: 10px;
 	margin-bottom: 5px;
@@ -180,14 +183,14 @@
 	font-size: 12px;
 }
 
-.EC-label-file{
+.EC-label-file {
 	display: flex;
 	width: 100%;
 	font-weight: bold;
 	font-size: x-small;
 }
 
-.EC-botao-anexo{
+.EC-botao-anexo {
 	display: flex;
 	cursor: pointer;
 	margin-bottom: 5px;
@@ -201,7 +204,7 @@
 	font-size: 12px;
 }
 
-.EC-container-file{
+.EC-container-file {
 	display: flex;
 	justify-content: space-around;
 	align-items: center;
@@ -211,11 +214,10 @@
 	padding-left: 8px;
 }
 
-.EC-button-remover{
+.EC-button-remover {
 	cursor: pointer;
 	border: #ffffff00;
 	background-color: #ffffff00;
-
 }
 
 .EC-textarea {
@@ -279,11 +281,11 @@
 }
 
 .EC-actions-buttons {
-  	position: relative;
+	position: relative;
 }
 
 .EC-container-buttons-actions {
-  	position: relative;
+	position: relative;
 }
 
 .EC-dialog-members-container {
@@ -298,12 +300,12 @@
 	height: 250px;
 }
 
-.EC-container-header-dialog{
+.EC-container-header-dialog {
 	display: flex;
 	height: 8%;
 }
 
-.EC-label-members{
+.EC-label-members {
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -311,13 +313,13 @@
 	color: #8b8b8b;
 }
 
-.EC-label-members-button{
+.EC-label-members-button {
 	display: flex;
 	justify-content: center;
 	align-items: center;
 }
 
-.EC-container-icons-members{
+.EC-container-icons-members {
 	display: flex;
 	flex-direction: column;
 	margin-top: 5px;
@@ -327,7 +329,7 @@
 	height: calc(100% - 10%);
 }
 
-.EC-input-search-members{
+.EC-input-search-members {
 	display: flex;
 	border-top-right-radius: 8px;
 	border-top-left-radius: 8px;
@@ -335,7 +337,7 @@
 	height: 15%;
 }
 
-.EC-members{
+.EC-members {
 	display: flex;
 	flex-direction: column;
 	border-bottom-right-radius: 8px;
@@ -346,31 +348,31 @@
 	overflow: auto;
 }
 
-.EC-member{
+.EC-member {
 	display: flex;
 	flex-direction: column;
 }
 
-.EC-container-member{
+.EC-container-member {
 	display: flex;
 	margin-bottom: 8px;
 	padding: 4px;
 }
 
-.EC-container-member:hover{
+.EC-container-member:hover {
 	cursor: pointer;
 	border-radius: 4px;
 	background-color: #e4e4e4;
 }
 
-.EC-member-photo{
+.EC-member-photo {
 	display: flex;
 	margin-right: 8px;
 	width: 100%;
 	max-width: 25px;
 }
 
-.EC-member-name-label{
+.EC-member-name-label {
 	display: flex;
 	align-items: center;
 	padding-left: 8px;
@@ -379,7 +381,7 @@
 	font-size: 14px;
 }
 
-.EC-input-members{
+.EC-input-members {
 	display: flex;
 	border: 1px solid rgba(215, 215, 215, 0);
 	border-radius: 4px;
@@ -390,15 +392,15 @@
 	color: #8b8b8b;
 }
 
-input:focus{
+input:focus {
 	outline: none;
 }
 
 .EC-input-members::placeholder {
-  color: #8b8b8b;
+	color: #8b8b8b;
 }
 
-textarea:focus{
+textarea:focus {
 	outline: none;
 }
 
