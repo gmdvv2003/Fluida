@@ -22,11 +22,14 @@ const LazyLoader = React.forwardRef(
 			insertFetchedElement,
 			pageSize,
 			getContent,
+			aee,
+			aee2,
 		},
 		ref
 	) => {
 		// Conteúdo a ser exibido na tela
 		const [visibleContent, setVisibleContent] = useState([]);
+		const [x, setX] = useState([]);
 
 		// Referências das intancias dos elementos que estão sendo exibidos na tela
 		const visibleContentDataRefs = useRef([]);
@@ -38,6 +41,8 @@ const LazyLoader = React.forwardRef(
 
 		const [topOffset, setTopOffset] = useState(0);
 		const [bottomOffset, setBottomOffset] = useState(0);
+
+		const j = useRef(null);
 
 		useImperativeHandle(
 			ref,
@@ -318,15 +323,27 @@ const LazyLoader = React.forwardRef(
 			/**
 			 * Função responsável por carregar o conteúdo a ser exibido na tela
 			 */
-			async function setDisplayableContent() {
-				setVisibleContent([]);
+			async function setDisplayableContent(ddd, l) {
+				j.current = l;
+				if (ddd) {
+					console.log("FUI CHAMADO DE FORA CARALHO", l);
+					console.log(visibleContent);
+				}
 
 				let update = (visibleContent) => {
 					// Reseta as referências dos elementos que estão sendo exibidos na tela
 					visibleContentDataRefs.current = [];
 
 					// Atualiza o conteúdo a ser exibido na tela
-					setVisibleContent(visibleContent);
+					setVisibleContent([...visibleContent]);
+
+					if (ddd) {
+						console.log("UPDATE AQ IRMAO", l);
+						console.log(aee2());
+						console.log(visibleContent, currentSectionStart, currentSectionEnd);
+						console.log(x);
+						setX([...visibleContent]);
+					}
 				};
 
 				update(await retrieveVisibleContent(currentSectionStart, currentSectionEnd, update));
@@ -389,12 +406,21 @@ const LazyLoader = React.forwardRef(
 			scrollBarCopy.addEventListener("scroll", handleScroll, { passive: true });
 
 			// Update inicial manual
-			handleScroll();
+			setDisplayableContent();
 
 			return () => {
 				scrollBarCopy.removeEventListener("scroll", handleScroll);
 			};
 		}, [update, container, scrollBar]);
+
+		useEffect(() => {
+			if (aee) {
+				console.log("DPS DO UPDATE TLG", j.current);
+				console.log(aee2());
+				console.log(x);
+				console.log("=====================================");
+			}
+		}, [x]);
 
 		return visibleContent.map((data, index) => {
 			if (data?.isPlaceholder) {
