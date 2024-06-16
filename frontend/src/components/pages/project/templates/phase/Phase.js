@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from "uuid";
+
 import React, { Suspense, useEffect, useImperativeHandle, useRef, useState } from "react";
 
 import { ReactComponent as DotsIcon } from "assets/action-icons/dots.svg";
@@ -23,6 +25,8 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 	const lazyLoaderRef = useRef(null);
 	const performLazyLoaderUpdateRef = useRef(null);
 
+	const xx = useRef(uuidv4());
+
 	useImperativeHandle(
 		ref,
 		() => ({
@@ -36,8 +40,22 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 			return undefined;
 		}
 
-		return projectState.current?.onProjectCardsStateChange(phase?.phaseDTO?.phaseId, () => {
-			performLazyLoaderUpdateRef.current?.();
+		return projectState.current?.onProjectCardsStateChange(phase?.phaseDTO?.phaseId, (phaseDTO) => {
+			if (phaseDTO?.phaseId === phase?.phaseDTO?.phaseId) {
+				performLazyLoaderUpdateRef.current?.();
+			}
+		});
+	});
+
+	useEffect(() => {
+		if (!phase) {
+			return undefined;
+		}
+
+		return projectState.current?.onProjectPhasesStateChange(() => {
+			console.log("ATUALIZOU MANE", xx.current);
+			console.log(performLazyLoaderUpdateRef);
+			performLazyLoaderUpdateRef.current?.(true, xx.current);
 		});
 	});
 
@@ -127,6 +145,8 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 										getContent={() => projectState.current?.getCards(phase?.phaseDTO?.phaseId) || []}
 										// Referência para o lazy loader
 										ref={lazyLoaderRef}
+										aee={true}
+										aee2={() => phase}
 									/>
 
 									<div ref={lazyLoaderBottomOffsetRef} />
