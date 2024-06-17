@@ -95,15 +95,7 @@ function DragableModalDropLocation({
 			onDragEndRef.current = null;
 			onDragMoveRef.current = null;
 		};
-	}, [
-		addPlaceholder,
-		removePlaceholder,
-		associatePlaceholder,
-		onDragBeginRef,
-		onDragEndRef,
-		onDragMoveRef,
-		onDragConcludedCallback,
-	]);
+	}, [addPlaceholder, removePlaceholder, associatePlaceholder, onDragBeginRef, onDragEndRef, onDragMoveRef, onDragConcludedCallback]);
 
 	return children;
 }

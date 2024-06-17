@@ -33,12 +33,18 @@
 }
 
 .P-phases-container {
+	margin: 0;
+	width: 100%;
+	height: calc(100% - var(--cards-padding));
+}
+
+.P-phases-container-lazy-loader {
 	display: flex;
 	column-gap: var(--cards-column-gap);
 	margin: 0;
 	padding: 0;
 	width: 100%;
-	height: calc(100% - var(--cards-padding));
+	height: 100%;
 }
 
 .P-add-new-phase-button-container {

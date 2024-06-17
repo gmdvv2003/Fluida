@@ -32,12 +32,17 @@
 }
 
 .PP-cards-container {
+	width: calc(100% - var(--phase-margin) * 2);
+	height: calc(100% - var(--phase-header-height) - 28px);
+}
+
+.PP-cards-container-lazy-loader {
 	display: flex;
 	row-gap: var(--phase-margin);
 	flex-direction: column;
 	margin: var(--phase-margin);
-	width: calc(100% - var(--phase-margin) * 2);
-	height: calc(100% - var(--phase-header-height) - 28px);
+	width: 100%;
+	height: 100%;
 	overflow: scroll;
 	scrollbar-width: none;
 	padding-right: 2px;
