@@ -1,12 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 
-import {
-	useDragState,
-	onComponentDragBegin,
-	onComponentDragMove,
-	onComponentDragEnd,
-	DragableModalContext,
-} from "./DragableModalContext";
+import { useDragState, onComponentDragBegin, onComponentDragMove, onComponentDragEnd, DragableModalContext } from "./DragableModalContext";
 
 const DragableModal = React.forwardRef(({ order, elements, callbacks, scrollableDivRef }, ref) => {
 	const { _, useGlobalDragState } = useDragState();

@@ -5,12 +5,12 @@ import React, { useEffect, useState, useImperativeHandle, useRef } from "react";
 const LazyLoader = React.forwardRef(
 	(
 		{
+			className,
 			canFillWithContent,
 			update,
 			topLeftOffset,
 			bottomRightOffset,
-			container,
-			scrollBar,
+			scrollBarRef,
 			constructElement,
 			width,
 			height,
@@ -22,8 +22,6 @@ const LazyLoader = React.forwardRef(
 			insertFetchedElement,
 			pageSize,
 			getContent,
-			aee,
-			aee2,
 		},
 		ref
 	) => {
@@ -41,6 +39,8 @@ const LazyLoader = React.forwardRef(
 
 		const [topOffset, setTopOffset] = useState(0);
 		const [bottomOffset, setBottomOffset] = useState(0);
+
+		const containerRef = useRef(null);
 
 		const j = useRef(null);
 
@@ -170,8 +170,12 @@ const LazyLoader = React.forwardRef(
 		);
 
 		useEffect(() => {
-			const containerCopy = container.current;
-			const scrollBarCopy = scrollBar.current;
+			const containerCopy = containerRef?.current;
+			const scrollBarCopy = scrollBarRef?.current;
+
+			if (!containerCopy || !scrollBarCopy) {
+				return undefined;
+			}
 
 			let sectionFetchTimeoutId;
 
@@ -222,7 +226,8 @@ const LazyLoader = React.forwardRef(
 							fetchedContent.forEach((element, index) => {
 								const contentIndex = start + undefinedContentIndex + index;
 								if (getContent()[contentIndex] == undefined) {
-									getContent()[contentIndex] = insertFetchedElement != undefined ? insertFetchedElement(element) : element;
+									getContent()[contentIndex] =
+										insertFetchedElement != undefined ? insertFetchedElement(element) : element;
 								}
 							});
 
@@ -267,10 +272,16 @@ const LazyLoader = React.forwardRef(
 			async function getBottomRightOffset() {
 				switch (direction) {
 					case "horizontal":
-						return Math.max((await getAvailableContentCountForFetch()) - 1, 0) * (width + padding) - getContent().length * (width + padding);
+						return (
+							Math.max((await getAvailableContentCountForFetch()) - 1, 0) * (width + padding) -
+							getContent().length * (width + padding)
+						);
 
 					case "vertical":
-						return Math.max((await getAvailableContentCountForFetch()) - 1, 0) * (height + padding) - getContent().length * (height + padding);
+						return (
+							Math.max((await getAvailableContentCountForFetch()) - 1, 0) * (height + padding) -
+							getContent().length * (height + padding)
+						);
 
 					default:
 						break;
@@ -323,27 +334,13 @@ const LazyLoader = React.forwardRef(
 			/**
 			 * Função responsável por carregar o conteúdo a ser exibido na tela
 			 */
-			async function setDisplayableContent(ddd, l) {
-				j.current = l;
-				if (ddd) {
-					console.log("FUI CHAMADO DE FORA CARALHO", l);
-					console.log(visibleContent);
-				}
-
+			async function setDisplayableContent() {
 				let update = (visibleContent) => {
 					// Reseta as referências dos elementos que estão sendo exibidos na tela
 					visibleContentDataRefs.current = [];
 
 					// Atualiza o conteúdo a ser exibido na tela
-					setVisibleContent([...visibleContent]);
-
-					if (ddd) {
-						console.log("UPDATE AQ IRMAO", l);
-						console.log(aee2());
-						console.log(visibleContent, currentSectionStart, currentSectionEnd);
-						console.log(x);
-						setX([...visibleContent]);
-					}
+					setVisibleContent((_) => [...visibleContent]);
 				};
 
 				update(await retrieveVisibleContent(currentSectionStart, currentSectionEnd, update));
@@ -411,38 +408,33 @@ const LazyLoader = React.forwardRef(
 			return () => {
 				scrollBarCopy.removeEventListener("scroll", handleScroll);
 			};
-		}, [update, container, scrollBar]);
+		}, [update, scrollBarRef]);
 
-		useEffect(() => {
-			if (aee) {
-				console.log("DPS DO UPDATE TLG", j.current);
-				console.log(aee2());
-				console.log(x);
-				console.log("=====================================");
-			}
-		}, [x]);
+		return (
+			<div className={className} ref={containerRef}>
+				{visibleContent.map((data, index) => {
+					if (data?.isPlaceholder) {
+						return data?.placeholder;
+					}
 
-		return visibleContent.map((data, index) => {
-			if (data?.isPlaceholder) {
-				return data?.placeholder;
-			}
+					// Função para setar a referência do elemento
+					const setReference = (element) => {
+						if (element == null) {
+							return null;
+						}
 
-			// Função para setar a referência do elemento
-			const setReference = (element) => {
-				if (element == null) {
-					return null;
-				}
+						const { ref } = element;
+						visibleContentDataRefs.current[index] = { current: ref.current, data, index };
+					};
 
-				const { ref } = element;
-				visibleContentDataRefs.current[index] = { current: ref.current, data, index };
-			};
-
-			if (data === undefined) {
-				return constructElement(null, index, true, setReference);
-			} else {
-				return constructElement(data, index, false, setReference);
-			}
-		});
+					if (data === undefined) {
+						return constructElement(null, index, true, setReference);
+					} else {
+						return constructElement(data, index, false, setReference);
+					}
+				})}
+			</div>
+		);
 	}
 );
 

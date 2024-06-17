@@ -16,7 +16,6 @@ import Card from "../card/Card";
 import "./Phase.css";
 
 const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectState, projectSocketRef, callbacks }, ref) => {
-	const cardsContainerRef = useRef(null);
 	const cardsContainerScrollBarRef = useRef(null);
 
 	const lazyLoaderTopOffsetRef = useRef(null);
@@ -24,8 +23,6 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 
 	const lazyLoaderRef = useRef(null);
 	const performLazyLoaderUpdateRef = useRef(null);
-
-	const xx = useRef(uuidv4());
 
 	useImperativeHandle(
 		ref,
@@ -40,22 +37,8 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 			return undefined;
 		}
 
-		return projectState.current?.onProjectCardsStateChange(phase?.phaseDTO?.phaseId, (phaseDTO) => {
-			if (phaseDTO?.phaseId === phase?.phaseDTO?.phaseId) {
-				performLazyLoaderUpdateRef.current?.();
-			}
-		});
-	});
-
-	useEffect(() => {
-		if (!phase) {
-			return undefined;
-		}
-
-		return projectState.current?.onProjectPhasesStateChange(() => {
-			console.log("ATUALIZOU MANE", xx.current);
-			console.log(performLazyLoaderUpdateRef);
-			performLazyLoaderUpdateRef.current?.(true, xx.current);
+		return projectState.current?.onProjectCardsStateChange(phase?.phaseDTO?.phaseId, (cardDTO) => {
+			performLazyLoaderUpdateRef.current?.();
 		});
 	});
 
@@ -93,19 +76,23 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 											});
 										}}
 									/>
-									<DotsIcon className="PP-header-icon" onClick={() => projectState.current?.previewPhaseConfiguration(phase)} />
+									<DotsIcon
+										className="PP-header-icon"
+										onClick={() => projectState.current?.previewPhaseConfiguration(phase)}
+									/>
 								</div>
 
-								<div className="PP-cards-container" ref={cardsContainerRef}>
+								<div className="PP-cards-container">
 									<div ref={lazyLoaderTopOffsetRef} />
 									<LazyLoader
+										className="PP-cards-container-lazy-loader"
+										// Função para atualizar o lazy loader
 										update={performLazyLoaderUpdateRef}
 										// Referências para os offsets
 										topLeftOffset={lazyLoaderTopOffsetRef}
 										bottomRightOffset={lazyLoaderBottomOffsetRef}
 										// Container e barra de rolagem
-										container={cardsContainerRef}
-										scrollBar={cardsContainerScrollBarRef}
+										scrollBarRef={cardsContainerScrollBarRef}
 										// Função para construir os elementos
 										constructElement={(card, _, isLoading, setReference) => {
 											return (
@@ -128,9 +115,13 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 										// Funções de controle do conteúdo
 										fetchMore={(page) => {
 											return new Promise((resolve, reject) => {
-												return projectSocketRef.current?.emit("fetchCards", { phaseId: phase?.phaseDTO?.phaseId, page }, (response) => {
-													resolve(response?.cards?.taken || []);
-												});
+												return projectSocketRef.current?.emit(
+													"fetchCards",
+													{ phaseId: phase?.phaseDTO?.phaseId, page },
+													(response) => {
+														resolve(response?.cards?.taken || []);
+													}
+												);
 											});
 										}}
 										getAvailableContentCountForFetch={async (sync = false) => {
@@ -145,8 +136,6 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 										getContent={() => projectState.current?.getCards(phase?.phaseDTO?.phaseId) || []}
 										// Referência para o lazy loader
 										ref={lazyLoaderRef}
-										aee={true}
-										aee2={() => phase}
 									/>
 
 									<div ref={lazyLoaderBottomOffsetRef} />
@@ -160,6 +149,8 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 			callbacks={callbacks}
 			// Referência para o modal
 			ref={ref}
+			// Chave
+			key={phase?.phaseDTO?.phaseId}
 		></DragableModal>
 	);
 });

@@ -21,7 +21,8 @@ import { useProjectAuthentication } from "context/ProjectAuthenticationContext";
 import { useSystemPopups } from "context/popup/SystemPopupsContext";
 
 function Project() {
-	const { newPopup } = useSystemPopups();
+	// const { newPopup } = useSystemPopups();
+	const newPopup = () => {};
 
 	const [cardBeingEdited, setCardBeingEdited] = useState(null);
 	const [phaseBeingConfigurated, setPhaseBeingConfigurated] = useState(null);
@@ -33,7 +34,6 @@ function Project() {
 	const projectSocketRef = useRef(null);
 	const projectStateRef = useRef(null);
 
-	const phasesContainerRef = useRef(null);
 	const phasesContainerScrollBarRef = useRef(null);
 
 	const lazyLoaderTopOffsetRef = useRef(null);
@@ -125,6 +125,18 @@ function Project() {
 				.catch(() => {});
 
 			this.#socket = socket;
+		}
+
+		get MembersSubscription() {
+			return this.#projectMembersStateListeners;
+		}
+
+		get PhasesSubscription() {
+			return this.#projectPhasesStateListeners;
+		}
+
+		get CardsSubscription() {
+			return this.#projectCardsStateListeners;
 		}
 
 		/**
@@ -729,6 +741,7 @@ function Project() {
 			}
 
 			const newProjectState = new ProjectState(socket);
+			const k = Math.random() * 10000;
 
 			// Atualiza as referências do projeto
 			projectStateRef.current = newProjectState;
@@ -752,18 +765,18 @@ function Project() {
 				setWaitingForReconnect(false);
 			};
 
-			const phaseCreated = (...data) => newProjectState.phaseCreated(data);
-			const phaseUpdated = (...data) => newProjectState.phaseUpdated(data);
-			const phaseDeleted = (...data) => newProjectState.phaseDeleted(data);
-			const phaseMoved = (...data) => newProjectState.phaseMoved(data);
+			const phaseCreated = (...data) => projectStateRef.current.phaseCreated(data);
+			const phaseUpdated = (...data) => projectStateRef.current.phaseUpdated(data);
+			const phaseDeleted = (...data) => projectStateRef.current.phaseDeleted(data);
+			const phaseMoved = (...data) => projectStateRef.current.phaseMoved(data);
 
-			const cardCreated = (...data) => newProjectState.cardCreated(data);
-			const cardUpdated = (...data) => newProjectState.cardUpdated(data);
-			const cardDeleted = (...data) => newProjectState.cardDeleted(data);
-			const cardMoved = (...data) => newProjectState.cardMoved(data);
+			const cardCreated = (...data) => projectStateRef.current.cardCreated(data);
+			const cardUpdated = (...data) => projectStateRef.current.cardUpdated(data);
+			const cardDeleted = (...data) => projectStateRef.current.cardDeleted(data);
+			const cardMoved = (...data) => projectStateRef.current.cardMoved(data);
 
-			const phasesFetched = (...data) => newProjectState.phasesFetched(data);
-			const cardsFetched = (...data) => newProjectState.cardsFetched(data);
+			const phasesFetched = (...data) => projectStateRef.current.phasesFetched(data);
+			const cardsFetched = (...data) => projectStateRef.current.cardsFetched(data);
 
 			// Adiciona os listeners
 			socket.on("disconnect", disconnect);
@@ -783,7 +796,7 @@ function Project() {
 			socket.on("cardsFetched", cardsFetched);
 
 			// Listener para quando o estado das fases do projeto mudar
-			const unbindOnPhaseStateChangeLazyLoaderUpdate = newProjectState.onProjectPhasesStateChange((phaseDTO) => {
+			const unbindOnPhaseStateChangeLazyLoaderUpdate = projectStateRef.current.onProjectPhasesStateChange((phaseDTO) => {
 				performLazyLoaderUpdateRef.current?.();
 			});
 
@@ -870,7 +883,7 @@ function Project() {
 			{projectStateRef.current && (
 				<div className="P-background" ref={phasesContainerScrollBarRef}>
 					<div className="P-phases-container-holder">
-						<ol className="P-phases-container" ref={phasesContainerRef}>
+						<ol className="P-phases-container">
 							<div ref={lazyLoaderTopOffsetRef} />
 							<MouseScrollableModal scrollableDivRef={phasesContainerScrollBarRef} ref={mouseScrollableModalRef}>
 								<DragableModalDropLocationWithLazyLoader
@@ -940,7 +953,10 @@ function Project() {
 
 											if (phaseState.phaseDTO.order < currentPhaseOrder && phaseState.phaseDTO.order >= newPosition) {
 												phaseState.phaseDTO.order += 1;
-											} else if (phaseState.phaseDTO.order > currentPhaseOrder && phaseState.phaseDTO.order <= newPosition) {
+											} else if (
+												phaseState.phaseDTO.order > currentPhaseOrder &&
+												phaseState.phaseDTO.order <= newPosition
+											) {
 												phaseState.phaseDTO.order -= 1;
 											}
 										});
@@ -953,14 +969,15 @@ function Project() {
 									}}
 								>
 									<LazyLoader
+										fff1={true}
+										className="P-phases-container-lazy-loader"
 										// Função para atualizar o lazy loader
 										update={performLazyLoaderUpdateRef}
 										// Referências para os offsets
 										topLeftOffset={lazyLoaderTopOffsetRef}
 										bottomRightOffset={lazyLoaderBottomOffsetRef}
-										// Container e barra de rolagem
-										container={phasesContainerRef}
-										scrollBar={phasesContainerScrollBarRef}
+										// Referência para o scroll bar
+										scrollBarRef={phasesContainerScrollBarRef}
 										// Função para construir os elementos
 										constructElement={(phase, _, isLoading, setReference) => (
 											<Phase
@@ -1020,7 +1037,10 @@ function Project() {
 						</ol>
 
 						<div className="P-add-new-phase-button-container">
-							<button className="P-add-new-phase-button" onClick={() => projectStateRef.current?.requestCreateNewPhase("Nova Fase")}>
+							<button
+								className="P-add-new-phase-button"
+								onClick={() => projectStateRef.current?.requestCreateNewPhase("Nova Fase")}
+							>
 								<AddButtonIcon className="P-add-new-phase-button-icon" />
 							</button>
 						</div>
