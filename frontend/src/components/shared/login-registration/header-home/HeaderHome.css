@@ -75,7 +75,7 @@
 }
 
 .HH-userIcons-container > :nth-child(n) {
-	margin-right: -15px;
+	margin-right: -5px;
 	border: 1px solid rgb(255, 255, 255);
 	border-radius: 50%;
 }
@@ -83,18 +83,22 @@
 .HH-bell-icon {
 	display: flex;
 	cursor: pointer;
-	margin-right: 10px;
-	border-radius: 50%;
+	border-radius: 8px;
+	padding: 4px;
 	height: 25px;
 	content: url("./../../../../assets/action-icons/bell-notifications.svg");
 }
 
 .HH-settings-icon {
 	cursor: pointer;
-	margin-right: 10px;
-	border-radius: 50%;
-	height: 27px;
+	border-radius: 8px;
+	padding: 4px;
+	height: 25px;
 	content: url("./../../../../assets/action-icons/settings.svg");
+}
+
+.teste{
+	background-color: red;
 }
 
 .HH-photo-icon {
@@ -151,4 +155,19 @@
 	.HH-buttons-container {
 		width: 250px;
 	}
+}
+
+.HH-icon-construction{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-right: 10px;
+	width: 32px;
+	height: 32px;
+}
+
+.HH-icon-construction:hover{
+	cursor: pointer;
+	border-radius: 8px;
+	background-color: #909090;
 }
