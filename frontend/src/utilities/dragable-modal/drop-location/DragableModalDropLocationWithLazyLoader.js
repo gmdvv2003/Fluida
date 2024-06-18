@@ -52,7 +52,10 @@ function DragableModalDropLocationWithLazyLoader({
 				);
 
 			case "vertical":
-				break;
+				return Math.max(
+					0,
+					Math.floor((clientY - margin) / (height + padding) + scrollableDivRef.current?.scrollTop / (height + padding))
+				);
 
 			default:
 				break;

@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 
 import React, { useEffect, useState, useImperativeHandle, useRef } from "react";
+import ReactSubscriptionHelper from "utilities/react-subscription-helper/ReactSubscriptionHelper";
 
 const LazyLoader = React.forwardRef(
 	(
@@ -27,7 +28,6 @@ const LazyLoader = React.forwardRef(
 	) => {
 		// Conteúdo a ser exibido na tela
 		const [visibleContent, setVisibleContent] = useState([]);
-		const [x, setX] = useState([]);
 
 		// Referências das intancias dos elementos que estão sendo exibidos na tela
 		const visibleContentDataRefs = useRef([]);
@@ -40,13 +40,14 @@ const LazyLoader = React.forwardRef(
 		const [topOffset, setTopOffset] = useState(0);
 		const [bottomOffset, setBottomOffset] = useState(0);
 
-		const containerRef = useRef(null);
-
-		const j = useRef(null);
+		const visibleViewportContentChangedListeners = new ReactSubscriptionHelper();
 
 		useImperativeHandle(
 			ref,
 			() => ({
+				visibleViewportContentChanged: (callback) => {
+					return visibleViewportContentChangedListeners.subscribe(callback);
+				},
 				/**
 				 *
 				 * @param {*} element
@@ -170,10 +171,9 @@ const LazyLoader = React.forwardRef(
 		);
 
 		useEffect(() => {
-			const containerCopy = containerRef?.current;
 			const scrollBarCopy = scrollBarRef?.current;
 
-			if (!containerCopy || !scrollBarCopy) {
+			if (!scrollBarCopy) {
 				return undefined;
 			}
 
@@ -233,7 +233,7 @@ const LazyLoader = React.forwardRef(
 
 							// Atualiza o conteúdo a ser exibido na tela
 							lateFetch(getContent().slice(start, end));
-						}, 1000);
+						}, 200);
 					}
 				}
 
@@ -340,7 +340,7 @@ const LazyLoader = React.forwardRef(
 					visibleContentDataRefs.current = [];
 
 					// Atualiza o conteúdo a ser exibido na tela
-					setVisibleContent((_) => [...visibleContent]);
+					setVisibleContent((_) => [...visibleContent, ...placeholdersContent.current]);
 				};
 
 				update(await retrieveVisibleContent(currentSectionStart, currentSectionEnd, update));
@@ -411,7 +411,7 @@ const LazyLoader = React.forwardRef(
 		}, [update, scrollBarRef]);
 
 		return (
-			<div className={className} ref={containerRef}>
+			<div className={className}>
 				{visibleContent.map((data, index) => {
 					if (data?.isPlaceholder) {
 						return data?.placeholder;

@@ -21,8 +21,7 @@ import { useProjectAuthentication } from "context/ProjectAuthenticationContext";
 import { useSystemPopups } from "context/popup/SystemPopupsContext";
 
 function Project() {
-	// const { newPopup } = useSystemPopups();
-	const newPopup = () => {};
+	const { newPopup } = useSystemPopups();
 
 	const [cardBeingEdited, setCardBeingEdited] = useState(null);
 	const [phaseBeingConfigurated, setPhaseBeingConfigurated] = useState(null);
@@ -984,7 +983,7 @@ function Project() {
 												scrollableDivRef={phasesContainerScrollBarRef}
 												isLoading={isLoading}
 												phase={phase}
-												projectState={projectStateRef}
+												projectStateRef={projectStateRef}
 												projectSocketRef={projectSocketRef}
 												callbacks={{
 													dragBegin: [
