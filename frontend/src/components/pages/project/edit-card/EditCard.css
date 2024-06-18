@@ -23,7 +23,7 @@
 .EC-container-card {
 	display: flex;
 	flex-direction: column;
-	box-shadow: 0 0 15px rgb(231, 231, 231);
+	box-shadow: rgb(174, 174, 174) 0px 0px 5px;
 	border: 1px solid #dedede;
 	border-radius: 8px;
 	background-color: #ffffff;
