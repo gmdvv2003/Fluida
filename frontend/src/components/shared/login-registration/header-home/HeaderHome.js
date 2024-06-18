@@ -12,7 +12,7 @@ import { faPersonDigging, faUserLarge } from '@fortawesome/free-solid-svg-icons'
 import "./HeaderHome.css";
 
 function HeaderHome({ hideSearchBar, hideUsersInProject, onUsersInProjectClick }) {
-	const [modalIsOpen, setModalIsOpen] = useState(true);
+	const [modalIsOpen, setModalIsOpen] = useState(false);
 	const [isHoveredConstruction, setIsHoveredConstruction] = useState(false);
 	const [isHoveredSettings, setIsHoveredSettings] = useState(false);
 
@@ -72,10 +72,10 @@ function HeaderHome({ hideSearchBar, hideUsersInProject, onUsersInProjectClick }
 						{!hideUsersInProject && (
 							<div className="HH-buttons-container">
 								<div className="HH-userIcons-container">
-									<FontAwesomeIcon icon={faUserLarge} style={{ color: "#e4e4e4" }} className="teste" size="xl"/>
-									<FontAwesomeIcon icon={faUserLarge} style={{ color: "#e4e4e4" }} className="teste" size="xl"/>
-									<FontAwesomeIcon icon={faUserLarge} style={{ color: "#e4e4e4" }} className="teste" size="xl"/>
-									<FontAwesomeIcon icon={faUserLarge} style={{ color: "#e4e4e4" }} className="teste" size="xl"/>
+									<FontAwesomeIcon icon={faUserLarge} style={{ color: "#e4e4e4" }} className="HH-icon-person" size="xl"/>
+									<FontAwesomeIcon icon={faUserLarge} style={{ color: "#e4e4e4" }} className="HH-icon-person" size="xl"/>
+									<FontAwesomeIcon icon={faUserLarge} style={{ color: "#e4e4e4" }} className="HH-icon-person" size="xl"/>
+									<FontAwesomeIcon icon={faUserLarge} style={{ color: "#e4e4e4" }} className="HH-icon-person" size="xl"/>
 								</div>
 								<i className="HH-user-in-project-icon" onClick={onUsersInProjectClick} />
 							</div>
