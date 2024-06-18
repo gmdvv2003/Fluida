@@ -436,7 +436,7 @@ function Project() {
 
 			const { cardDTO } = phaseState.cards[cardIndex];
 
-			cardDTO.cardName = newCardName || cardDTO.phaseName;
+			cardDTO.cardName = newCardName || cardDTO.cardName;
 			cardDTO.cardDescription = newCardDescription || cardDTO.cardDescription;
 
 			this.#projectCardsStateListeners[cardDTO.phaseId]?.notify(cardDTO);
@@ -639,11 +639,12 @@ function Project() {
 		 *
 		 * @param {*} cardId
 		 * @param {*} newCardName
+		 * @param {*} newCardDescription
 		 * @returns
 		 */
-		requestUpdateCard(cardId, newCardName) {
+		requestUpdateCard(cardId, newCardName, newCardDescription) {
 			return new Promise((resolve) => {
-				this.#socket.emit("updateCard", { cardId, newCardName }, (success, data) => {
+				this.#socket.emit("updateCard", { cardId, newCardName, newCardDescription }, (success, data) => {
 					success
 						? newPopup("Common", {
 								severity: "success",
@@ -949,10 +950,7 @@ function Project() {
 
 											if (phaseState.phaseDTO.order < currentPhaseOrder && phaseState.phaseDTO.order >= newPosition) {
 												phaseState.phaseDTO.order += 2;
-											} else if (
-												phaseState.phaseDTO.order > currentPhaseOrder &&
-												phaseState.phaseDTO.order <= newPosition
-											) {
+											} else if (phaseState.phaseDTO.order > currentPhaseOrder && phaseState.phaseDTO.order <= newPosition) {
 												phaseState.phaseDTO.order -= 2;
 											}
 										});
@@ -1033,10 +1031,7 @@ function Project() {
 						</ol>
 
 						<div className="P-add-new-phase-button-container">
-							<button
-								className="P-add-new-phase-button"
-								onClick={() => projectStateRef.current?.requestCreateNewPhase("Nova Fase")}
-							>
+							<button className="P-add-new-phase-button" onClick={() => projectStateRef.current?.requestCreateNewPhase("Nova Fase")}>
 								<AddButtonIcon className="P-add-new-phase-button-icon" />
 							</button>
 						</div>

@@ -103,3 +103,7 @@
 .PC-background-placeholder {
 	background-color: rgb(202, 202, 202);
 }
+
+.PC-background:hover {
+	border: 2px solid rgb(63, 30, 211);
+}
