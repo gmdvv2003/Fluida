@@ -133,7 +133,30 @@ class CardFunctionality {
 			});
 	}
 
-	#IOMoveCard(projectsIO, socket, project, data) {}
+	/**
+	 * 
+	 * @param {*} projectsIO 
+	 * @param {*} socket 
+	 * @param {*} project 
+	 * @param {*} data 
+	 * @returns 
+	 */
+	#IOMoveCard(projectsIO, socket, project, data, acknowledgement) {
+		const { cardId, targetPositionIndex, targetPhaseId } = data;
+
+		if (project.getCard(cardId) == undefined) {
+			return socket.emit("error", { message: "Card não encontrado." });
+		}
+
+		this.ProjectsController.CardsService.moveCard(new CardsDTO({ projectId: project.projectId, cardId }), targetPositionIndex, targetPhaseId)
+			.then((result) => {})
+			.catch((error) => {
+				socket.emit("error", { message: "Erro ao mover o card", error: error });
+
+				// Emite a resposta pessoal do evento
+				acknowledgement && acknowledgement(false, { error: error });
+			});
+	}
 
 	/**
 	 *
