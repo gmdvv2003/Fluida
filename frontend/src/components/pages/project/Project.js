@@ -741,7 +741,6 @@ function Project() {
 			}
 
 			const newProjectState = new ProjectState(socket);
-			const k = Math.random() * 10000;
 
 			// Atualiza as referências do projeto
 			projectStateRef.current = newProjectState;
