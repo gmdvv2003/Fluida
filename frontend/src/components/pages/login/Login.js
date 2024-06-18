@@ -92,6 +92,7 @@ function Login() {
 			unbindEmailChangeSubscription();
 			unbindPasswordChangeSubscription();
 		};
+		
 	});
 
 	return (
@@ -106,6 +107,7 @@ function Login() {
 								<h1 className="L-login-form-title">Inicie sessão na sua conta</h1>
 							</div>
 
+						{/*
 							<div className="L-google-icon-container">
 								<GoogleIcon className="L-google-icon" />
 								<div className="L-login-form-google-button-container">
@@ -118,7 +120,7 @@ function Login() {
 							<div>
 								<h1 className="L-login-or-text">ou</h1>
 							</div>
-
+						 */}
 							<div className="L-left-email-icon-container">
 								<div className="L-left-icon-container">
 									<EmailIcon className="L-left-icon" />

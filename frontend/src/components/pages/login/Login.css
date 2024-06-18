@@ -1,5 +1,6 @@
 .L-login-form-title-container {
 	position: relative;
+	margin-bottom: 15px;
 }
 .L-login-form-title {
 	color: #3e3e3e;
@@ -150,15 +151,15 @@
 	height: 60px;
 
 	.S-L-logo-container {
+		top: calc(85% - 30px);
 		width: 100%;
 		height: 70px;
-		top: calc(85% - 30px);
 	}
 
 	.S-L-logo-container > img {
+		margin: -150px 0 0 -75px;
 		width: 150px;
 		height: 150px;
-		margin: -150px 0 0 -75px;
 	}
 }
 

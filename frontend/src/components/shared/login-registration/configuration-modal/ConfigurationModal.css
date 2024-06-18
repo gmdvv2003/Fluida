@@ -1,37 +1,63 @@
 .CM-fluida-container {
 	display: flex;
-	flex-direction: column;
 	position: absolute;
-	z-index: 1000;
 	left: calc(100% - 238px);
-	width: 200px;
-	height: 140px;
-	background-color: rgb(240, 240, 240);
+	flex-direction: column;
+	z-index: 1000;
+	box-shadow: rgb(238, 238, 238) 0px 3px 8px;
 	border: 1px;
 	border-style: solid;
 	border-color: rgb(213, 213, 213);
-	box-shadow: rgb(238, 238, 238) 0px 3px 8px;
 	border-radius: 8px;
+	background-color: rgb(240, 240, 240);
 	padding: 10px;
+	width: 200px;
+}
+
+.CM-option-account-container, 
+.CM-option-logout-container,
+.CM-option-configuration-container {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	cursor: pointer;
+	border-radius: 4px;
+	padding: 8px;
+	height: 30px;
+}
+
+.CM-option-account-container:hover,
+.CM-option-logout-container:hover,
+.CM-option-configuration-container:hover {
+	background-color: rgb(217, 217, 217);	
 }
 
 .CM-title-option {
-	font-size: 18px;
 	margin: 0;
 	color: gray;
 	font-weight: lighter;
+	font-size: 18px;
 }
 
 .CM-text-option {
-	font-size: 14px;
+	cursor: pointer;
 	margin: 0;
 	color: gray;
+	font-size: 14px;
 	text-decoration: none;
-	cursor: pointer
 }
 
 .CM-hr-divider {
-	border: 1px;
-	border-style: solid;
-	border-color: rgb(213, 213, 213);
+	border: 1px solid rgb(213, 213, 213);
+	width: 100%;
+}
+
+.CM-centered-text {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 30px;
+	color: gray;
+	font-size: 14px;
 }
