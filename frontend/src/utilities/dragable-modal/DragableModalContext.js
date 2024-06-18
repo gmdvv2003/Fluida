@@ -70,13 +70,34 @@ const DragableModalContext = React.forwardRef(({ getChild, uuid, modal, children
 	);
 
 	useEffect(() => {
+		let wantsToDragLocal = false;
+		let isDraggingLocal = false;
+
 		/**
 		 *
 		 * @param {*} event
 		 */
 		function onMouseMove(event) {
-			invokeListeners(onDragMove, uuid, event);
-			event.preventDefault();
+			if (isDraggingLocal || isDragging) {
+				invokeListeners(onDragMove, uuid, event);
+				event.preventDefault();
+			} else if (wantsToDragLocal) {
+				wantsToDragLocal = false;
+				isDraggingLocal = true;
+
+				// Atualiza o estado de drag
+				setIsDragging(true);
+				setCurrentComponentGettingDraggedUUID(uuid);
+
+				// Invoca os listeners de drag begin do elemento
+				invokeListeners(onDragBegin, uuid, event);
+
+				requestAnimationFrame(() => {
+					invokeListeners(onDragMove, uuid, event);
+				});
+
+				event.preventDefault();
+			}
 		}
 
 		/**
@@ -84,15 +105,20 @@ const DragableModalContext = React.forwardRef(({ getChild, uuid, modal, children
 		 * @param {} event
 		 */
 		function onMouseUp(event) {
-			invokeListeners(onDragEnd, uuid, event);
+			if (isDraggingLocal || isDragging) {
+				invokeListeners(onDragEnd, uuid, event);
 
-			setIsDragging(false);
-			setCurrentComponentGettingDraggedUUID(null);
+				setIsDragging(false);
+				setCurrentComponentGettingDraggedUUID(null);
 
-			currentMouseMoveEventHandler = null;
-			currentMouseUpEventHandler = null;
+				currentMouseMoveEventHandler = null;
+				currentMouseUpEventHandler = null;
 
-			event.preventDefault();
+				event.preventDefault();
+			}
+
+			wantsToDragLocal = false;
+			isDraggingLocal = false;
 		}
 
 		/**
@@ -113,21 +139,10 @@ const DragableModalContext = React.forwardRef(({ getChild, uuid, modal, children
 				return null;
 			}
 
-			// Atualiza o estado de drag
-			setIsDragging(true);
-			setCurrentComponentGettingDraggedUUID(uuid);
-
-			// Invoca os listeners de drag begin do elemento
-			invokeListeners(onDragBegin, uuid, event);
-
 			currentMouseMoveEventHandler = onMouseMove;
 			currentMouseUpEventHandler = onMouseUp;
 
-			requestAnimationFrame(() => {
-				invokeListeners(onDragMove, uuid, event);
-			});
-
-			event.preventDefault();
+			wantsToDragLocal = true;
 		}
 
 		// Pega o elemento atual

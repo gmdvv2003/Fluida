@@ -35,7 +35,7 @@ class NotificationMetadata {
 
 class AssignmentMetadata {}
 
-const Card = React.forwardRef(({ scrollableDivRef, isLoading, card, projectState, projectSocketRef, callbacks }, ref) => {
+const Card = React.forwardRef(({ scrollableDivRef, isLoading, card, projectStateRef, projectSocketRef, callbacks }, ref) => {
 	const isBeingDraggedExternalRef = useRef(false);
 
 	const [labels, setLabels] = useState([]);
@@ -117,7 +117,7 @@ const Card = React.forwardRef(({ scrollableDivRef, isLoading, card, projectState
 							return null;
 						}
 
-						projectState.current?.previewCard(card);
+						projectStateRef.current?.previewCard(card);
 					}}
 					ref={realRef}
 				>
