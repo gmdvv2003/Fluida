@@ -108,7 +108,7 @@ class CardsRepository extends Repository {
 	 * @param {number} targetPositionIndex
 	 * @returns
 	 */
-	async movePhase(cardDTO, targetPositionIndex, targetPhaseId) {
+	async moveCard(cardDTO, targetPositionIndex, targetPhaseId) {
 		// Pega a posição atual do card
 		const { order } =
 			(await this.Repository.createQueryBuilder("Cards").select("Cards.order", "order").where(`cardId = :cardId`, cardDTO).getRawOne()) ||
