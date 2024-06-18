@@ -86,10 +86,7 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 											});
 										}}
 									/>
-									<DotsIcon
-										className="PP-header-icon"
-										onClick={() => projectStateRef.current?.previewPhaseConfiguration(phase)}
-									/>
+									<DotsIcon className="PP-header-icon" onClick={() => projectStateRef.current?.previewPhaseConfiguration(phase)} />
 								</div>
 
 								<div className="PP-cards-container">
@@ -132,9 +129,6 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 												// "Salva" a ordem atual da fase
 												const currentCardOrder = cardState.cardDTO.order;
 
-												// Para caso a nova posição seja posterior a posição atual
-												newPosition += newPosition <= currentCardOrder ? 1 : 0;
-
 												if (currentCardOrder == newPosition) {
 													return null;
 												}
@@ -157,20 +151,14 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 
 												// Ajusta a ordem das outras fases
 												projectStateRef.current?.getCards(cardDTO?.phaseId).forEach((cardState) => {
-													if (cardState == undefined || cardState.cardDTO.phaseId == cardDTO.phaseId) {
+													if (cardState == undefined || cardState.cardDTO.cardId == cardDTO.cardId) {
 														return null;
 													}
 
-													if (
-														cardState.cardDTO.order < currentCardOrder &&
-														cardState.cardDTO.order >= newPosition
-													) {
-														cardState.cardDTO.order += 1;
-													} else if (
-														cardState.cardDTO.order > currentCardOrder &&
-														cardState.cardDTO.order <= newPosition
-													) {
-														cardState.cardDTO.order -= 1;
+													if (cardState.cardDTO.order < currentCardOrder && cardState.cardDTO.order >= newPosition) {
+														cardState.cardDTO.order += 2;
+													} else if (cardState.cardDTO.order > currentCardOrder && cardState.cardDTO.order <= newPosition) {
+														cardState.cardDTO.order -= 2;
 													}
 												});
 
@@ -227,13 +215,9 @@ const Phase = React.forwardRef(({ scrollableDivRef, isLoading, phase, projectSta
 												// Funções de controle do conteúdo
 												fetchMore={(page) => {
 													return new Promise((resolve, reject) => {
-														return projectSocketRef.current?.emit(
-															"fetchCards",
-															{ phaseId: phase?.phaseDTO?.phaseId, page },
-															(response) => {
-																resolve(response?.cards?.taken || []);
-															}
-														);
+														return projectSocketRef.current?.emit("fetchCards", { phaseId: phase?.phaseDTO?.phaseId, page }, (response) => {
+															resolve(response?.cards?.taken || []);
+														});
 													});
 												}}
 												getAvailableContentCountForFetch={async (sync = false) => {

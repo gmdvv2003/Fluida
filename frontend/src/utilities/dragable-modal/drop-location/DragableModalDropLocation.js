@@ -54,8 +54,7 @@ function DragableModalDropLocation({
 			const { clientX, clientY } = event;
 
 			// Novo índice de ordem do componente
-			let newOrderIndex = getDropoffIndex(clientX, clientY);
-			newOrderIndex += newOrderIndex >= getComponentOrderFromData(data) || 0;
+			let newOrderIndex = getDropoffIndex(clientX, clientY) * 2;
 
 			if (onDragConcludedCallback && typeof onDragConcludedCallback === "function") {
 				onDragConcludedCallback(data, newOrderIndex);
@@ -80,8 +79,8 @@ function DragableModalDropLocation({
 				const { clientX, clientY } = event;
 
 				// Novo índice de ordem do componente
-				let newOrderIndex = getDropoffIndex(clientX, clientY);
-				newOrderIndex += newOrderIndex >= getComponentOrderFromData(data) ? 1 : 0;
+				let newOrderIndex = getDropoffIndex(clientX, clientY, event) * 2;
+				newOrderIndex += newOrderIndex >= getComponentOrderFromData(data) ? 1 : -1;
 
 				// Atualiza a ordem do componente
 				getReference().style.order = newOrderIndex;

@@ -922,9 +922,6 @@ function Project() {
 										// "Salva" a ordem atual da fase
 										const currentPhaseOrder = phaseState.phaseDTO.order;
 
-										// Para caso a nova posição seja posterior a posição atual
-										newPosition += newPosition <= currentPhaseOrder ? 1 : 0;
-
 										if (currentPhaseOrder == newPosition) {
 											return null;
 										}
@@ -951,12 +948,12 @@ function Project() {
 											}
 
 											if (phaseState.phaseDTO.order < currentPhaseOrder && phaseState.phaseDTO.order >= newPosition) {
-												phaseState.phaseDTO.order += 1;
+												phaseState.phaseDTO.order += 2;
 											} else if (
 												phaseState.phaseDTO.order > currentPhaseOrder &&
 												phaseState.phaseDTO.order <= newPosition
 											) {
-												phaseState.phaseDTO.order -= 1;
+												phaseState.phaseDTO.order -= 2;
 											}
 										});
 
