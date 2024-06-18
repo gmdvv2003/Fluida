@@ -72,10 +72,10 @@ function HeaderHome({ hideSearchBar, hideUsersInProject, onUsersInProjectClick }
 						{!hideUsersInProject && (
 							<div className="HH-buttons-container">
 								<div className="HH-userIcons-container">
-									<FontAwesomeIcon icon={faUserLarge} style={{ color: "#e4e4e4" }} className="HH-icon-person" size="xl"/>
-									<FontAwesomeIcon icon={faUserLarge} style={{ color: "#e4e4e4" }} className="HH-icon-person" size="xl"/>
-									<FontAwesomeIcon icon={faUserLarge} style={{ color: "#e4e4e4" }} className="HH-icon-person" size="xl"/>
-									<FontAwesomeIcon icon={faUserLarge} style={{ color: "#e4e4e4" }} className="HH-icon-person" size="xl"/>
+									<FontAwesomeIcon icon={faUserLarge} style={{ color: "#ffffff" }} className="HH-icon-person" size="xl"/>
+									<FontAwesomeIcon icon={faUserLarge} style={{ color: "#ffffff" }} className="HH-icon-person" size="xl"/>
+									<FontAwesomeIcon icon={faUserLarge} style={{ color: "#ffffff" }} className="HH-icon-person" size="xl"/>
+									<FontAwesomeIcon icon={faUserLarge} style={{ color: "#ffffff" }} className="HH-icon-person" size="xl"/>
 								</div>
 								<i className="HH-user-in-project-icon" onClick={onUsersInProjectClick} />
 							</div>

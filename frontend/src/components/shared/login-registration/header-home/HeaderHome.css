@@ -75,7 +75,7 @@
 }
 
 .HH-userIcons-container > :nth-child(n) {
-	margin-right: -5px;
+	margin-right: -10px;
 	border: 1px solid rgb(255, 255, 255);
 	border-radius: 50%;
 }
@@ -98,7 +98,9 @@
 }
 
 .HH-icon-person{
-	background-color: red;
+	cursor: pointer;
+	background-color: rgb(233, 233, 233);
+	padding: 8px;
 }
 
 .HH-photo-icon {
