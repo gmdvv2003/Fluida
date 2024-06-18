@@ -100,6 +100,63 @@ class CardsRepository extends Repository {
 			.where("cardId = :cardId", { cardId })
 			.execute();
 	}
+
+	/**
+	 * Move as ordens das fases para a posição alvo.
+	 *
+	 * @param {PhasesDTO} cardDTO
+	 * @param {number} targetPositionIndex
+	 * @returns
+	 */
+	async movePhase(cardDTO, targetPositionIndex, targetPhaseId) {
+		// Pega a posição atual do card
+		const { order } =
+			(await this.Repository.createQueryBuilder("Cards").select("Cards.order", "order").where(`cardId = :cardId`, cardDTO).getRawOne()) ||
+			{};
+
+		if (!order) {
+			throw new Error("Card não encontrado.");
+		}
+
+		let rangeStart, rangeEnd;
+		if (order < targetPositionIndex) {
+			rangeStart = order;
+			rangeEnd = targetPositionIndex;
+		} else {
+			rangeStart = targetPositionIndex;
+			rangeEnd = order;
+		}
+
+		return await this.Repository.manager.transaction(async (transactionalEntityManager) => {
+			// Pega todos os cards que precisam ser atualizados
+			const cardsToUpdate = await transactionalEntityManager
+				.createQueryBuilder("Cards", "Card")
+				.where("Card.cardId = :cardId AND Card.order >= :rangeStart AND Card.order <= :rangeEnd", {
+					cardId: cardDTO.cardId,
+					rangeStart,
+					rangeEnd,
+				})
+				.orderBy("Card.order")
+				.limit(rangeEnd - rangeStart + 1)
+				.getMany();
+
+			// Atualiza a posição das fases
+			cardsToUpdate.forEach((card) => {
+				if (card.cardId === cardDTO.cardId) {
+					card.order = targetPositionIndex;
+				} else if (card.order < order && card.order >= targetPositionIndex) {
+					card.order += 1;
+				} else if (card.order > order && card.order <= targetPositionIndex) {
+					card.order -= 1;
+				}
+			});
+
+			// Salva as fases atualizadas no banco de dados
+			await transactionalEntityManager.save(cardsToUpdate);
+		});
+	}
+
+
 }
 
 module.exports = CardsRepository;

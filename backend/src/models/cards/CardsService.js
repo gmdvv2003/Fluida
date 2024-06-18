@@ -51,6 +51,16 @@ class CardsService extends Service {
 	async updateCard(cardId, newCardName, newCardDescription) {
 		return await this.CardsRepository.updateCard(cardId, newCardName, newCardDescription);
 	}
+
+	/**
+	 *
+	 * @param {*} cardDto
+	 * @param {*} targetPositionIndex
+	 * @returns
+	 */
+	async moveCard(cardDTO, targetPositionIndex, targetPhaseId) {
+		return await this.CardsRepository.moveCard(cardDTO, targetPositionIndex, targetPhaseId);
+	}
 }
 
 module.exports = CardsService;
