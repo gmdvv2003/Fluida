@@ -51,8 +51,10 @@ function DragableModalDropLocation({
 			// Remove o placeholder associado ao elemento
 			removePlaceholder(uuid);
 
+			const { clientX, clientY } = event;
+
 			// Novo índice de ordem do componente
-			let newOrderIndex = getDropoffIndex(event.clientX);
+			let newOrderIndex = getDropoffIndex(clientX, clientY);
 			newOrderIndex += newOrderIndex >= getComponentOrderFromData(data) || 0;
 
 			if (onDragConcludedCallback && typeof onDragConcludedCallback === "function") {
@@ -73,17 +75,17 @@ function DragableModalDropLocation({
 			// Pega o placeholder associado ao elemento
 			const { getReference } = getAssociatedPlaceholder(current) || {};
 			if (!getReference) {
-				return null;
+				onDragBegin(ref, null, null);
+			} else {
+				const { clientX, clientY } = event;
+
+				// Novo índice de ordem do componente
+				let newOrderIndex = getDropoffIndex(clientX, clientY);
+				newOrderIndex += newOrderIndex >= getComponentOrderFromData(data) ? 1 : 0;
+
+				// Atualiza a ordem do componente
+				getReference().style.order = newOrderIndex;
 			}
-
-			const { clientX } = event;
-
-			// Novo índice de ordem do componente
-			let newOrderIndex = getDropoffIndex(clientX);
-			newOrderIndex += newOrderIndex >= getComponentOrderFromData(data) || 0;
-
-			// Atualiza a ordem do componente
-			getReference().style.order = newOrderIndex;
 		}
 
 		onDragBeginRef.current = onDragBegin;

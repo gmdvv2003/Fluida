@@ -59,7 +59,16 @@ class CardsRepository extends Repository {
 	 * @returns {InsertResult}
 	 */
 	async createCard(cardsDTO) {
-		return await this.Repository.createQueryBuilder("Cards").insert().into("Cards").values(cardsDTO).execute();
+		return await this.Repository.createQueryBuilder("Cards")
+			.insert()
+			.into("Cards")
+			.values({
+				...cardsDTO,
+				order: () =>
+					"(COALESCE((SELECT MAX(`order`) FROM (SELECT * FROM `Cards` WHERE `phaseId` = :phaseId) AS temporary) + 1, 1))",
+			})
+			.setParameter("phaseId", cardsDTO.phaseId)
+			.execute();
 	}
 
 	/**

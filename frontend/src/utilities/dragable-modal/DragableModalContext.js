@@ -27,9 +27,7 @@ function bindToListenerWrapper(key) {
 	return function (listener, target) {
 		setGlobalDragState(key, (previousListeners) => [...(previousListeners || []), { listener, target }]);
 		return () => {
-			setGlobalDragState(key, (previousListeners) =>
-				previousListeners?.filter((listener) => listener.listener == listener)
-			);
+			setGlobalDragState(key, (previousListeners) => previousListeners?.filter((listener) => listener.listener == listener));
 		};
 	};
 }
@@ -51,19 +49,15 @@ export const useDragState = () => {
 };
 
 // Contexto que permite arrastar um modal.
-const DragableModalContext = React.forwardRef(({ children, uuid, modal }, ref) => {
+const DragableModalContext = React.forwardRef(({ getChild, uuid, modal, children }, ref) => {
 	const [isDragging, setIsDragging] = useGlobalDragState("isDragging");
-	const [_, setCurrentComponentGettingDraggedUUID] = useGlobalDragState("currentComponentGettingDraggedUUID");
+	const [__, setCurrentComponentGettingDraggedUUID] = useGlobalDragState("currentComponentGettingDraggedUUID");
 
 	const [onDragBegin] = useGlobalDragState("onDragBegin");
 	const [onDragEnd] = useGlobalDragState("onDragEnd");
 	const [onDragMove] = useGlobalDragState("onDragMove");
 
 	uuid.current = uuid.current || uuidv4();
-
-	function getChild() {
-		return modal?.current?.children?.[0];
-	}
 
 	useImperativeHandle(
 		ref,
@@ -115,7 +109,7 @@ const DragableModalContext = React.forwardRef(({ children, uuid, modal }, ref) =
 			const { target } = event;
 
 			// Verifica se o elemento clicado é o mesmo que o ref
-			if (getChild() != target) {
+			if ((getChild != undefined ? getChild(modal) : modal?.current?.children?.[0]) != target) {
 				return null;
 			}
 

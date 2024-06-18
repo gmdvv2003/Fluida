@@ -259,18 +259,8 @@ class Project {
 			return null;
 		}
 
-		console.log("=========================");
-		console.log(card);
-
-		console.log(index);
-		console.log("================== ANTES");
-		console.log(phase.cards.forEach((x) => console.log(x?.cardDTO)));
-
 		// Remove o card da fase
 		phase.cards.splice(index, 1);
-
-		console.log("================== DEPOIS");
-		console.log(phase.cards.forEach((x) => console.log(x?.cardDTO)));
 
 		// Atualiza o total de cards na fase
 		phase.totalCardsInProject !== undefined ? --phase.totalCardsInProject : --phase.totalCardsInProjectBeforeFetch;
