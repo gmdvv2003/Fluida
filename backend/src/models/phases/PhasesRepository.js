@@ -65,7 +65,8 @@ class PhasesRepository extends Repository {
 			.into("Phases")
 			.values({
 				...phasesDTO,
-				order: () => "(COALESCE((SELECT MAX(`order`) FROM (SELECT * FROM `Phases` WHERE `projectId` = :projectId) AS temporary) + 1, 1))",
+				order: () =>
+					"(COALESCE((SELECT MAX(`order`) FROM (SELECT * FROM `Phases` WHERE `projectId` = :projectId) AS temporary) + 2, 2))",
 			})
 			.setParameter("projectId", phasesDTO.projectId)
 			.execute();
@@ -103,10 +104,14 @@ class PhasesRepository extends Repository {
 	 * @returns
 	 */
 	async movePhase(phaseDTO, targetPositionIndex) {
+		targetPositionIndex = Math.max(targetPositionIndex + (targetPositionIndex % 2), 2);
+
 		// Pega a posição atual da fase
 		const { order } =
-			(await this.Repository.createQueryBuilder("Phases").select("Phases.order", "order").where(`phaseId = :phaseId`, phaseDTO).getRawOne()) ||
-			{};
+			(await this.Repository.createQueryBuilder("Phases")
+				.select("Phases.order", "order")
+				.where(`phaseId = :phaseId`, phaseDTO)
+				.getRawOne()) || {};
 
 		if (!order) {
 			throw new Error("Fase não encontrada.");
@@ -131,7 +136,7 @@ class PhasesRepository extends Repository {
 					rangeEnd,
 				})
 				.orderBy("Phase.order")
-				.limit(rangeEnd - rangeStart + 1)
+				.limit(rangeEnd - rangeStart + 2)
 				.getMany();
 
 			// Atualiza a posição das fases
@@ -139,9 +144,9 @@ class PhasesRepository extends Repository {
 				if (phase.phaseId === phaseDTO.phaseId) {
 					phase.order = targetPositionIndex;
 				} else if (phase.order < order && phase.order >= targetPositionIndex) {
-					phase.order += 1;
+					phase.order += 2;
 				} else if (phase.order > order && phase.order <= targetPositionIndex) {
-					phase.order -= 1;
+					phase.order -= 2;
 				}
 			});
 

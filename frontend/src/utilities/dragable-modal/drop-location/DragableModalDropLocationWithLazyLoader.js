@@ -42,17 +42,18 @@ function DragableModalDropLocationWithLazyLoader({
 	 * @param {*} clientY
 	 * @returns
 	 */
-	function getDropoffIndex(clientX, clientY) {
+	function getDropoffIndex(clientX, clientY, v) {
 		const { width, height, margin, padding, direction } = lazyLoaderRef.current?.settings;
+
+		// Pega os offsets relativos do scrollableDiv a tela
+		const { x, y } = scrollableDivRef.current?.getBoundingClientRect();
+
 		switch (direction) {
 			case "horizontal":
-				return Math.max(
-					0,
-					Math.floor((clientX - margin) / (width + padding) + scrollableDivRef.current?.scrollLeft / (width + padding))
-				);
+				return Math.max(0, Math.floor((clientX - margin) / (width + padding)));
 
 			case "vertical":
-				break;
+				return Math.max(0, Math.floor((clientY - margin) / (height + padding)));
 
 			default:
 				break;

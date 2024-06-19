@@ -13,6 +13,7 @@ function EditCard({ projectState, card }) {
 	const [isMoveCardDialogOpen, setIsMoveCardDialogOpen] = useState(false);
 
 	const [cardTitle, setCardTitle] = useState(null);
+	const [cardDescription, setCardDescription] = useState(null);
 
 	const [thisCardPhaseState, setThisCardPhaseState] = useState(card.phase);
 
@@ -23,7 +24,9 @@ function EditCard({ projectState, card }) {
 		setCardTitle(event.target.value);
 	}
 
-	function handleOnCardDescriptionChange(event) {}
+	function handleOnCardDescriptionChange(event) {
+		setCardDescription(event.target.value);
+	}
 
 	useEffect(() => {
 		const phaseState = projectState.current?.getPhaseState(card?.cardDTO?.phaseId);
@@ -110,11 +113,7 @@ function EditCard({ projectState, card }) {
 								<div className="EC-label-action">Ações</div>
 								<div className="EC-container-buttons-actions">
 									<div className="EC-actions-buttons">
-										<ModularButton
-											label="Membros"
-											customClassName={"EC-button"}
-											action={() => setIsMembersDialogOpen(!isMembersDialogOpen)}
-										/>
+										<ModularButton label="Membros" customClassName={"EC-button"} action={() => setIsMembersDialogOpen(!isMembersDialogOpen)} />
 										<ModularButton label="Etiquetas" customClassName={"EC-button"} />
 										<ModularButton label="Data" customClassName={"EC-button"} />
 										<ModularButton label="Mover" customClassName={"EC-button"} />
@@ -127,12 +126,12 @@ function EditCard({ projectState, card }) {
 												});
 											}}
 										/>
-										{cardTitle && (
+										{(cardTitle || cardDescription) && (
 											<ModularButton
 												label="Atualizar card"
 												customClassName={"EC-button-update"}
 												action={() => {
-													projectState.current?.requestUpdateCard(card?.cardDTO?.cardId, cardTitle)?.catch((error) => {
+													projectState.current?.requestUpdateCard(card?.cardDTO?.cardId, cardTitle, cardDescription)?.catch((error) => {
 														console.error(`Erro ao atualizar o card:`, error);
 													});
 												}}

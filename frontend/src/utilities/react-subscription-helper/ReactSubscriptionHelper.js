@@ -37,6 +37,10 @@ class ReactSubscriptionHelper {
 	getSubscriptions() {
 		return this.subscriptions;
 	}
+
+	beGone() {
+		delete this.subscriptions;
+	}
 }
 
 export default ReactSubscriptionHelper;

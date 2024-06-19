@@ -33,7 +33,6 @@ function Project() {
 	const projectSocketRef = useRef(null);
 	const projectStateRef = useRef(null);
 
-	const phasesContainerRef = useRef(null);
 	const phasesContainerScrollBarRef = useRef(null);
 
 	const lazyLoaderTopOffsetRef = useRef(null);
@@ -125,6 +124,18 @@ function Project() {
 				.catch(() => {});
 
 			this.#socket = socket;
+		}
+
+		get MembersSubscription() {
+			return this.#projectMembersStateListeners;
+		}
+
+		get PhasesSubscription() {
+			return this.#projectPhasesStateListeners;
+		}
+
+		get CardsSubscription() {
+			return this.#projectCardsStateListeners;
 		}
 
 		/**
@@ -425,7 +436,7 @@ function Project() {
 
 			const { cardDTO } = phaseState.cards[cardIndex];
 
-			cardDTO.cardName = newCardName || cardDTO.phaseName;
+			cardDTO.cardName = newCardName || cardDTO.cardName;
 			cardDTO.cardDescription = newCardDescription || cardDTO.cardDescription;
 
 			this.#projectCardsStateListeners[cardDTO.phaseId]?.notify(cardDTO);
@@ -628,11 +639,12 @@ function Project() {
 		 *
 		 * @param {*} cardId
 		 * @param {*} newCardName
+		 * @param {*} newCardDescription
 		 * @returns
 		 */
-		requestUpdateCard(cardId, newCardName) {
+		requestUpdateCard(cardId, newCardName, newCardDescription) {
 			return new Promise((resolve) => {
-				this.#socket.emit("updateCard", { cardId, newCardName }, (success, data) => {
+				this.#socket.emit("updateCard", { cardId, newCardName, newCardDescription }, (success, data) => {
 					success
 						? newPopup("Common", {
 								severity: "success",
@@ -752,18 +764,18 @@ function Project() {
 				setWaitingForReconnect(false);
 			};
 
-			const phaseCreated = (...data) => newProjectState.phaseCreated(data);
-			const phaseUpdated = (...data) => newProjectState.phaseUpdated(data);
-			const phaseDeleted = (...data) => newProjectState.phaseDeleted(data);
-			const phaseMoved = (...data) => newProjectState.phaseMoved(data);
+			const phaseCreated = (...data) => projectStateRef.current.phaseCreated(data);
+			const phaseUpdated = (...data) => projectStateRef.current.phaseUpdated(data);
+			const phaseDeleted = (...data) => projectStateRef.current.phaseDeleted(data);
+			const phaseMoved = (...data) => projectStateRef.current.phaseMoved(data);
 
-			const cardCreated = (...data) => newProjectState.cardCreated(data);
-			const cardUpdated = (...data) => newProjectState.cardUpdated(data);
-			const cardDeleted = (...data) => newProjectState.cardDeleted(data);
-			const cardMoved = (...data) => newProjectState.cardMoved(data);
+			const cardCreated = (...data) => projectStateRef.current.cardCreated(data);
+			const cardUpdated = (...data) => projectStateRef.current.cardUpdated(data);
+			const cardDeleted = (...data) => projectStateRef.current.cardDeleted(data);
+			const cardMoved = (...data) => projectStateRef.current.cardMoved(data);
 
-			const phasesFetched = (...data) => newProjectState.phasesFetched(data);
-			const cardsFetched = (...data) => newProjectState.cardsFetched(data);
+			const phasesFetched = (...data) => projectStateRef.current.phasesFetched(data);
+			const cardsFetched = (...data) => projectStateRef.current.cardsFetched(data);
 
 			// Adiciona os listeners
 			socket.on("disconnect", disconnect);
@@ -783,7 +795,7 @@ function Project() {
 			socket.on("cardsFetched", cardsFetched);
 
 			// Listener para quando o estado das fases do projeto mudar
-			const unbindOnPhaseStateChangeLazyLoaderUpdate = newProjectState.onProjectPhasesStateChange((phaseDTO) => {
+			const unbindOnPhaseStateChangeLazyLoaderUpdate = projectStateRef.current.onProjectPhasesStateChange((phaseDTO) => {
 				performLazyLoaderUpdateRef.current?.();
 			});
 
@@ -870,7 +882,7 @@ function Project() {
 			{projectStateRef.current && (
 				<div className="P-background" ref={phasesContainerScrollBarRef}>
 					<div className="P-phases-container-holder">
-						<ol className="P-phases-container" ref={phasesContainerRef}>
+						<ol className="P-phases-container">
 							<div ref={lazyLoaderTopOffsetRef} />
 							<MouseScrollableModal scrollableDivRef={phasesContainerScrollBarRef} ref={mouseScrollableModalRef}>
 								<DragableModalDropLocationWithLazyLoader
@@ -910,9 +922,6 @@ function Project() {
 										// "Salva" a ordem atual da fase
 										const currentPhaseOrder = phaseState.phaseDTO.order;
 
-										// Para caso a nova posição seja posterior a posição atual
-										newPosition += newPosition <= currentPhaseOrder ? 1 : 0;
-
 										if (currentPhaseOrder == newPosition) {
 											return null;
 										}
@@ -939,9 +948,9 @@ function Project() {
 											}
 
 											if (phaseState.phaseDTO.order < currentPhaseOrder && phaseState.phaseDTO.order >= newPosition) {
-												phaseState.phaseDTO.order += 1;
+												phaseState.phaseDTO.order += 2;
 											} else if (phaseState.phaseDTO.order > currentPhaseOrder && phaseState.phaseDTO.order <= newPosition) {
-												phaseState.phaseDTO.order -= 1;
+												phaseState.phaseDTO.order -= 2;
 											}
 										});
 
@@ -953,21 +962,22 @@ function Project() {
 									}}
 								>
 									<LazyLoader
+										fff1={true}
+										className="P-phases-container-lazy-loader"
 										// Função para atualizar o lazy loader
 										update={performLazyLoaderUpdateRef}
 										// Referências para os offsets
 										topLeftOffset={lazyLoaderTopOffsetRef}
 										bottomRightOffset={lazyLoaderBottomOffsetRef}
-										// Container e barra de rolagem
-										container={phasesContainerRef}
-										scrollBar={phasesContainerScrollBarRef}
+										// Referência para o scroll bar
+										scrollBarRef={phasesContainerScrollBarRef}
 										// Função para construir os elementos
 										constructElement={(phase, _, isLoading, setReference) => (
 											<Phase
 												scrollableDivRef={phasesContainerScrollBarRef}
 												isLoading={isLoading}
 												phase={phase}
-												projectState={projectStateRef}
+												projectStateRef={projectStateRef}
 												projectSocketRef={projectSocketRef}
 												callbacks={{
 													dragBegin: [

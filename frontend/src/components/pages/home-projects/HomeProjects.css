@@ -248,6 +248,11 @@
             font-weight: bold;
             font-size: 16px;
         }
+
+        .HP-button-new-project:hover{
+            background-color: var(--action-button-hover);
+        }
+
     }
 
 
