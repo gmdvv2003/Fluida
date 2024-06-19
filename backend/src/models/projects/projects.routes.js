@@ -276,7 +276,12 @@ module.exports = function (app, io, projectsController) {
 		// Função utilitária para linkar os métodos do controller com os eventos do socket
 		function linkToMethod(method) {
 			return (data, acknowledgement) => {
-				projectsController.ProjectsFunctionalityInterface[method](projectsIO, socket, data, acknowledgement);
+				projectsController.ProjectsFunctionalityInterface[method](
+					projectsIO,
+					socket,
+					data,
+					acknowledgement
+				);
 			};
 		}
 
@@ -284,22 +289,194 @@ module.exports = function (app, io, projectsController) {
 		socket.on("unsubscribeFromProject", linkToMethod("IOUnsubscribeFromProject"));
 
 		// Rotas de manipulação de cards
+
+		/**
+		 * @swagger
+		 * /createCard:
+		 *   post:
+		 *     summary: Cria um Card
+		 *     tags:
+		 *       - WebSocket
+		 *     description: Cria um card para inserir suas tarefas dentro da fase escolhida.
+		 *     responses:
+		 *       101:
+		 *         description: Conexão estabelecida com sucesso.
+		 *       400:
+		 *         description: Requisição inválida.
+		 *       500:
+		 *         description: Erro interno do servidor.
+		 */
 		socket.on("createCard", linkToMethod("IOCreateCard"));
+
+		/**
+		 * @swagger
+		 * /deleteCard:
+		 *   delete:
+		 *     summary: Deleta um Card
+		 *     tags:
+		 *       - WebSocket
+		 *     description: Deleta um Card que esta armazenando uma tarefa.
+		 *     responses:
+		 *       101:
+		 *         description: Conexão estabelecida com sucesso.
+		 *       400:
+		 *         description: Requisição inválida.
+		 *       500:
+		 *         description: Erro interno do servidor.
+		 */
 		socket.on("deleteCard", linkToMethod("IODeleteCard"));
+
+		/**
+		 * @swagger
+		 * /updateCard:
+		 *   put:
+		 *     summary: Edita um Card
+		 *     tags:
+		 *       - WebSocket
+		 *     description: Ele edita um card de tarefa, podendo alterar nome, descrição ou data.
+		 *     responses:
+		 *       101:
+		 *         description: Conexão estabelecida com sucesso.
+		 *       400:
+		 *         description: Requisição inválida.
+		 *       500:
+		 *         description: Erro interno do servidor.
+		 */
 		socket.on("updateCard", linkToMethod("IOUpdateCard"));
+
+		/**
+		 * @swagger
+		 * /moveCard:
+		 *   put:
+		 *     summary: Movimento dos Cards
+		 *     tags:
+		 *       - WebSocket
+		 *     description: Os cards se movimentão dentro de uma fase podendo deixa eles por prioridade.
+		 *     responses:
+		 *       101:
+		 *         description: Conexão estabelecida com sucesso.
+		 *       400:
+		 *         description: Requisição inválida.
+		 *       500:
+		 *         description: Erro interno do servidor.
+		 */
 		socket.on("moveCard", linkToMethod("IOMoveCard"));
+
 		socket.on("fetchCards", linkToMethod("IOFetchCards"));
 		socket.on("getTotalCards", linkToMethod("IOGetTotalCards"));
 
 		// Rotas de manipulação de fases
+
+		/**
+		 * @swagger
+		 * /createPhase:
+		 *   post:
+		 *     summary: Cria a fase do projeto
+		 *     tags:
+		 *       - WebSocket
+		 *     description: Cria uma fase para armazenar cards de tarefas.
+		 *     responses:
+		 *       101:
+		 *         description: Conexão estabelecida com sucesso.
+		 *       400:
+		 *         description: Requisição inválida.
+		 *       500:
+		 *         description: Erro interno do servidor.
+		 */
 		socket.on("createPhase", linkToMethod("IOCreatePhase"));
+
+		/**
+		 * @swagger
+		 * /deletePhase:
+		 *   delete:
+		 *     summary: Deleta a fase
+		 *     tags:
+		 *       - WebSocket
+		 *     description: Deleta a fase do projeto, junto com todos os cards que estão dentro dela.
+		 *     responses:
+		 *       101:
+		 *         description: Conexão estabelecida com sucesso.
+		 *       400:
+		 *         description: Requisição inválida.
+		 *       500:
+		 *         description: Erro interno do servidor.
+		 */
 		socket.on("deletePhase", linkToMethod("IODeletePhase"));
+
+		/**
+		 * @swagger
+		 * /updatePhase:
+		 *   put:
+		 *     summary: Edita a fase
+		 *     tags:
+		 *       - WebSocket
+		 *     description: Altera o nome da fase.
+		 *     responses:
+		 *       101:
+		 *         description: Conexão estabelecida com sucesso.
+		 *       400:
+		 *         description: Requisição inválida.
+		 *       500:
+		 *         description: Erro interno do servidor.
+		 */
 		socket.on("updatePhase", linkToMethod("IOUpdatePhase"));
+
+		/**
+		 * @swagger
+		 * /movePhase:
+		 *   put:
+		 *     summary: Movimentação das fases
+		 *     tags:
+		 *       - WebSocket
+		 *     description: Faz o movimento das fases podendo organizar se dentro do projeto.
+		 *     responses:
+		 *       101:
+		 *         description: Conexão estabelecida com sucesso.
+		 *       400:
+		 *         description: Requisição inválida.
+		 *       500:
+		 *         description: Erro interno do servidor.
+		 */
 		socket.on("movePhase", linkToMethod("IOMovePhase"));
+
+		/**
+		 * @swagger
+		 * /fetchPhases:
+		 *   put:
+		 *     summary: Criar um card para inserir suas tarefas
+		 *     tags:
+		 *       - WebSocket
+		 *     description: Faz a criação dos cards dentro da fase escolhida.
+		 *     responses:
+		 *       101:
+		 *         description: Conexão estabelecida com sucesso.
+		 *       400:
+		 *         description: Requisição inválida.
+		 *       500:
+		 *         description: Erro interno do servidor.
+		 */
 		socket.on("fetchPhases", linkToMethod("IOFetchPhases"));
+
+		/**
+		 * @swagger
+		 * /getTotalPhases:
+		 *   get:
+		 *     summary: Gerencia o total de fases
+		 *     tags:
+		 *       - WebSocket
+		 *     description: Gerencia em tempo real o total de fases que estão criadas.
+		 *     responses:
+		 *       101:
+		 *         description: Conexão estabelecida com sucesso.
+		 *       400:
+		 *         description: Requisição inválida.
+		 *       500:
+		 *         description: Erro interno do servidor.
+		 */
 		socket.on("getTotalPhases", linkToMethod("IOGetTotalPhases"));
 
 		// Rotas do chat
+
 		socket.on("sendMessage", linkToMethod("IOSendMessage"));
 		socket.on("deleteMessage", linkToMethod("IODeleteMessage"));
 		socket.on("editMessage", linkToMethod("IOEditMessage"));
